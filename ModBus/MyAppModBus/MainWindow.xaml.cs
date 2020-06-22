@@ -1,5 +1,6 @@
 ﻿using Modbus.Device;
 using System;
+using System.Diagnostics;
 using System.IO.Ports;
 using System.Threading;
 using System.Windows;
@@ -48,6 +49,10 @@ namespace MyAppModBus {
       _serialPort = new SerialPort();
 
       try {
+        if ( _serialPort.IsOpen ) {
+          _serialPort.Close();
+          disconnectComPort.Visibility = Visibility.Hidden;
+        }
         _serialPort.PortName = comboBoxMainPorts.Text;
         _serialPort.BaudRate = 19200;
         _serialPort.Parity = Parity.None;
@@ -55,11 +60,10 @@ namespace MyAppModBus {
         _serialPort.ReadTimeout = 300;
         _serialPort.Open();
         ModbusSerialMaster master = ModbusSerialMaster.CreateRtu( _serialPort );
-        connectComPort.Content = "Откл";
+        disconnectComPort.Visibility = Visibility.Visible;
         textViewer.Text = $"Порт {_serialPort.PortName} подключен";
       }
-      catch ( Exception ex ) {
-
+      catch ( Exception ex ) { 
         connectComPort.Content = "Подкл";
         _serialPort.Close();
         textViewer.Text = ex.Message;
@@ -67,6 +71,12 @@ namespace MyAppModBus {
       }
 
 
+    }
+
+    private void disconnectToDevice(object sender, RoutedEventArgs e ) {
+      _serialPort.Close();
+      disconnectComPort.Visibility = Visibility.Hidden;
+      textViewer.Text = $"Порт {_serialPort.PortName} закрыт";
     }
 
 

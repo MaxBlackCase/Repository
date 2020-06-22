@@ -39,6 +39,15 @@
               Height="23"
               VerticalAlignment="Bottom"
               Click="connectToDevice" />
+      <Button Grid.Row="0"
+              Grid.Column="1"
+              Name="disconnectComPort"
+              Content="Откл"
+              Margin="5,0,5,5"
+              Height="23"
+              VerticalAlignment="Bottom"
+              Click="disconnectToDevice" 
+              Visibility="Hidden"/>
     </Grid>
     <Grid Grid.Row="1">
     </Grid>
