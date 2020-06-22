@@ -21,7 +21,8 @@
               Grid.Column="0"
               Name="comboBoxMainPorts"
               Height="30"
-              Margin="20 0 20 0" />
+              Margin="20 0 20 0"
+              SelectionChanged="addItemToComboBox" />
     <GroupBox Grid.Row="0" Grid.Column="1" Margin="10">
       <StackPanel Height="auto">
         <Button Grid.Row="0"
