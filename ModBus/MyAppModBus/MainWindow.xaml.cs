@@ -45,6 +45,11 @@ namespace MyAppModBus {
       comboBoxMainPorts.SelectedIndex = 0;
     }
 
+    /// <summary>
+    /// Открытие закрытие COM - порта
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void connectToDevice( object sender, RoutedEventArgs e ) {
       _serialPort = new SerialPort();
 
@@ -57,9 +62,13 @@ namespace MyAppModBus {
         _serialPort.BaudRate = 19200;
         _serialPort.Parity = Parity.None;
         _serialPort.StopBits = StopBits.One;
+
         _serialPort.ReadTimeout = 300;
+        _serialPort.WriteTimeout = 300;
+
         _serialPort.Open();
         ModbusSerialMaster master = ModbusSerialMaster.CreateRtu( _serialPort );
+
         disconnectComPort.Visibility = Visibility.Visible;
         textViewer.Text = $"Порт {_serialPort.PortName} подключен";
       }
