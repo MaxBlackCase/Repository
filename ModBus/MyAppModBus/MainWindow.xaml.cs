@@ -6,6 +6,7 @@ using System.IO.Ports;
 using System.Threading;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Threading;
 
 namespace MyAppModBus {
   /// <summary>
@@ -14,13 +15,14 @@ namespace MyAppModBus {
   public partial class MainWindow : Window {
 
     const byte slaveID = 1;
+    private DispatcherTimer timer;
     public static string result;
     public static SerialPort _serialPort = null;
 
     public MainWindow() {
       InitializeComponent();
       addItemToComboBox();
-
+      btnGetHoldReg.IsEnabled = false;
     }
 
     public void loadSerialPort() {
@@ -55,6 +57,7 @@ namespace MyAppModBus {
     /// <param name="e"></param>
     public void connectToDevice( object sender, RoutedEventArgs e ) {
       _serialPort = new SerialPort();
+      timer = new DispatcherTimer();
       try {
         if ( _serialPort.IsOpen ) {
           _serialPort.Close();
@@ -67,12 +70,15 @@ namespace MyAppModBus {
         _serialPort.StopBits = StopBits.One;
         _serialPort.Open();
 
+        timer.Tick += new EventHandler( getHoldReg );
+        timer.Interval = new TimeSpan( 0, 0, 1 );
+        timer.Start();
+
         btnGetHoldReg.IsEnabled = true;
         comboBoxMainPorts.IsEnabled = false;
         disconnectComPort.Visibility = Visibility.Visible;
         textViewer.Text = $"Порт {_serialPort.PortName} подключен";
 
-        Thread.Sleep( 1000 );
 
       }
       catch ( Exception ex ) {
@@ -86,6 +92,7 @@ namespace MyAppModBus {
     }
 
     private void disconnectToDevice( object sender, RoutedEventArgs e ) {
+      timer.Stop();
       _serialPort.Close();
       comboBoxMainPorts.IsEnabled = true;
       disconnectComPort.Visibility = Visibility.Hidden;
@@ -94,14 +101,12 @@ namespace MyAppModBus {
     }
 
 
-    private void getHoldReg( object sender, RoutedEventArgs e ) {
+    private void getHoldReg( object sender, EventArgs e ) {
 
-      textViewer.Text = "";
-
-      byte funcCode = 6;
+      
+      byte funcCode = 3;
       ushort startAddr = 0;
-      ushort numOfPoints = 1;
-
+      ushort numOfPoints = 9;
 
       //Создание запроса
       byte[] frame = new byte[ 8 ];
@@ -116,15 +121,20 @@ namespace MyAppModBus {
       frame[ 7 ] = checkSum[ 1 ];
 
       //Вывод в тектовое окно
-
+      textViewer.Text += "\n\n";
       foreach ( var item in frame ) {
 
-        textViewer.Text += string.Format( "{0:X2} ", item );
+        textViewer.Text += string.Format( "{0:X2} ", item);
 
       }
 
     }
 
+    /// <summary>
+    /// Подсчет контрольной суммы
+    /// </summary>
+    /// <param name="data">Данные массива запроса</param>
+    /// <returns></returns>
     private static byte[] CRC16( byte[] data ) {
 
       byte[] checkSum = new byte[ 2 ];
