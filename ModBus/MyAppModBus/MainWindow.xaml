@@ -46,8 +46,9 @@
               Margin="5,0,5,5"
               Height="23"
               VerticalAlignment="Bottom"
-              Click="disconnectToDevice" 
-              Visibility="Hidden"/>
+              Click="disconnectToDevice"
+              Visibility="Hidden" />
+
     </Grid>
     <Grid Grid.Row="1">
     </Grid>
@@ -68,5 +69,16 @@
                  Name="textViewer"
                  TextWrapping="Wrap" />
     </ScrollViewer>
+    <Button Grid.Row="1"
+            Grid.Column="0"
+            Name="btnGetHoldReg"
+            Content="Запр"
+            Margin="5"
+            FontSize="14"
+            Width="100"
+            Height="40"
+            Click="getHoldReg"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top" />
   </Grid>
 </Window>
