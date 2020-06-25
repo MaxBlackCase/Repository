@@ -1,84 +1,114 @@
-﻿<Window x:Class="MyAppModBus.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MyAppModBus"
-        mc:Ignorable="d"
-        Title="MainWindow"
-        Height="400"
-        Width="600"
-        ResizeMode="NoResize">
+﻿<Window
+  x:Class="MyAppModBus.MainWindow"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:local="clr-namespace:MyAppModBus"
+  mc:Ignorable="d"
+  Title="MainWindow"
+  Height="400"
+  Width="600"
+  ResizeMode="NoResize">
   <Grid>
     <Grid.RowDefinitions>
-      <RowDefinition Height="auto" />
-      <RowDefinition Height="*" />
+      <RowDefinition
+        Height="auto" />
+      <RowDefinition
+        Height="*" />
     </Grid.RowDefinitions>
     <Grid.ColumnDefinitions>
       <ColumnDefinition />
       <ColumnDefinition />
     </Grid.ColumnDefinitions>
-    <Grid Grid.Row="0">
+    <Grid
+      Grid.Row="0">
       <Grid.RowDefinitions>
-        <RowDefinition Height="auto" />
-        <RowDefinition Height="auto" />
+        <RowDefinition
+          Height="auto" />
+        <RowDefinition
+          Height="auto" />
+        <RowDefinition
+          Height="auto" />
       </Grid.RowDefinitions>
       <Grid.ColumnDefinitions>
         <ColumnDefinition />
         <ColumnDefinition />
       </Grid.ColumnDefinitions>
-      <ComboBox Grid.Row="0"
-                Grid.Column="0"
-                Name="comboBoxMainPorts"
-                Margin="5" />
-      <Button Grid.Row="0"
-              Grid.Column="1"
-              Name="connectComPort"
-              Content="Подкл"
-              Margin="5,0,5,5"
-              Height="23"
-              VerticalAlignment="Bottom"
-              Click="connectToDevice" />
-      <Button Grid.Row="0"
-              Grid.Column="1"
-              Name="disconnectComPort"
-              Content="Откл"
-              Margin="5,0,5,5"
-              Height="23"
-              VerticalAlignment="Bottom"
-              Click="disconnectToDevice"
-              Visibility="Hidden" />
-
+      <ComboBox
+        Grid.Row="0"
+        Grid.Column="0"
+        Name="comboBoxMainPorts"
+        Margin="5" />
+      <Button
+        Grid.Row="0"
+        Grid.Column="1"
+        Name="connectComPort"
+        Content="Подкл"
+        Margin="5,0,5,5"
+        Height="23"
+        VerticalAlignment="Bottom"
+        Click="connectToDevice" />
+      <Button
+        Grid.Row="0"
+        Grid.Column="1"
+        Name="disconnectComPort"
+        Content="Откл"
+        Margin="5,0,5,5"
+        Height="23"
+        VerticalAlignment="Bottom"
+        Click="disconnectToDevice"
+        Visibility="Hidden" />
+      <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
+          <Ellipse
+            Name="LimitSwitch_1"
+            Fill="Red"
+            Width="20"
+            Height="20"
+            HorizontalAlignment="Center"
+            Margin="5 5 5 5" />
+          <Ellipse
+            Name="LimitSwitch_2"
+            Fill="Red"
+            Width="20"
+            Height="20"
+            HorizontalAlignment="Center"
+            Margin="0 5" />
+      </StackPanel>
     </Grid>
-    <Grid Grid.Row="1">
+    <Grid
+      Grid.Row="1">
     </Grid>
-    <TextBlock Grid.Row="0"
-               Grid.Column="1"
-               Text="Выводимые данные"
-               VerticalAlignment="Center"
-               Margin="5 0 0 0"
-               FontSize="14" />
-    <ScrollViewer Grid.Row="1"
-                  Grid.Column="1"
-                  CanContentScroll="True">
+    <TextBlock
+      Grid.Row="0"
+      Grid.Column="1"
+      Text="Выводимые данные"
+      VerticalAlignment="Center"
+      Margin="5 0 0 0"
+      FontSize="14" />
+    <ScrollViewer
+      Grid.Row="1"
+      Grid.Column="1"
+      CanContentScroll="True">
 
-      <TextBlock Background="#212121"
-                 Foreground="#fff"
-                 Margin="5"
-                 Padding="5"
-                 Name="textViewer"
-                 TextWrapping="Wrap" />
+      <TextBlock
+        Background="#212121"
+        Foreground="#fff"
+        Margin="5"
+        Padding="5"
+        Name="textViewer"
+        TextWrapping="Wrap" />
     </ScrollViewer>
-    <Button Grid.Row="1"
-            Grid.Column="0"
-            Name="btnGetHoldReg"
-            Content="Запр"
-            Margin="5"
-            FontSize="14"
-            Width="100"
-            Height="40"
-            Click="getHoldReg"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top" />
+    <Button
+      Grid.Row="1"
+      Grid.Column="0"
+      Name="btnGetHoldReg"
+      Content="Запр"
+      Margin="5"
+      FontSize="14"
+      Width="100"
+      Height="40"
+      HorizontalAlignment="Left"
+      VerticalAlignment="Top" />
   </Grid>
 </Window>

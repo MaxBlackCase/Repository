@@ -1,12 +1,10 @@
 ﻿using Modbus.Device;
-using Modbus.Utility;
 using System;
-using System.Collections.Generic;
 using System.IO.Ports;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading;
 using System.Windows;
-using System.Windows.Documents;
+using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace MyAppModBus {
@@ -16,20 +14,20 @@ namespace MyAppModBus {
   public partial class MainWindow : Window {
 
     const byte slaveID = 1;
+    private ushort startAddress = 0;
+    private ushort numburOfPoints = 18;
     private DispatcherTimer timer;
     public static string result;
     public static SerialPort _serialPort = null;
+    public static ModbusSerialMaster master = null;
 
     public MainWindow() {
       InitializeComponent();
       addItemToComboBox();
       btnGetHoldReg.IsEnabled = false;
-    }
-
-    public void loadSerialPort() {
-
 
     }
+
     //Инициализация портов
     private void addItemToComboBox() {
       //Получение портов
@@ -52,7 +50,7 @@ namespace MyAppModBus {
     }
 
     /// <summary>
-    /// Открытие закрытие COM - порта
+    /// Подключение по SerilaPort(RTU) к Master устройству
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -65,14 +63,20 @@ namespace MyAppModBus {
           disconnectComPort.Visibility = Visibility.Hidden;
           btnGetHoldReg.IsEnabled = false;
         }
+
+        #region <Настройки RTU подключения>
         _serialPort.PortName = comboBoxMainPorts.Text;
         _serialPort.BaudRate = 119200;
         _serialPort.Parity = Parity.None;
         _serialPort.StopBits = StopBits.One;
-        _serialPort.ReadTimeout = 100;
+        _serialPort.ReadTimeout = 1000;
         _serialPort.WriteTimeout = 300;
         _serialPort.DtrEnable = true;
         _serialPort.Open();
+        #endregion
+
+        master = ModbusSerialMaster.CreateRtu( _serialPort );
+
         timer.Tick += new EventHandler( getHoldReg );
         timer.Interval = new TimeSpan( 0, 0, 1 );
         timer.Start();
@@ -82,12 +86,11 @@ namespace MyAppModBus {
         disconnectComPort.Visibility = Visibility.Visible;
         textViewer.Text = $"Порт {_serialPort.PortName} подключен";
 
-
       }
-      catch ( Exception ex ) {
+      catch ( Exception err ) {
         connectComPort.Content = "Подкл";
         _serialPort.Close();
-        textViewer.Text += ex.Message;
+        textViewer.Text = $"Ошибка: {err.Message}";
 
       }
 
@@ -103,34 +106,33 @@ namespace MyAppModBus {
       btnGetHoldReg.IsEnabled = false;
     }
 
-    public void getHoldReg( object sender, EventArgs e ) {
+    private void getHoldReg( object sender, EventArgs e ) {
 
 
       try {
-        //byte funcCode = 3;
-        ushort startAddr = 0;
-        ushort numOfPoints = 18;
 
-        ModbusSerialMaster master = ModbusSerialMaster.CreateRtu( _serialPort );
 
-        ushort[] result = master.ReadHoldingRegisters( slaveID, startAddr, numOfPoints );
+        master = ModbusSerialMaster.CreateRtu( _serialPort );
+        ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
 
         textViewer.Text = "";
         int i = 0;
         foreach ( ushort item in result ) {
 
           textViewer.Text += $"Регистр: {i} \t{item}\n";
-          
+
           i++;
         }
+
+        
+        SetValSingleRegister();
       }
       catch ( Exception err ) {
 
-        textViewer.Text = $"Error: {err.Message}";
+        textViewer.Text = $"Ошибка: {err.Message}";
       }
 
-
-      #region Контрольная сумма
+      #region Просчет контрольной суммы, если понадобится
       //Создание запроса
 
       //byte[] frame = new byte[ 8 ];
@@ -152,31 +154,66 @@ namespace MyAppModBus {
 
       //}
 
+      /// <summary>
+      /// Метод подсчет контрольной суммы
+      /// </summary>
+      /// <param name = "data" > Данные массива запроса</param>
+      /// <returns></returns>
+      //private static byte[] CRC16( byte[] data ) {
+
+      //  byte[] checkSum = new byte[ 2 ];
+      //  ushort reg_crc = 0xFFFF;
+      //  for ( int i = 0; i < data.Length; i++ ) {
+      //    if ( (reg_crc & 0x01) == 1 ) {
+      //      reg_crc = (ushort)((reg_crc >> 1) ^ 0xA001);
+      //    }
+      //    else {
+      //      reg_crc = (ushort)(reg_crc >> 1);
+      //    }
+      //  }
+
+      //  checkSum[ 1 ] = (byte)((reg_crc >> 8) & 0xFF);
+      //  checkSum[ 0 ] = (byte)(reg_crc & 0xFF);
+      //  return checkSum;
+      //}
+      #endregion
+
+    }
+    /// <summary>
+    /// Получение данных концевиков
+    /// </summary>
+    private void SetValSingleRegister() {
+
+      try {
+        if ( _serialPort.IsOpen ) {
+
+          ushort[] res = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
+          int[] arrLimitSwitch = new int[ 2 ];
+          arrLimitSwitch[ 0 ] = Convert.ToInt32( res[ 9 ] );
+          arrLimitSwitch[ 1 ] = Convert.ToInt32( res[ 10 ] );
+
+          if(arrLimitSwitch[0] == 1 ) {
+            LimitSwitch_1.Fill = Brushes.Green;
+          }
+          else {
+            LimitSwitch_1.Fill = Brushes.Red;
+          }
+          if(arrLimitSwitch[1] == 1 ) {
+            LimitSwitch_2.Fill = Brushes.Green;
+          }
+          else {
+            LimitSwitch_2.Fill = Brushes.Red;
+          }
+        }
+
+      }
+      catch ( Exception err ) {
+
+        textViewer.Text = $"Ошибка: {err.Message}";
+      }
+
     }
 
-    /// <summary>
-    /// Подсчет контрольной суммы
-    /// </summary>
-    /// <param name = "data" > Данные массива запроса</param>
-    /// <returns></returns>
-    //private static byte[] CRC16( byte[] data ) {
-
-    //  byte[] checkSum = new byte[ 2 ];
-    //  ushort reg_crc = 0xFFFF;
-    //  for ( int i = 0; i < data.Length; i++ ) {
-    //    if ( (reg_crc & 0x01) == 1 ) {
-    //      reg_crc = (ushort)((reg_crc >> 1) ^ 0xA001);
-    //    }
-    //    else {
-    //      reg_crc = (ushort)(reg_crc >> 1);
-    //    }
-    //  }
-
-    //  checkSum[ 1 ] = (byte)((reg_crc >> 8) & 0xFF);
-    //  checkSum[ 0 ] = (byte)(reg_crc & 0xFF);
-    //  return checkSum;
-    //}
-    #endregion
 
   }
 }
