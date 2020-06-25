@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace MyAppModBus {
@@ -69,18 +70,18 @@ namespace MyAppModBus {
         _serialPort.BaudRate = 119200;
         _serialPort.Parity = Parity.None;
         _serialPort.StopBits = StopBits.One;
-        _serialPort.ReadTimeout = 1000;
-        _serialPort.WriteTimeout = 300;
+        _serialPort.ReadTimeout = 100;
+        _serialPort.WriteTimeout = 100;
         _serialPort.DtrEnable = true;
         _serialPort.Open();
         #endregion
 
         master = ModbusSerialMaster.CreateRtu( _serialPort );
-
+        #region <Timer>
         timer.Tick += new EventHandler( getHoldReg );
-        timer.Interval = new TimeSpan( 0, 0, 1 );
+        timer.Interval = new TimeSpan( 0, 0, 1 / 1000 );
         timer.Start();
-
+        #endregion
         btnGetHoldReg.IsEnabled = true;
         comboBoxMainPorts.IsEnabled = false;
         disconnectComPort.Visibility = Visibility.Visible;
@@ -91,10 +92,7 @@ namespace MyAppModBus {
         connectComPort.Content = "Подкл";
         _serialPort.Close();
         textViewer.Text = $"Ошибка: {err.Message}";
-
       }
-
-
     }
 
     private void disconnectToDevice( object sender, RoutedEventArgs e ) {
@@ -104,6 +102,7 @@ namespace MyAppModBus {
       disconnectComPort.Visibility = Visibility.Hidden;
       textViewer.Text = $"Порт {_serialPort.PortName} закрыт";
       btnGetHoldReg.IsEnabled = false;
+
     }
 
     private void getHoldReg( object sender, EventArgs e ) {
@@ -120,11 +119,10 @@ namespace MyAppModBus {
         foreach ( ushort item in result ) {
 
           textViewer.Text += $"Регистр: {i} \t{item}\n";
-
           i++;
         }
 
-        
+
         SetValSingleRegister();
       }
       catch ( Exception err ) {
@@ -192,18 +190,31 @@ namespace MyAppModBus {
           arrLimitSwitch[ 0 ] = Convert.ToInt32( res[ 9 ] );
           arrLimitSwitch[ 1 ] = Convert.ToInt32( res[ 10 ] );
 
-          if(arrLimitSwitch[0] == 1 ) {
-            LimitSwitch_1.Fill = Brushes.Green;
+
+          for ( int i = 0; i < LimSwPanel.Children.Count; i++ ) {
+            LimSwPanel.Children.Clear();
+
           }
-          else {
-            LimitSwitch_1.Fill = Brushes.Red;
+
+          foreach ( var item in arrLimitSwitch ) {
+            if ( item == 1 ) {
+              Ellipse LimSwEllipse = new Ellipse();
+              LimSwEllipse.Width = 20;
+              LimSwEllipse.Height = 20;
+              LimSwEllipse.Fill = Brushes.Green;
+              LimSwEllipse.Margin = new Thickness( 15, 5, 15, 5 );
+              LimSwPanel.Children.Add( LimSwEllipse );
+            }
+            else {
+              Ellipse LimSwEllipse = new Ellipse();
+              LimSwEllipse.Width = 20;
+              LimSwEllipse.Height = 20;
+              LimSwEllipse.Fill = Brushes.Red;
+              LimSwEllipse.Margin = new Thickness( 15, 5, 15, 5 );
+              LimSwPanel.Children.Add( LimSwEllipse );
+            }
           }
-          if(arrLimitSwitch[1] == 1 ) {
-            LimitSwitch_2.Fill = Brushes.Green;
-          }
-          else {
-            LimitSwitch_2.Fill = Brushes.Red;
-          }
+
         }
 
       }
@@ -214,6 +225,9 @@ namespace MyAppModBus {
 
     }
 
+    private void WriteValToRegisters(object sender, RoutedEventArgs e ) {
+
+    }
 
   }
 }

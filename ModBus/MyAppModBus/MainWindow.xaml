@@ -59,21 +59,17 @@
         VerticalAlignment="Bottom"
         Click="disconnectToDevice"
         Visibility="Hidden" />
-      <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
-          <Ellipse
-            Name="LimitSwitch_1"
-            Fill="Red"
-            Width="20"
-            Height="20"
-            HorizontalAlignment="Center"
-            Margin="5 5 5 5" />
-          <Ellipse
-            Name="LimitSwitch_2"
-            Fill="Red"
-            Width="20"
-            Height="20"
-            HorizontalAlignment="Center"
-            Margin="0 5" />
+      <StackPanel
+        Name="LimSwPanel"
+        Grid.Row="2"
+        Grid.Column="0"
+        Orientation="Horizontal">
+        
+      </StackPanel>
+      <StackPanel >
+        <RadioButton />
+        <RadioButton />
+        <RadioButton />
       </StackPanel>
     </Grid>
     <Grid
@@ -90,7 +86,6 @@
       Grid.Row="1"
       Grid.Column="1"
       CanContentScroll="True">
-
       <TextBlock
         Background="#212121"
         Foreground="#fff"
@@ -108,6 +103,7 @@
       FontSize="14"
       Width="100"
       Height="40"
+      Click="getHoldReg"
       HorizontalAlignment="Left"
       VerticalAlignment="Top" />
   </Grid>
