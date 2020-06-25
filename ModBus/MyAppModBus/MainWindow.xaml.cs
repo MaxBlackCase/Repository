@@ -77,9 +77,9 @@ namespace MyAppModBus {
 
         master = ModbusSerialMaster.CreateRtu( _serialPort );
         #region <Timer>
-        //timer.Tick += new EventHandler( getHoldReg );
-        //timer.Interval = new TimeSpan( 0, 0, 1 / 1000 );
-        //timer.Start();
+        timer.Tick += new EventHandler( getHoldReg );
+        timer.Interval = new TimeSpan( 0, 0, 1 / 1000 );
+        timer.Start();
         #endregion
         btnGetHoldReg.IsEnabled = true;
         comboBoxMainPorts.IsEnabled = false;
