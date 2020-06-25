@@ -1,7 +1,6 @@
 ﻿using Modbus.Device;
 using System;
 using System.IO.Ports;
-using System.Security.Cryptography.X509Certificates;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -78,9 +77,9 @@ namespace MyAppModBus {
 
         master = ModbusSerialMaster.CreateRtu( _serialPort );
         #region <Timer>
-        timer.Tick += new EventHandler( getHoldReg );
-        timer.Interval = new TimeSpan( 0, 0, 1 / 1000 );
-        timer.Start();
+        //timer.Tick += new EventHandler( getHoldReg );
+        //timer.Interval = new TimeSpan( 0, 0, 1 / 1000 );
+        //timer.Start();
         #endregion
         btnGetHoldReg.IsEnabled = true;
         comboBoxMainPorts.IsEnabled = false;
@@ -89,8 +88,10 @@ namespace MyAppModBus {
 
       }
       catch ( Exception err ) {
-        connectComPort.Content = "Подкл";
         _serialPort.Close();
+        connectComPort.Content = "Подкл";
+        comboBoxMainPorts.IsEnabled = true;
+        disconnectComPort.Visibility = Visibility.Hidden;
         textViewer.Text = $"Ошибка: {err.Message}";
       }
     }
@@ -193,7 +194,6 @@ namespace MyAppModBus {
 
           for ( int i = 0; i < LimSwPanel.Children.Count; i++ ) {
             LimSwPanel.Children.Clear();
-
           }
 
           foreach ( var item in arrLimitSwitch ) {
@@ -225,8 +225,37 @@ namespace MyAppModBus {
 
     }
 
-    private void WriteValToRegisters(object sender, RoutedEventArgs e ) {
+    private void WriteValToRegisters( object sender, RoutedEventArgs e ) {
+      try {
+        if ( _serialPort.IsOpen ) {
 
+
+
+          CheckBox pressed = (CheckBox)sender;
+          
+          
+
+        }
+
+      }
+      catch ( Exception err ) {
+
+        textViewer.Text = $"Ошибка: {err.Message}";
+      }
+    }
+    private void RewriteValToRegisters( object sender, RoutedEventArgs e ) {
+      try {
+        if ( _serialPort.IsOpen ) {
+
+
+
+        }
+
+      }
+      catch ( Exception err ) {
+
+        textViewer.Text = $"Ошибка: {err.Message}";
+      }
     }
 
   }

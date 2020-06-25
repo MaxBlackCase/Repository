@@ -9,11 +9,9 @@
   Title="MainWindow"
   Height="400"
   Width="600"
-  ResizeMode="NoResize">
+  ResizeMode="CanResize">
   <Grid>
     <Grid.RowDefinitions>
-      <RowDefinition
-        Height="auto" />
       <RowDefinition
         Height="*" />
     </Grid.RowDefinitions>
@@ -22,7 +20,8 @@
       <ColumnDefinition />
     </Grid.ColumnDefinitions>
     <Grid
-      Grid.Row="0">
+      Grid.Row="0"
+      Grid.Column="0">
       <Grid.RowDefinitions>
         <RowDefinition
           Height="auto" />
@@ -32,8 +31,10 @@
           Height="auto" />
       </Grid.RowDefinitions>
       <Grid.ColumnDefinitions>
-        <ColumnDefinition />
-        <ColumnDefinition />
+        <ColumnDefinition
+          Width="2*" />
+        <ColumnDefinition
+          Width="*" />
       </Grid.ColumnDefinitions>
       <ComboBox
         Grid.Row="0"
@@ -59,52 +60,82 @@
         VerticalAlignment="Bottom"
         Click="disconnectToDevice"
         Visibility="Hidden" />
+
+      <StackPanel
+        Grid.Row="1"
+        Grid.Column="0"
+        Grid.ColumnSpan="2"
+        Orientation="Horizontal"
+        VerticalAlignment="Top"
+        x:Name="CheckBoxWriteRegisters">
+        <CheckBox
+          Name="checkBoxWrite_1"
+          Content="1000"
+          Margin="15 5"
+          IsChecked="false"
+          Checked="WriteValToRegisters"
+          Unchecked="RewriteValToRegisters"/>
+        <CheckBox
+          Name="checkBoxWrite_2"
+          Content="2000"
+          Margin="15 5"
+          IsChecked="false"
+          Checked="WriteValToRegisters"
+          Unchecked="RewriteValToRegisters"/>
+        <CheckBox
+          Name="checkBoxWrite_3"
+          Content="3000"
+          Margin="15 5"
+          IsChecked="false"
+          Checked="WriteValToRegisters"
+          Unchecked="RewriteValToRegisters"/>
+      </StackPanel>
+
+      <Button
+        Grid.Row="2"
+        Grid.Column="0"
+        Name="btnGetHoldReg"
+        Content="Запрос"
+        Margin="5"
+        FontSize="14"
+        Width="100"
+        Height="25"
+        Click="getHoldReg"
+        HorizontalAlignment="Left"
+        VerticalAlignment="Top" />
       <StackPanel
         Name="LimSwPanel"
         Grid.Row="2"
-        Grid.Column="0"
+        Grid.Column="1"
         Orientation="Horizontal">
-        
-      </StackPanel>
-      <StackPanel >
-        <RadioButton />
-        <RadioButton />
-        <RadioButton />
       </StackPanel>
     </Grid>
     <Grid
-      Grid.Row="1">
-    </Grid>
-    <TextBlock
       Grid.Row="0"
       Grid.Column="1"
-      Text="Выводимые данные"
-      VerticalAlignment="Center"
-      Margin="5 0 0 0"
-      FontSize="14" />
-    <ScrollViewer
-      Grid.Row="1"
-      Grid.Column="1"
-      CanContentScroll="True">
+      Margin="5">
+      <Grid.RowDefinitions>
+        <RowDefinition
+          Height="auto" />
+        <RowDefinition
+          Height="*" />
+      </Grid.RowDefinitions>
       <TextBlock
-        Background="#212121"
-        Foreground="#fff"
-        Margin="5"
-        Padding="5"
-        Name="textViewer"
-        TextWrapping="Wrap" />
-    </ScrollViewer>
-    <Button
-      Grid.Row="1"
-      Grid.Column="0"
-      Name="btnGetHoldReg"
-      Content="Запр"
-      Margin="5"
-      FontSize="14"
-      Width="100"
-      Height="40"
-      Click="getHoldReg"
-      HorizontalAlignment="Left"
-      VerticalAlignment="Top" />
+        Grid.Row="0"
+        Text="Выводимые данные"
+        VerticalAlignment="Center"
+        FontSize="14" />
+      <ScrollViewer
+        Grid.Row="1"
+        CanContentScroll="True">
+        <TextBlock
+          Background="#212121"
+          Foreground="#fff"
+          Margin="5"
+          Padding="5"
+          Name="textViewer"
+          TextWrapping="Wrap" />
+      </ScrollViewer>
+    </Grid>
   </Grid>
 </Window>
