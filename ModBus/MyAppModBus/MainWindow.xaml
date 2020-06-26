@@ -10,8 +10,7 @@
   Height="450"
   Width="600"
   ResizeMode="NoResize"
-  WindowStartupLocation="CenterScreen"
-  >
+  WindowStartupLocation="CenterScreen">
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition
@@ -83,14 +82,14 @@
           Margin="15 5"
           IsChecked="false"
           Checked="CheckValToRegisters"
-          Unchecked="UncheckValToRegisters"/>
+          Unchecked="UncheckValToRegisters" />
         <CheckBox
           Name="checkBoxWrite_3"
           Content="3000"
           Margin="15 5"
           IsChecked="false"
           Checked="CheckValToRegisters"
-          Unchecked="UncheckValToRegisters"/>
+          Unchecked="UncheckValToRegisters" />
       </StackPanel>
 
       <Button

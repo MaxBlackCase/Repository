@@ -225,6 +225,8 @@ namespace MyAppModBus {
 
     }
 
+
+
     private void CheckValToRegisters( object sender, RoutedEventArgs e ) {
       try {
         CheckBox pressed = (CheckBox)sender;
