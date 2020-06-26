@@ -94,6 +94,7 @@ namespace MyAppModBus {
         checkBoxWrite_2.IsEnabled = true;
         checkBoxWrite_3.IsEnabled = true;
         btnGetHoldReg.IsEnabled = true;
+        decTextBox.IsEnabled = false;
         decButtonTimeout.IsEnabled = false;
         comboBoxMainPorts.IsEnabled = false;
         disconnectComPort.Visibility = Visibility.Visible;
@@ -122,6 +123,7 @@ namespace MyAppModBus {
       disconnectComPort.Visibility = Visibility.Hidden;
       textViewer.Text = $"Порт {_serialPort.PortName} закрыт";
       decButtonTimeout.IsEnabled = true;
+      decTextBox.IsEnabled = true;
       btnGetHoldReg.IsEnabled = false;
       btnGetHoldReg.IsEnabled = false;
       #region checkBoxWrite
