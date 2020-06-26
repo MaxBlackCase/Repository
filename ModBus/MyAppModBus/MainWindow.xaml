@@ -8,7 +8,7 @@
   mc:Ignorable="d"
   Title="MainWindow"
   Height="450"
-  Width="600"
+  Width="700"
   ResizeMode="NoResize"
   WindowStartupLocation="CenterScreen">
   <Grid>
@@ -24,6 +24,8 @@
       Grid.Row="0"
       Grid.Column="0">
       <Grid.RowDefinitions>
+        <RowDefinition
+          Height="auto" />
         <RowDefinition
           Height="auto" />
         <RowDefinition
@@ -46,7 +48,7 @@
         Grid.Row="0"
         Grid.Column="1"
         Name="connectComPort"
-        Content="Подкл"
+        Content="Подключить"
         Margin="5,0,5,5"
         Height="23"
         VerticalAlignment="Bottom"
@@ -55,7 +57,7 @@
         Grid.Row="0"
         Grid.Column="1"
         Name="disconnectComPort"
-        Content="Откл"
+        Content="Отключить"
         Margin="5,0,5,5"
         Height="23"
         VerticalAlignment="Bottom"
@@ -66,6 +68,7 @@
         Grid.Row="1"
         Grid.Column="0"
         Grid.ColumnSpan="2"
+        Width="auto"
         Orientation="Horizontal"
         VerticalAlignment="Top"
         x:Name="CheckBoxWriteRegisters">
@@ -75,21 +78,24 @@
           Margin="15 5"
           IsChecked="false"
           Checked="CheckValToRegisters"
-          Unchecked="UncheckValToRegisters"/>
+          Unchecked="UncheckValToRegisters"
+          IsEnabled="false"/>
         <CheckBox
           Name="checkBoxWrite_2"
           Content="2000"
           Margin="15 5"
           IsChecked="false"
           Checked="CheckValToRegisters"
-          Unchecked="UncheckValToRegisters" />
+          Unchecked="UncheckValToRegisters"
+          IsEnabled="false"/>
         <CheckBox
           Name="checkBoxWrite_3"
           Content="3000"
           Margin="15 5"
           IsChecked="false"
           Checked="CheckValToRegisters"
-          Unchecked="UncheckValToRegisters" />
+          Unchecked="UncheckValToRegisters"
+          IsEnabled="false"/>
       </StackPanel>
 
       <Button
@@ -110,6 +116,42 @@
         Grid.Column="1"
         Orientation="Horizontal"
         HorizontalAlignment="Right">
+      </StackPanel>
+      <StackPanel
+        Grid.Row="3"
+        Grid.Column="0"
+        Grid.ColumnSpan="2">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition
+              Height="auto" />
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition
+              Width="1*" />
+            <ColumnDefinition
+              Width="1*" />
+            <ColumnDefinition />
+          </Grid.ColumnDefinitions>
+          <TextBox
+            Name="decTextBox"
+            HorizontalContentAlignment="Right"
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Margin="5"
+            Width="auto"
+            Background="#212121"
+            Foreground="#fff"
+            PreviewTextInput="TextBoxDecimalPreviewTextInput" />
+          <Button
+            Name="decButtonTimeout"
+            Grid.Row="0"
+            Grid.Column="3"
+            Content="Задать"
+            Margin="5"
+            Click="DecimalButtonTimeoutClic" />
+        </Grid>
       </StackPanel>
     </Grid>
     <Grid

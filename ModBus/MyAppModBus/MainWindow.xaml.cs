@@ -1,8 +1,10 @@
 ﻿using Modbus.Device;
 using System;
 using System.IO.Ports;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
@@ -16,10 +18,12 @@ namespace MyAppModBus {
     const byte slaveID = 1;
     private readonly ushort startAddress = 0;
     private readonly ushort numburOfPoints = 18;
+    private int readWriteTimeOut = 100;
     private DispatcherTimer timer;
     public static string result;
     public static SerialPort _serialPort = null;
     public static ModbusSerialMaster master = null;
+
 
     public MainWindow() {
       InitializeComponent();
@@ -57,11 +61,12 @@ namespace MyAppModBus {
     public void ConnectToDevice( object sender, RoutedEventArgs e ) {
       _serialPort = new SerialPort();
       timer = new DispatcherTimer();
+
       try {
         if ( _serialPort.IsOpen ) {
           _serialPort.Close();
           disconnectComPort.Visibility = Visibility.Hidden;
-          btnGetHoldReg.IsEnabled = false;
+
         }
 
         #region <Настройки RTU подключения>
@@ -69,8 +74,8 @@ namespace MyAppModBus {
         _serialPort.BaudRate = 119200;
         _serialPort.Parity = Parity.None;
         _serialPort.StopBits = StopBits.One;
-        _serialPort.ReadTimeout = 100;
-        _serialPort.WriteTimeout = 100;
+        _serialPort.ReadTimeout = readWriteTimeOut;
+        _serialPort.WriteTimeout = readWriteTimeOut;
         _serialPort.DtrEnable = true;
         _serialPort.Open();
         #endregion
@@ -78,10 +83,18 @@ namespace MyAppModBus {
         master = ModbusSerialMaster.CreateRtu( _serialPort );
         #region <Timer>
         timer.Tick += new EventHandler( GetHoldReg );
-        timer.Interval = new TimeSpan( 0, 0, 1 / 1000 );
+        timer.Interval = new TimeSpan( 0, 0, 0, 0, readWriteTimeOut );
         timer.Start();
         #endregion
+
+        //Сброс регистров
+        ResetRegisters();
+
+        checkBoxWrite_1.IsEnabled = true;
+        checkBoxWrite_2.IsEnabled = true;
+        checkBoxWrite_3.IsEnabled = true;
         btnGetHoldReg.IsEnabled = true;
+        decButtonTimeout.IsEnabled = false;
         comboBoxMainPorts.IsEnabled = false;
         disconnectComPort.Visibility = Visibility.Visible;
         textViewer.Text = $"Порт {_serialPort.PortName} подключен";
@@ -91,19 +104,34 @@ namespace MyAppModBus {
         _serialPort.Close();
         connectComPort.Content = "Подкл";
         comboBoxMainPorts.IsEnabled = true;
+        decButtonTimeout.IsEnabled = false;
         disconnectComPort.Visibility = Visibility.Hidden;
         textViewer.Text = $"Ошибка: {err.Message}";
       }
     }
 
+    /// <summary>
+    /// Отключение устройства
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void DisconnectToDevice( object sender, RoutedEventArgs e ) {
       timer.Stop();
       _serialPort.Close();
       comboBoxMainPorts.IsEnabled = true;
       disconnectComPort.Visibility = Visibility.Hidden;
       textViewer.Text = $"Порт {_serialPort.PortName} закрыт";
+      decButtonTimeout.IsEnabled = true;
       btnGetHoldReg.IsEnabled = false;
-
+      btnGetHoldReg.IsEnabled = false;
+      #region checkBoxWrite
+      checkBoxWrite_1.IsChecked = false;
+      checkBoxWrite_2.IsChecked = false;
+      checkBoxWrite_3.IsChecked = false;
+      checkBoxWrite_1.IsEnabled = false;
+      checkBoxWrite_2.IsEnabled = false;
+      checkBoxWrite_3.IsEnabled = false;
+      #endregion
     }
 
     private void GetHoldReg( object sender, EventArgs e ) {
@@ -262,6 +290,40 @@ namespace MyAppModBus {
       }
       catch ( Exception err ) {
         textViewer.Text = $"Ошибка: {err.Message}";
+      }
+    }
+
+    private void TextBoxDecimalPreviewTextInput( object sender, TextCompositionEventArgs e ) {
+      e.Handled = new Regex( "[^0-9]+" ).IsMatch( e.Text );
+    }
+
+    private void DecimalButtonTimeoutClic( object sender, RoutedEventArgs e ) {
+      if ( decTextBox.Text != "" ) {
+        int valTextBox = Convert.ToInt32( decTextBox.Text );
+
+        if ( valTextBox < 100 ) {
+          readWriteTimeOut = 100;
+          textViewer.Text = $"Интервал не может быть меньше {readWriteTimeOut} ms, поэтому задан интервал по умолчанию {readWriteTimeOut} ms.";
+        }
+        else if ( valTextBox > 1000 ) {
+          readWriteTimeOut = 1000;
+          textViewer.Text = $"Значение не может превышать значение в {readWriteTimeOut} ms, поэтому задано значение по умолчанию {readWriteTimeOut} ms.";
+        }
+        else {
+          readWriteTimeOut = (int)valTextBox;
+          textViewer.Text = $"Значение интервала опроса устроства: {readWriteTimeOut} ms";
+        }
+      }
+
+    }
+    /// <summary>
+    /// Сброс регистров 
+    /// </summary>
+    private void ResetRegisters() {
+      ushort[] arrRegisters = new ushort[] { 6, 7, 8 };
+
+      for ( int i = 0; i < arrRegisters.Length; i++ ) {
+        master.WriteSingleRegister( slaveID, arrRegisters[ i ], 0 );
       }
     }
 
