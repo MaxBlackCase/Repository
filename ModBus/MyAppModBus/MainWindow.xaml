@@ -10,7 +10,8 @@
   Height="450"
   Width="700"
   ResizeMode="NoResize"
-  WindowStartupLocation="CenterScreen">
+  WindowStartupLocation="CenterScreen"
+  Background="#212121">
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition
@@ -40,11 +41,15 @@
           Width="*" />
       </Grid.ColumnDefinitions>
       <ComboBox
+        BorderBrush="#fff"
+        Background="#fff"
         Grid.Row="0"
         Grid.Column="0"
         Name="comboBoxMainPorts"
         Margin="5" />
       <Button
+        BorderBrush="#fff"
+        Background="#fff"
         Grid.Row="0"
         Grid.Column="1"
         Name="connectComPort"
@@ -79,7 +84,8 @@
           IsChecked="false"
           Checked="CheckValToRegisters"
           Unchecked="UncheckValToRegisters"
-          IsEnabled="false"/>
+          IsEnabled="false"
+          Foreground="#fff"/>
         <CheckBox
           Name="checkBoxWrite_2"
           Content="2000"
@@ -87,7 +93,8 @@
           IsChecked="false"
           Checked="CheckValToRegisters"
           Unchecked="UncheckValToRegisters"
-          IsEnabled="false"/>
+          IsEnabled="false"
+          Foreground="#fff" />
         <CheckBox
           Name="checkBoxWrite_3"
           Content="3000"
@@ -95,10 +102,13 @@
           IsChecked="false"
           Checked="CheckValToRegisters"
           Unchecked="UncheckValToRegisters"
-          IsEnabled="false"/>
+          IsEnabled="false"
+          Foreground="#fff"/>
       </StackPanel>
 
       <Button
+        BorderBrush="#fff"
+        Background="#fff"
         Grid.Row="2"
         Grid.Column="0"
         Name="btnGetHoldReg"
@@ -141,10 +151,12 @@
             Grid.ColumnSpan="2"
             Margin="5"
             Width="auto"
-            Background="#212121"
-            Foreground="#fff"
+            Background="#fff"
+            Foreground="#212121"
             PreviewTextInput="TextBoxDecimalPreviewTextInput" />
           <Button
+            BorderBrush="#fff"
+            Background="#fff"
             Name="decButtonTimeout"
             Grid.Row="0"
             Grid.Column="3"
@@ -168,13 +180,14 @@
         Grid.Row="0"
         Text="Выводимые данные"
         VerticalAlignment="Center"
-        FontSize="14" />
+        FontSize="14"
+        Foreground="#fff"/>
       <ScrollViewer
         Grid.Row="1"
         CanContentScroll="True">
         <TextBlock
-          Background="#212121"
-          Foreground="#fff"
+          Background="#fff"
+          Foreground="#212121"
           Margin="5"
           Padding="5"
           Name="textViewer"
