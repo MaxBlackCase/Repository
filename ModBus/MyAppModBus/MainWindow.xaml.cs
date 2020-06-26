@@ -202,7 +202,7 @@ namespace MyAppModBus {
               LimSwEllipse.Width = 20;
               LimSwEllipse.Height = 20;
               LimSwEllipse.Fill = Brushes.Green;
-              LimSwEllipse.Margin = new Thickness( 15, 5, 15, 5 );
+              LimSwEllipse.Margin = new Thickness( 10, 5, 10, 5 );
               LimSwPanel.Children.Add( LimSwEllipse );
             }
             else {
@@ -210,7 +210,7 @@ namespace MyAppModBus {
               LimSwEllipse.Width = 20;
               LimSwEllipse.Height = 20;
               LimSwEllipse.Fill = Brushes.Red;
-              LimSwEllipse.Margin = new Thickness( 15, 5, 15, 5 );
+              LimSwEllipse.Margin = new Thickness( 10, 5, 10, 5 );
               LimSwPanel.Children.Add( LimSwEllipse );
             }
           }
@@ -225,35 +225,39 @@ namespace MyAppModBus {
 
     }
 
-    private void WriteValToRegisters( object sender, RoutedEventArgs e ) {
+    private void CheckValToRegisters( object sender, RoutedEventArgs e ) {
       try {
+        CheckBox pressed = (CheckBox)sender;
+        var indElem = CheckBoxWriteRegisters.Children.IndexOf( pressed );
+        ushort[] arrRegisters = new ushort[] { 6, 7, 8 };
+
         if ( _serialPort.IsOpen ) {
-
-
-
-          CheckBox pressed = (CheckBox)sender;
-          
-          
-
+          for ( var i = 0; i < arrRegisters.Length; i++ ) {
+            if ( i == indElem ) {
+              master.WriteSingleRegister( slaveID, arrRegisters[ i ], 1 );
+            }
+          }
         }
-
       }
       catch ( Exception err ) {
-
         textViewer.Text = $"Ошибка: {err.Message}";
       }
     }
-    private void RewriteValToRegisters( object sender, RoutedEventArgs e ) {
+    private void UncheckValToRegisters( object sender, RoutedEventArgs e ) {
       try {
+        CheckBox pressed = (CheckBox)sender;
+        var indElem = CheckBoxWriteRegisters.Children.IndexOf( pressed );
+        ushort[] arrRegisters = new ushort[] { 6, 7, 8 };
+
         if ( _serialPort.IsOpen ) {
-
-
-
+          for ( var i = 0; i < arrRegisters.Length; i++ ) {
+            if ( i == indElem ) {
+              master.WriteSingleRegister( slaveID, arrRegisters[ i ], 0 );
+            }
+          }
         }
-
       }
       catch ( Exception err ) {
-
         textViewer.Text = $"Ошибка: {err.Message}";
       }
     }

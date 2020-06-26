@@ -7,9 +7,11 @@
   xmlns:local="clr-namespace:MyAppModBus"
   mc:Ignorable="d"
   Title="MainWindow"
-  Height="400"
+  Height="450"
   Width="600"
-  ResizeMode="CanResize">
+  ResizeMode="NoResize"
+  WindowStartupLocation="CenterScreen"
+  >
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition
@@ -73,22 +75,22 @@
           Content="1000"
           Margin="15 5"
           IsChecked="false"
-          Checked="WriteValToRegisters"
-          Unchecked="RewriteValToRegisters"/>
+          Checked="CheckValToRegisters"
+          Unchecked="UncheckValToRegisters"/>
         <CheckBox
           Name="checkBoxWrite_2"
           Content="2000"
           Margin="15 5"
           IsChecked="false"
-          Checked="WriteValToRegisters"
-          Unchecked="RewriteValToRegisters"/>
+          Checked="CheckValToRegisters"
+          Unchecked="UncheckValToRegisters"/>
         <CheckBox
           Name="checkBoxWrite_3"
           Content="3000"
           Margin="15 5"
           IsChecked="false"
-          Checked="WriteValToRegisters"
-          Unchecked="RewriteValToRegisters"/>
+          Checked="CheckValToRegisters"
+          Unchecked="UncheckValToRegisters"/>
       </StackPanel>
 
       <Button
@@ -107,7 +109,8 @@
         Name="LimSwPanel"
         Grid.Row="2"
         Grid.Column="1"
-        Orientation="Horizontal">
+        Orientation="Horizontal"
+        HorizontalAlignment="Right">
       </StackPanel>
     </Grid>
     <Grid
