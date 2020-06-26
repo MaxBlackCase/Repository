@@ -14,8 +14,8 @@ namespace MyAppModBus {
   public partial class MainWindow : Window {
 
     const byte slaveID = 1;
-    private ushort startAddress = 0;
-    private ushort numburOfPoints = 18;
+    private readonly ushort startAddress = 0;
+    private readonly ushort numburOfPoints = 18;
     private DispatcherTimer timer;
     public static string result;
     public static SerialPort _serialPort = null;
@@ -23,13 +23,13 @@ namespace MyAppModBus {
 
     public MainWindow() {
       InitializeComponent();
-      addItemToComboBox();
+      AddItemToComboBox();
       btnGetHoldReg.IsEnabled = false;
 
     }
 
     //Инициализация портов
-    private void addItemToComboBox() {
+    private void AddItemToComboBox() {
       //Получение портов
       string[] ports = SerialPort.GetPortNames();
       foreach ( string port in ports ) {
@@ -54,7 +54,7 @@ namespace MyAppModBus {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void connectToDevice( object sender, RoutedEventArgs e ) {
+    public void ConnectToDevice( object sender, RoutedEventArgs e ) {
       _serialPort = new SerialPort();
       timer = new DispatcherTimer();
       try {
@@ -77,7 +77,7 @@ namespace MyAppModBus {
 
         master = ModbusSerialMaster.CreateRtu( _serialPort );
         #region <Timer>
-        timer.Tick += new EventHandler( getHoldReg );
+        timer.Tick += new EventHandler( GetHoldReg );
         timer.Interval = new TimeSpan( 0, 0, 1 / 1000 );
         timer.Start();
         #endregion
@@ -96,7 +96,7 @@ namespace MyAppModBus {
       }
     }
 
-    private void disconnectToDevice( object sender, RoutedEventArgs e ) {
+    private void DisconnectToDevice( object sender, RoutedEventArgs e ) {
       timer.Stop();
       _serialPort.Close();
       comboBoxMainPorts.IsEnabled = true;
@@ -106,15 +106,12 @@ namespace MyAppModBus {
 
     }
 
-    private void getHoldReg( object sender, EventArgs e ) {
-
+    private void GetHoldReg( object sender, EventArgs e ) {
 
       try {
 
-
         master = ModbusSerialMaster.CreateRtu( _serialPort );
         ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
-
         textViewer.Text = "";
         int i = 0;
         foreach ( ushort item in result ) {
@@ -198,19 +195,23 @@ namespace MyAppModBus {
 
           foreach ( var item in arrLimitSwitch ) {
             if ( item == 1 ) {
-              Ellipse LimSwEllipse = new Ellipse();
-              LimSwEllipse.Width = 20;
-              LimSwEllipse.Height = 20;
-              LimSwEllipse.Fill = Brushes.Green;
-              LimSwEllipse.Margin = new Thickness( 10, 5, 10, 5 );
+              Ellipse LimSwEllipse = new Ellipse
+              {
+                Width = 20,
+                Height = 20,
+                Fill = Brushes.Green,
+                Margin = new Thickness( 10, 5, 10, 5 )
+              };
               LimSwPanel.Children.Add( LimSwEllipse );
             }
             else {
-              Ellipse LimSwEllipse = new Ellipse();
-              LimSwEllipse.Width = 20;
-              LimSwEllipse.Height = 20;
-              LimSwEllipse.Fill = Brushes.Red;
-              LimSwEllipse.Margin = new Thickness( 10, 5, 10, 5 );
+              Ellipse LimSwEllipse = new Ellipse
+              {
+                Width = 20,
+                Height = 20,
+                Fill = Brushes.Red,
+                Margin = new Thickness( 10, 5, 10, 5 )
+              };
               LimSwPanel.Children.Add( LimSwEllipse );
             }
           }

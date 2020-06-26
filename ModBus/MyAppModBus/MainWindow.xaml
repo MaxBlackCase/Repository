@@ -50,7 +50,7 @@
         Margin="5,0,5,5"
         Height="23"
         VerticalAlignment="Bottom"
-        Click="connectToDevice" />
+        Click="ConnectToDevice" />
       <Button
         Grid.Row="0"
         Grid.Column="1"
@@ -59,7 +59,7 @@
         Margin="5,0,5,5"
         Height="23"
         VerticalAlignment="Bottom"
-        Click="disconnectToDevice"
+        Click="DisconnectToDevice"
         Visibility="Hidden" />
 
       <StackPanel
@@ -101,7 +101,7 @@
         FontSize="14"
         Width="100"
         Height="25"
-        Click="getHoldReg"
+        Click="GetHoldReg"
         HorizontalAlignment="Left"
         VerticalAlignment="Top" />
       <StackPanel
