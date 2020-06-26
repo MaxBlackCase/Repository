@@ -18,7 +18,7 @@ namespace MyAppModBus {
     const byte slaveID = 1;
     private readonly ushort startAddress = 0;
     private readonly ushort numburOfPoints = 18;
-    private int readWriteTimeOut = 100;
+    private int readWriteTimeOut = 50;
     private DispatcherTimer timer;
     public static string result;
     public static SerialPort _serialPort = null;
@@ -301,8 +301,8 @@ namespace MyAppModBus {
       if ( decTextBox.Text != "" ) {
         int valTextBox = Convert.ToInt32( decTextBox.Text );
 
-        if ( valTextBox < 100 ) {
-          readWriteTimeOut = 100;
+        if ( valTextBox < 50 ) {
+          readWriteTimeOut = 50;
           textViewer.Text = $"Интервал не может быть меньше {readWriteTimeOut} ms, поэтому задан интервал по умолчанию {readWriteTimeOut} ms.";
         }
         else if ( valTextBox > 1000 ) {
