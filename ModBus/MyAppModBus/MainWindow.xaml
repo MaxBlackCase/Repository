@@ -33,6 +33,8 @@
           Height="auto" />
         <RowDefinition
           Height="auto" />
+        <RowDefinition
+          Height="auto" />
       </Grid.RowDefinitions>
       <Grid.ColumnDefinitions>
         <ColumnDefinition
@@ -85,7 +87,7 @@
           Checked="CheckValToRegisters"
           Unchecked="UncheckValToRegisters"
           IsEnabled="false"
-          Foreground="#fff"/>
+          Foreground="#fff" />
         <CheckBox
           Name="checkBoxWrite_2"
           Content="2000"
@@ -103,7 +105,7 @@
           Checked="CheckValToRegisters"
           Unchecked="UncheckValToRegisters"
           IsEnabled="false"
-          Foreground="#fff"/>
+          Foreground="#fff" />
       </StackPanel>
 
       <Button
@@ -165,6 +167,16 @@
             Click="DecimalButtonTimeoutClic" />
         </Grid>
       </StackPanel>
+      <StackPanel
+        Grid.Row="4"
+        Grid.Column="1"
+        Margin="5">
+        <Button
+          Name="ScheduleBtn"
+          Content="График"
+          Background="#fff"
+          Click="ScheduleBtn_Click" />
+      </StackPanel>
     </Grid>
     <Grid
       Grid.Row="0"
@@ -181,7 +193,7 @@
         Text="Выводимые данные"
         VerticalAlignment="Center"
         FontSize="14"
-        Foreground="#fff"/>
+        Foreground="#fff" />
       <ScrollViewer
         Grid.Row="1"
         CanContentScroll="True">

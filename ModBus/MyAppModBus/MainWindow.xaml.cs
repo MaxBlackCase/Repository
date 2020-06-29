@@ -329,5 +329,19 @@ namespace MyAppModBus {
       }
     }
 
+    private void ScheduleBtn_Click( object sender, RoutedEventArgs e ) {
+      try {
+        if ( _serialPort.IsOpen ) {
+
+          
+
+        }
+      }
+      catch ( Exception err ) {
+
+        MessageBox.Show( err.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+
+      }
+    }
   }
 }
