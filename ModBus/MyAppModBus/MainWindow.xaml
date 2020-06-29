@@ -6,6 +6,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:local="clr-namespace:MyAppModBus"
   xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+  xmlns:smtx="clr-namespace:ShowMeTheXAML;assembly=ShowMeTheXAML"
   mc:Ignorable="d"
   Title="MainWindow"
   Height="450"
@@ -16,8 +17,39 @@
   AllowsTransparency="True"
   WindowStyle="None"
   BorderBrush="#fff">
+  <Window.Resources>
+    <Style
+      x:Key="LabelForToggleBtn">
+      <Setter
+        Property="TextBlock.Foreground"
+        Value="#fff" />
+      <Setter
+        Property="TextBlock.Margin"
+        Value="0 5 15 0" />
+    </Style>
+    <Style
+      x:Key="TextBoxStyle">
+      <Setter
+        Property="TextBox.Background"
+        Value="#fff" />
+      <Setter
+        Property="TextBox.VerticalContentAlignment"
+        Value="Center" />
+      <Setter
+        Property="TextBox.HorizontalContentAlignment"
+        Value="Right" />
+      <Setter
+        Property="TextBox.FontSize"
+        Value="14" />
+      <Setter
+        Property="TextBox.FontWeight"
+        Value="DemiBold" />
+    </Style>
+  </Window.Resources>
   <Grid>
     <Grid.RowDefinitions>
+      <RowDefinition
+        Height="auto" />
       <RowDefinition
         Height="*" />
     </Grid.RowDefinitions>
@@ -30,7 +62,53 @@
     <Grid
       Grid.Row="0"
       Grid.Column="0"
-      Margin="15">
+      Grid.ColumnSpan="2"
+      Background="#FF006EDC">
+      <Grid.RowDefinitions>
+        <RowDefinition
+          MinHeight="30" />
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition
+          Width="*" />
+        <ColumnDefinition
+          Width="0.1*" />
+      </Grid.ColumnDefinitions>
+      <StackPanel
+        Grid.Column="0"
+        VerticalAlignment="Center">
+        <TextBlock
+          Padding="10"
+          Foreground="White"
+          FontSize="16"
+          Background="#FF006EDC">ModBus(RTU)</TextBlock>
+      </StackPanel>
+      <StackPanel
+        Grid.Column="1"
+        HorizontalAlignment="Right"
+        Orientation="Horizontal"
+        Margin="0 0 5 0">
+        <Button
+          Margin="1.5"
+          MinHeight="25"
+          MinWidth="25">
+
+        </Button>
+        <Button
+          Margin="1.5"
+          MinHeight="25"
+          MinWidth="25">
+        </Button>
+      </StackPanel>
+    </Grid>
+    <Grid
+      Grid.Row="0">
+
+    </Grid>
+    <Grid
+      Grid.Row="1"
+      Grid.Column="0"
+      Margin="10">
       <Grid.RowDefinitions>
         <RowDefinition
           Height="auto" />
@@ -50,30 +128,29 @@
           Width="*" />
       </Grid.ColumnDefinitions>
       <ComboBox
-        BorderBrush="#fff"
-        Background="#fff"
-        Grid.Row="0"
-        Grid.Column="0"
-        Name="comboBoxMainPorts"
-        Margin="5" />
+          BorderBrush="#fff"
+          Background="#fff"
+          Grid.Row="0"
+          Padding="10 0"
+          Height="30"
+          VerticalContentAlignment="Center"
+          Grid.Column="0"
+          Name="comboBoxMainPorts" />
       <Button
-        BorderBrush="#fff"
-        Background="#fff"
         Grid.Row="0"
         Grid.Column="1"
+        Margin="10 0 0 0"
         Name="connectComPort"
         Content="Подключить"
-        Margin="5,0,5,5"
-        Height="23"
+        VerticalContentAlignment="Center"
         VerticalAlignment="Bottom"
         Click="ConnectToDevice" />
       <Button
         Grid.Row="0"
         Grid.Column="1"
+        Margin="10 0 0 0"
         Name="disconnectComPort"
         Content="Отключить"
-        Margin="5,0,5,5"
-        Height="23"
         VerticalAlignment="Bottom"
         Click="DisconnectToDevice"
         Visibility="Hidden" />
@@ -83,49 +160,63 @@
         Grid.Column="0"
         Grid.ColumnSpan="2"
         Width="auto"
+        Margin="0 10"
         Orientation="Horizontal"
         VerticalAlignment="Top"
         x:Name="CheckBoxWriteRegisters">
-        <CheckBox
-          Name="checkBoxWrite_1"
-          Content="1000"
-          Margin="15 5"
-          IsChecked="false"
-          Checked="CheckValToRegisters"
-          Unchecked="UncheckValToRegisters"
-          IsEnabled="false"
-          Foreground="#fff" />
-        <CheckBox
-          Name="checkBoxWrite_2"
-          Content="2000"
-          Margin="15 5"
-          IsChecked="false"
-          Checked="CheckValToRegisters"
-          Unchecked="UncheckValToRegisters"
-          IsEnabled="false"
-          Foreground="#fff" />
-        <CheckBox
-          Name="checkBoxWrite_3"
-          Content="3000"
-          Margin="15 5"
-          IsChecked="false"
-          Checked="CheckValToRegisters"
-          Unchecked="UncheckValToRegisters"
-          IsEnabled="false"
-          Foreground="#fff" />
+        <StackPanel
+          Orientation="Vertical">
+          <CheckBox
+            Margin="0 0 10 0"
+            Name="checkBoxWrite_1"
+            IsChecked="false"
+            IsEnabled="False"
+            Checked="CheckValToRegisters"
+            Unchecked="UncheckValToRegisters" />
+          <TextBlock
+            Text="1000"
+            Style="{StaticResource LabelForToggleBtn}" />
+        </StackPanel>
+        <StackPanel
+          Orientation="Vertical">
+          <CheckBox
+            Margin="0 0 10 0"
+            Name="checkBoxWrite_2"
+            IsChecked="false"
+            IsEnabled="false"
+            Checked="CheckValToRegisters"
+            Unchecked="UncheckValToRegisters" />
+          <TextBlock
+            Text="2000"
+            Style="{StaticResource LabelForToggleBtn}" />
+        </StackPanel>
+        <StackPanel
+          Orientation="Vertical">
+          <CheckBox
+            Margin="0 0 10 0"
+            Name="checkBoxWrite_3"
+            IsChecked="false"
+            IsEnabled="false"
+            Checked="CheckValToRegisters"
+            Unchecked="UncheckValToRegisters"/>
+          <TextBlock
+            Text="3000"
+            Style="{StaticResource LabelForToggleBtn}" />
+        </StackPanel>
+
+
+
       </StackPanel>
 
       <Button
         BorderBrush="#fff"
-        Background="#fff"
         Grid.Row="2"
         Grid.Column="0"
         Name="btnGetHoldReg"
         Content="Запрос"
-        Margin="5"
         FontSize="14"
-        Width="100"
-        Height="25"
+        MinWidth="120"
+        Margin="0 10"
         Click="GetHoldReg"
         HorizontalAlignment="Left"
         VerticalAlignment="Top" />
@@ -140,45 +231,44 @@
         Grid.Row="3"
         Grid.Column="0"
         Grid.ColumnSpan="2">
-        <Grid>
+        <Grid
+          Margin="0 5">
           <Grid.RowDefinitions>
             <RowDefinition
               Height="auto" />
           </Grid.RowDefinitions>
           <Grid.ColumnDefinitions>
             <ColumnDefinition
-              Width="1*" />
-            <ColumnDefinition
-              Width="1*" />
+              Width="2*" />
             <ColumnDefinition />
           </Grid.ColumnDefinitions>
-          <TextBox
-            Name="decTextBox"
-            HorizontalContentAlignment="Right"
-            Grid.Row="0"
-            Grid.Column="0"
-            Grid.ColumnSpan="2"
-            Margin="5"
-            Width="auto"
-            Background="#fff"
-            Foreground="#212121"
-            PreviewTextInput="TextBoxDecimalPreviewTextInput" />
+          <Border
+            BorderBrush="Black"
+            CornerRadius="15">
+            <TextBox
+              Name="decTextBox"
+              MaxLength="4"
+              Grid.Row="0"
+              Grid.Column="0"
+              Grid.ColumnSpan="1"
+              PreviewTextInput="TextBoxDecimalPreviewTextInput"
+              Style="{DynamicResource TextBoxStyle}" />
+          </Border>
+
           <Button
-            BorderBrush="#fff"
-            Background="#fff"
-            Name="decButtonTimeout"
             Grid.Row="0"
             Grid.Column="3"
             Content="Задать"
-            Margin="5"
-            Click="DecimalButtonTimeoutClic" />
+            Name="decButtonTimeout"
+            Click="DecimalButtonTimeoutClic"
+            Grid.ColumnSpan="2"
+            Margin="10 0 0 0" />
         </Grid>
       </StackPanel>
       <Grid
         Grid.Row="4"
         Grid.Column="0"
-        Grid.ColumnSpan="2"
-        Margin="5">
+        Grid.ColumnSpan="2">
         <Grid.RowDefinitions>
           <RowDefinition
             Height="auto" />
@@ -190,25 +280,24 @@
           Text="Выводимые данные"
           VerticalAlignment="Center"
           FontSize="14"
-          Foreground="#fff" 
-          Margin="5 0 0 5"/>
+          Foreground="#fff"
+          Margin="0 10" />
         <ScrollViewer
           Grid.Row="1"
           CanContentScroll="True">
           <TextBlock
+            Padding="10"
             Background="#fff"
             Foreground="#212121"
-            Margin="5"
-            Padding="5"
             Name="textViewer"
             TextWrapping="Wrap" />
         </ScrollViewer>
       </Grid>
     </Grid>
     <Grid
-      Grid.Row="0"
+      Grid.Row="1"
       Grid.Column="1"
-      Margin="15">
+      Margin="15 0 0 0">
       <lvc:CartesianChart
         Series="{Binding SeriesCollection}" />
     </Grid>

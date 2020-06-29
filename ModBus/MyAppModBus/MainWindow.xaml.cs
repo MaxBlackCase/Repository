@@ -3,13 +3,11 @@ using System;
 using System.IO.Ports;
 using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using LiveCharts;
-using LiveCharts.Wpf;
+using System.Windows.Controls;
 
 namespace MyAppModBus {
   /// <summary>
@@ -100,12 +98,12 @@ namespace MyAppModBus {
         decButtonTimeout.IsEnabled = false;
         comboBoxMainPorts.IsEnabled = false;
         disconnectComPort.Visibility = Visibility.Visible;
-        textViewer.Text = $"Порт {_serialPort.PortName} подключен";
+        textViewer.Text = $"Порт {_serialPort.PortName} Подключен";
 
       }
       catch ( Exception err ) {
         _serialPort.Close();
-        connectComPort.Content = "Подкл";
+        connectComPort.Content = "Подключить";
         comboBoxMainPorts.IsEnabled = true;
         decButtonTimeout.IsEnabled = false;
         disconnectComPort.Visibility = Visibility.Hidden;
@@ -272,10 +270,11 @@ namespace MyAppModBus {
     private void CheckValToRegisters( object sender, RoutedEventArgs e ) {
       try {
         CheckBox pressed = (CheckBox)sender;
+        textViewer.Text = pressed.ToString();
         var indElem = CheckBoxWriteRegisters.Children.IndexOf( pressed );
         ushort[] arrRegisters = new ushort[] { 6, 7, 8 };
 
-        if ( _serialPort.IsOpen ) {
+        if ( _serialPort.IsOpen && Convert.ToBoolean(pressed.IsChecked) == true ) {
           for ( var i = 0; i < arrRegisters.Length; i++ ) {
             if ( i == indElem ) {
               master.WriteSingleRegister( slaveID, arrRegisters[ i ], 1 );
@@ -296,10 +295,11 @@ namespace MyAppModBus {
     private void UncheckValToRegisters( object sender, RoutedEventArgs e ) {
       try {
         CheckBox pressed = (CheckBox)sender;
+        textViewer.Text = pressed.ToString();
         var indElem = CheckBoxWriteRegisters.Children.IndexOf( pressed );
         ushort[] arrRegisters = new ushort[] { 6, 7, 8 };
 
-        if ( _serialPort.IsOpen ) {
+        if ( _serialPort.IsOpen && Convert.ToBoolean( pressed.IsChecked ) == true ) {
           for ( var i = 0; i < arrRegisters.Length; i++ ) {
             if ( i == indElem ) {
               master.WriteSingleRegister( slaveID, arrRegisters[ i ], 0 );
@@ -311,6 +311,8 @@ namespace MyAppModBus {
         textViewer.Text = $"Ошибка: {err.Message}";
       }
     }
+
+
     /// <summary>
     /// Ввод целочисленного значения в тектовое поле
     /// </summary>
@@ -326,7 +328,7 @@ namespace MyAppModBus {
     /// <param name="e"></param>
     private void DecimalButtonTimeoutClic( object sender, RoutedEventArgs e ) {
       if ( decTextBox.Text != "" ) {
-        int valTextBox = Convert.ToInt32( decTextBox.Text );
+        double valTextBox = Convert.ToDouble( decTextBox.Text );
 
         if ( valTextBox < 50 ) {
           readWriteTimeOut = 50;
@@ -361,9 +363,11 @@ namespace MyAppModBus {
       }
       catch ( Exception err ) {
 
-        MessageBox.Show( err.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error );
+        System.Windows.MessageBox.Show( err.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error );
 
       }
     }
+
+    
   }
 }
