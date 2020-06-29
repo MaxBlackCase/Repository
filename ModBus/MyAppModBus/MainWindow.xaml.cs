@@ -8,6 +8,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using LiveCharts;
+using LiveCharts.Wpf;
 
 namespace MyAppModBus {
   /// <summary>
@@ -136,6 +138,11 @@ namespace MyAppModBus {
       #endregion
     }
 
+    /// <summary>
+    /// Получение данных с регистров
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void GetHoldReg( object sender, EventArgs e ) {
 
       try {
@@ -257,7 +264,11 @@ namespace MyAppModBus {
     }
 
 
-
+    /// <summary>
+    /// Проверка записаных данных в регистры
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void CheckValToRegisters( object sender, RoutedEventArgs e ) {
       try {
         CheckBox pressed = (CheckBox)sender;
@@ -276,6 +287,12 @@ namespace MyAppModBus {
         textViewer.Text = $"Ошибка: {err.Message}";
       }
     }
+
+    /// <summary>
+    /// Снятие ограничений в регистрах
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void UncheckValToRegisters( object sender, RoutedEventArgs e ) {
       try {
         CheckBox pressed = (CheckBox)sender;
@@ -294,11 +311,19 @@ namespace MyAppModBus {
         textViewer.Text = $"Ошибка: {err.Message}";
       }
     }
-
+    /// <summary>
+    /// Ввод целочисленного значения в тектовое поле
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void TextBoxDecimalPreviewTextInput( object sender, TextCompositionEventArgs e ) {
       e.Handled = new Regex( "[^0-9]+" ).IsMatch( e.Text );
     }
-
+    /// <summary>
+    /// Задает время опроса устройства в ms
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void DecimalButtonTimeoutClic( object sender, RoutedEventArgs e ) {
       if ( decTextBox.Text != "" ) {
         int valTextBox = Convert.ToInt32( decTextBox.Text );
@@ -330,12 +355,9 @@ namespace MyAppModBus {
     }
 
     private void ScheduleBtn_Click( object sender, RoutedEventArgs e ) {
+
       try {
-        if ( _serialPort.IsOpen ) {
 
-          
-
-        }
       }
       catch ( Exception err ) {
 

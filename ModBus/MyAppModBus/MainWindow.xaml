@@ -5,25 +5,32 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:local="clr-namespace:MyAppModBus"
+  xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
   mc:Ignorable="d"
   Title="MainWindow"
   Height="450"
-  Width="700"
+  Width="1000"
   ResizeMode="NoResize"
   WindowStartupLocation="CenterScreen"
-  Background="#212121">
+  Background="#212121"
+  AllowsTransparency="True"
+  WindowStyle="None"
+  BorderBrush="#fff">
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition
         Height="*" />
     </Grid.RowDefinitions>
     <Grid.ColumnDefinitions>
-      <ColumnDefinition />
-      <ColumnDefinition />
+      <ColumnDefinition
+        Width="0.8*" />
+      <ColumnDefinition
+        Width="*" />
     </Grid.ColumnDefinitions>
     <Grid
       Grid.Row="0"
-      Grid.Column="0">
+      Grid.Column="0"
+      Margin="15">
       <Grid.RowDefinitions>
         <RowDefinition
           Height="auto" />
@@ -34,7 +41,7 @@
         <RowDefinition
           Height="auto" />
         <RowDefinition
-          Height="auto" />
+          Height="*" />
       </Grid.RowDefinitions>
       <Grid.ColumnDefinitions>
         <ColumnDefinition
@@ -167,44 +174,43 @@
             Click="DecimalButtonTimeoutClic" />
         </Grid>
       </StackPanel>
-      <StackPanel
+      <Grid
         Grid.Row="4"
-        Grid.Column="1"
+        Grid.Column="0"
+        Grid.ColumnSpan="2"
         Margin="5">
-        <Button
-          Name="ScheduleBtn"
-          Content="График"
-          Background="#fff"
-          Click="ScheduleBtn_Click" />
-      </StackPanel>
+        <Grid.RowDefinitions>
+          <RowDefinition
+            Height="auto" />
+          <RowDefinition
+            Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock
+          Grid.Row="0"
+          Text="Выводимые данные"
+          VerticalAlignment="Center"
+          FontSize="14"
+          Foreground="#fff" 
+          Margin="5 0 0 5"/>
+        <ScrollViewer
+          Grid.Row="1"
+          CanContentScroll="True">
+          <TextBlock
+            Background="#fff"
+            Foreground="#212121"
+            Margin="5"
+            Padding="5"
+            Name="textViewer"
+            TextWrapping="Wrap" />
+        </ScrollViewer>
+      </Grid>
     </Grid>
     <Grid
       Grid.Row="0"
       Grid.Column="1"
-      Margin="5">
-      <Grid.RowDefinitions>
-        <RowDefinition
-          Height="auto" />
-        <RowDefinition
-          Height="*" />
-      </Grid.RowDefinitions>
-      <TextBlock
-        Grid.Row="0"
-        Text="Выводимые данные"
-        VerticalAlignment="Center"
-        FontSize="14"
-        Foreground="#fff" />
-      <ScrollViewer
-        Grid.Row="1"
-        CanContentScroll="True">
-        <TextBlock
-          Background="#fff"
-          Foreground="#212121"
-          Margin="5"
-          Padding="5"
-          Name="textViewer"
-          TextWrapping="Wrap" />
-      </ScrollViewer>
+      Margin="15">
+      <lvc:CartesianChart
+        Series="{Binding SeriesCollection}" />
     </Grid>
   </Grid>
 </Window>
