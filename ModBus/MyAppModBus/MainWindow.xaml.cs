@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace MyAppModBus {
   /// <summary>
@@ -269,8 +270,7 @@ namespace MyAppModBus {
     /// <param name="e"></param>
     private void CheckValToRegisters( object sender, RoutedEventArgs e ) {
       try {
-        CheckBox pressed = (CheckBox)sender;
-        textViewer.Text = pressed.ToString();
+        ToggleButton pressed = (ToggleButton)sender;
         var indElem = CheckBoxWriteRegisters.Children.IndexOf( pressed );
         ushort[] arrRegisters = new ushort[] { 6, 7, 8 };
 
@@ -294,8 +294,7 @@ namespace MyAppModBus {
     /// <param name="e"></param>
     private void UncheckValToRegisters( object sender, RoutedEventArgs e ) {
       try {
-        CheckBox pressed = (CheckBox)sender;
-        textViewer.Text = pressed.ToString();
+        ToggleButton pressed = (ToggleButton)sender;
         var indElem = CheckBoxWriteRegisters.Children.IndexOf( pressed );
         ushort[] arrRegisters = new ushort[] { 6, 7, 8 };
 
