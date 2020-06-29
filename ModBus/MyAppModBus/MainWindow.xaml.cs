@@ -298,7 +298,7 @@ namespace MyAppModBus {
         var indElem = CheckBoxWriteRegisters.Children.IndexOf( pressed );
         ushort[] arrRegisters = new ushort[] { 6, 7, 8 };
 
-        if ( _serialPort.IsOpen && Convert.ToBoolean( pressed.IsChecked ) == true ) {
+        if ( _serialPort.IsOpen && Convert.ToBoolean( pressed.IsChecked ) == false ) {
           for ( var i = 0; i < arrRegisters.Length; i++ ) {
             if ( i == indElem ) {
               master.WriteSingleRegister( slaveID, arrRegisters[ i ], 0 );
