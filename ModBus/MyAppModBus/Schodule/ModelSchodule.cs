@@ -3,15 +3,11 @@
 namespace MyAppModBus.Schodule {
   public class ModelSchodule {
 
-    public ModelSchodule(string name) {
+    public string Name { get; set; }
 
-      string Name = name;
+    public string SchGetGraph() {
 
-    }
-
-
-    private string SchGetGraph(string Name) {
-
+      Name = "Get Out";
       return Name;
     }
   }

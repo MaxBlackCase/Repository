@@ -10,7 +10,7 @@ using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
 using LiveCharts;
 using LiveCharts.Wpf;
-
+using MyAppModBus.Schodule;
 
 namespace MyAppModBus {
   /// <summary>
@@ -31,13 +31,15 @@ namespace MyAppModBus {
 
     public SeriesCollection SeriesCollection { get; private set; }
     public string[] Labels { get; set; }
-    public Func<double, string> YFormatter { get; set; }
+    public Func<int, string> YFormatter { get; set; }
 
     public MainWindow() {
       InitializeComponent();
       AddItemToComboBox();
       btnGetHoldReg.IsEnabled = false;
-      ScheduleGet();
+      ModelSchodule modelSchodule = new ModelSchodule();
+
+      textViewer.Text = modelSchodule.SchGetGraph();
 
     }
 
@@ -363,26 +365,29 @@ namespace MyAppModBus {
       }
     }
 
+    /// <summary>
+    /// Статический график
+    /// </summary>
     private void ScheduleGet() {
       SeriesCollection = new SeriesCollection
             {
                 new LineSeries
                 {
-                    Title = "Series 1",
-                    Values = new ChartValues<double> { 4, 6, 5, 2 ,4 }
-                },
-                new LineSeries
-                {
-                    Title = "Series 2",
-                    Values = new ChartValues<double> { 6, 7, 3, 4 ,6 },
+                    Title = "Voltage",
+                    Values = new ChartValues<int> { 1000, 200, 300, 4000 },
                     PointGeometry = null
                 },
                 new LineSeries
                 {
-                    Title = "Series 3",
-                    Values = new ChartValues<double> { 4,2,7,2,7 },
-                    PointGeometry = DefaultGeometries.Square,
-                    PointGeometrySize = 15
+                    Title = "Current",
+                    Values = new ChartValues<int> { 500,1500,200,4000 },
+                    PointGeometry = null
+                },
+                new LineSeries
+                {
+                    Title = "Torque",
+                    Values = new ChartValues<int> { 10,3000,600,2000 },
+                    PointGeometry = null
                 }
       };
       Labels = new[] { "Jan", "Feb", "Mar", "Apr", "May" };
