@@ -113,7 +113,14 @@
       </Grid>
     </Grid>
     <Grid Grid.Row="1" Grid.Column="1" Margin="10">
-      <lvc:CartesianChart Series="{Binding SeriesCollection}" />
+      <lvc:CartesianChart Series="{Binding SeriesCollection}">
+        <lvc:CartesianChart.AxisY>
+          <lvc:Axis Title="Values" LabelFormatter="{Binding YFormatter}" />
+        </lvc:CartesianChart.AxisY>
+        <lvc:CartesianChart.AxisX>
+          <lvc:Axis Title="Time" LabelFormatter="{Binding Labels}" />
+        </lvc:CartesianChart.AxisX>
+      </lvc:CartesianChart>
     </Grid>
   </Grid>
 </Window>

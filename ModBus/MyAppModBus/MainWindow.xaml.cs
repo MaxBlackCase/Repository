@@ -10,8 +10,6 @@ using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
 using LiveCharts;
 using LiveCharts.Wpf;
-using MyAppModBus.Schodule;
-
 namespace MyAppModBus {
   /// <summary>
   /// Логика взаимодействия для MainWindow.xaml
@@ -30,17 +28,18 @@ namespace MyAppModBus {
     public static ModbusSerialMaster master = null;
 
     public SeriesCollection SeriesCollection { get; private set; }
-    public string[] Labels { get; set; }
-    public Func<int, string> YFormatter { get; set; }
+    public int[] Labels { get; set; }
+    public Func<int, int> YFormatter { get; set; }
 
+    public ChartValues<int> voltageValues = new ChartValues<int>();
+    public ChartValues<int> currentValues = new ChartValues<int>();
+    public ChartValues<int> torqueValues = new ChartValues<int>();
     public MainWindow() {
       InitializeComponent();
+
       AddItemToComboBox();
       btnGetHoldReg.IsEnabled = false;
-      ModelSchodule modelSchodule = new ModelSchodule();
-
-      textViewer.Text = modelSchodule.SchGetGraph();
-
+      ScheduleGet();
     }
 
     //Инициализация портов
@@ -163,9 +162,13 @@ namespace MyAppModBus {
         foreach ( ushort item in result ) {
 
           textViewer.Text += $"Регистр: {i} \t{item}\n";
+
           i++;
         }
 
+        voltageValues.Add( result[ 0 ] );
+        currentValues.Add( result[ 1 ] );
+        torqueValues.Add( result[ 4 ] );
 
         SetValSingleRegister();
       }
@@ -173,6 +176,7 @@ namespace MyAppModBus {
 
         textViewer.Text = $"Ошибка: {err.Message}";
       }
+
 
       #region Просчет контрольной суммы, если понадобится
       //Создание запроса
@@ -365,35 +369,34 @@ namespace MyAppModBus {
       }
     }
 
-    /// <summary>
-    /// Статический график
-    /// </summary>
-    private void ScheduleGet() {
+    public void ScheduleGet() {
+
+
       SeriesCollection = new SeriesCollection
             {
                 new LineSeries
                 {
                     Title = "Voltage",
-                    Values = new ChartValues<int> { 1000, 200, 300, 4000 },
+                    Values = voltageValues,
                     PointGeometry = null
                 },
                 new LineSeries
                 {
                     Title = "Current",
-                    Values = new ChartValues<int> { 500,1500,200,4000 },
+                    Values = currentValues,
                     PointGeometry = null
                 },
                 new LineSeries
                 {
                     Title = "Torque",
-                    Values = new ChartValues<int> { 10,3000,600,2000 },
+                    Values = torqueValues,
                     PointGeometry = null
-                }
+                },
       };
-      Labels = new[] { "Jan", "Feb", "Mar", "Apr", "May" };
-      YFormatter = value => value.ToString( "C" );
-
+      Labels = new[] { 1, 2, 3, 4, 5, 6 };
+      YFormatter = value => value;
       DataContext = this;
     }
+
   }
 }
