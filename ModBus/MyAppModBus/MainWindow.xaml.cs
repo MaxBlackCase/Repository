@@ -7,8 +7,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using LiveCharts;
+using LiveCharts.Wpf;
+
 
 namespace MyAppModBus {
   /// <summary>
@@ -17,19 +19,25 @@ namespace MyAppModBus {
   public partial class MainWindow : Window {
 
     const byte slaveID = 1;
+
     private readonly ushort startAddress = 0;
     private readonly ushort numburOfPoints = 18;
     private int readWriteTimeOut = 50;
     private DispatcherTimer timer;
+
     public static string result;
     public static SerialPort _serialPort = null;
     public static ModbusSerialMaster master = null;
 
+    public SeriesCollection SeriesCollection { get; private set; }
+    public string[] Labels { get; set; }
+    public Func<double, string> YFormatter { get; set; }
 
     public MainWindow() {
       InitializeComponent();
       AddItemToComboBox();
       btnGetHoldReg.IsEnabled = false;
+      ScheduleGet();
 
     }
 
@@ -59,7 +67,7 @@ namespace MyAppModBus {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public void ConnectToDevice( object sender, RoutedEventArgs e ) {
+    private void ConnectToDevice( object sender, RoutedEventArgs e ) {
       _serialPort = new SerialPort();
       timer = new DispatcherTimer();
 
@@ -274,7 +282,7 @@ namespace MyAppModBus {
         var indElem = CheckBoxWriteRegisters.Children.IndexOf( pressed );
         ushort[] arrRegisters = new ushort[] { 6, 7, 8 };
 
-        if ( _serialPort.IsOpen && Convert.ToBoolean(pressed.IsChecked) == true ) {
+        if ( _serialPort.IsOpen && Convert.ToBoolean( pressed.IsChecked ) == true ) {
           for ( var i = 0; i < arrRegisters.Length; i++ ) {
             if ( i == indElem ) {
               master.WriteSingleRegister( slaveID, arrRegisters[ i ], 1 );
@@ -355,18 +363,32 @@ namespace MyAppModBus {
       }
     }
 
-    private void ScheduleBtn_Click( object sender, RoutedEventArgs e ) {
+    private void ScheduleGet() {
+      SeriesCollection = new SeriesCollection
+            {
+                new LineSeries
+                {
+                    Title = "Series 1",
+                    Values = new ChartValues<double> { 4, 6, 5, 2 ,4 }
+                },
+                new LineSeries
+                {
+                    Title = "Series 2",
+                    Values = new ChartValues<double> { 6, 7, 3, 4 ,6 },
+                    PointGeometry = null
+                },
+                new LineSeries
+                {
+                    Title = "Series 3",
+                    Values = new ChartValues<double> { 4,2,7,2,7 },
+                    PointGeometry = DefaultGeometries.Square,
+                    PointGeometrySize = 15
+                }
+      };
+      Labels = new[] { "Jan", "Feb", "Mar", "Apr", "May" };
+      YFormatter = value => value.ToString( "C" );
 
-      try {
-
-      }
-      catch ( Exception err ) {
-
-        System.Windows.MessageBox.Show( err.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error );
-
-      }
+      DataContext = this;
     }
-
-    
   }
 }
