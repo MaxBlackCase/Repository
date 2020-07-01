@@ -21,22 +21,22 @@ namespace MyAppModBus {
     private readonly ushort startAddress = 0;
     private readonly ushort numburOfPoints = 18;
     private int readWriteTimeOut = 50;
-    private DispatcherTimer timer;
 
     public static string result;
+    private DispatcherTimer timer;
     public static SerialPort _serialPort = null;
     public static ModbusSerialMaster master = null;
 
     public SeriesCollection SeriesCollection { get; private set; }
     public int[] Labels { get; set; }
-    public Func<int, int> YFormatter { get; set; }
+    public Func<int, string> YFormatter { get; set; }
 
     public MainWindow() {
       InitializeComponent();
 
+      //ScheduleGet();
       AddItemToComboBox();
       btnGetHoldReg.IsEnabled = false;
-      //ScheduleGet();
     }
 
     //Инициализация портов
@@ -383,7 +383,7 @@ namespace MyAppModBus {
         //},
       };
       Labels = new[] { 1, 2, 3, 4, 5 };
-      YFormatter = value => value;
+      YFormatter = value => value.ToString();
       DataContext = this;
     }
 
