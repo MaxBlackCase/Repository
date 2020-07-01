@@ -31,9 +31,6 @@ namespace MyAppModBus {
     public int[] Labels { get; set; }
     public Func<int, int> YFormatter { get; set; }
 
-    public ChartValues<int> voltageValues = new ChartValues<int>();
-    public ChartValues<int> currentValues = new ChartValues<int>();
-    public ChartValues<int> torqueValues = new ChartValues<int>();
     public MainWindow() {
       InitializeComponent();
 
@@ -153,24 +150,18 @@ namespace MyAppModBus {
     /// <param name="e"></param>
     private void GetHoldReg( object sender, EventArgs e ) {
 
+      master = ModbusSerialMaster.CreateRtu( _serialPort );
       try {
-
-        master = ModbusSerialMaster.CreateRtu( _serialPort );
-        ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
         textViewer.Text = "";
+        ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
         int i = 0;
         foreach ( ushort item in result ) {
-
           textViewer.Text += $"Регистр: {i} \t{item}\n";
-
           i++;
         }
 
-        voltageValues.Add( result[ 0 ] );
-        currentValues.Add( result[ 1 ] );
-        torqueValues.Add( result[ 4 ] );
+        SetValSingleRegister( result[9], result[10] );
 
-        SetValSingleRegister();
       }
       catch ( Exception err ) {
 
@@ -228,15 +219,14 @@ namespace MyAppModBus {
     /// <summary>
     /// Получение данных концевиков
     /// </summary>
-    private void SetValSingleRegister() {
+    private void SetValSingleRegister(ushort registrNine, ushort registrTen ) {
 
       try {
         if ( _serialPort.IsOpen ) {
 
-          ushort[] res = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
           int[] arrLimitSwitch = new int[ 2 ];
-          arrLimitSwitch[ 0 ] = Convert.ToInt32( res[ 9 ] );
-          arrLimitSwitch[ 1 ] = Convert.ToInt32( res[ 10 ] );
+          arrLimitSwitch[ 0 ] = Convert.ToInt32( registrNine );
+          arrLimitSwitch[ 1 ] = Convert.ToInt32( registrTen );
 
 
           for ( int i = 0; i < LimSwPanel.Children.Count; i++ ) {
@@ -374,26 +364,26 @@ namespace MyAppModBus {
 
       SeriesCollection = new SeriesCollection
             {
-                new LineSeries
-                {
-                    Title = "Voltage",
-                    Values = voltageValues,
-                    PointGeometry = null
-                },
-                new LineSeries
-                {
-                    Title = "Current",
-                    Values = currentValues,
-                    PointGeometry = null
-                },
-                new LineSeries
-                {
-                    Title = "Torque",
-                    Values = torqueValues,
-                    PointGeometry = null
-                },
+                //new LineSeries
+                //{
+                //    Title = "Voltage",
+                //    Values = voltageValues,
+                //    PointGeometry = null
+                //},
+                //new LineSeries
+                //{
+                //    Title = "Current",
+                //    Values = currentValues,
+                //    PointGeometry = null
+                //},
+                //new LineSeries
+                //{
+                //    Title = "Torque",
+                //    Values = torqueValues,
+                //    PointGeometry = null
+                //},
       };
-      Labels = new[] { 1, 2, 3, 4, 5, 6 };
+      Labels = new[] { 1,2,3,4,5};
       YFormatter = value => value;
       DataContext = this;
     }
