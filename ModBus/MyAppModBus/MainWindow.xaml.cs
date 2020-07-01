@@ -28,6 +28,8 @@ namespace MyAppModBus {
     public static ModbusSerialMaster master = null;
 
     public ChartValues<int> voltageValues = new ChartValues<int>();
+    public ChartValues<int> currentValues = new ChartValues<int>();
+    public ChartValues<int> torqueValues = new ChartValues<int>();
 
     public SeriesCollection SeriesCollection { get; private set; }
     public int[] Labels { get; set; }
@@ -39,6 +41,7 @@ namespace MyAppModBus {
       //ScheduleGet();
       AddItemToComboBox();
       btnGetHoldReg.IsEnabled = false;
+
     }
 
     //Инициализация портов
@@ -145,28 +148,34 @@ namespace MyAppModBus {
       #endregion
     }
 
+
     /// <summary>
     /// Получение данных с регистров
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
+    private int timeCount = 0;
+
     private void GetHoldReg( object sender, EventArgs e ) {
 
       ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
       try {
         textViewer.Text = "";
         int i = 0;
+        timeCount += readWriteTimeOut;
         foreach ( ushort item in result ) {
           textViewer.Text += $"Регистр: {i} \t{item}\n";
           i++;
         }
 
         SetValSingleRegister( result[ 9 ], result[ 10 ] );
-        voltageValues.Add( result[ 0 ] );
-        if ( (readWriteTimeOut % 50) == 0 ) {
-          //Остановился тут
+        if ( timeCount % 1000 == 0 ) {
+          voltageValues.Add( result[ 0 ] );
+          currentValues.Add( result[ 1 ] );
+          torqueValues.Add( result[ 4 ] );
           ScheduleGet();
         }
+
       }
       catch ( Exception err ) {
 
@@ -366,29 +375,28 @@ namespace MyAppModBus {
 
     public void ScheduleGet() {
 
-
       SeriesCollection = new SeriesCollection
       {
         new LineSeries
         {
             Title = "Voltage",
             Values = voltageValues,
-            //PointGeometry = null
+            PointGeometry = null
         },
-        //new LineSeries
-        //{
-        //    Title = "Current",
-        //    Values = currentValues,
-        //    PointGeometry = null
-        //},
-        //new LineSeries
-        //{
-        //    Title = "Torque",
-        //    Values = torqueValues,
-        //    PointGeometry = null
-        //},
+        new LineSeries
+        {
+            Title = "Current",
+            Values = currentValues,
+            PointGeometry = null
+        },
+        new LineSeries
+        {
+            Title = "Torque",
+            Values = torqueValues,
+            PointGeometry = null
+        },
       };
-      Labels = new[] { 1, 2, 3, 4, 5 };
+      Labels = new[] { 50, 100, 150, 200, 250 };
       YFormatter = value => value.ToString();
       DataContext = this;
     }
