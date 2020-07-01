@@ -27,6 +27,8 @@ namespace MyAppModBus {
     public static SerialPort _serialPort = null;
     public static ModbusSerialMaster master = null;
 
+    public ChartValues<int> voltageValues = new ChartValues<int>();
+
     public SeriesCollection SeriesCollection { get; private set; }
     public int[] Labels { get; set; }
     public Func<int, string> YFormatter { get; set; }
@@ -160,7 +162,11 @@ namespace MyAppModBus {
         }
 
         SetValSingleRegister( result[ 9 ], result[ 10 ] );
-
+        voltageValues.Add( result[ 0 ] );
+        if ( (readWriteTimeOut % 50) == 0 ) {
+          //Остановился тут
+          ScheduleGet();
+        }
       }
       catch ( Exception err ) {
 
@@ -363,12 +369,12 @@ namespace MyAppModBus {
 
       SeriesCollection = new SeriesCollection
       {
-        //new LineSeries
-        //{
-        //    Title = "Voltage",
-        //    Values = voltageValues,
-        //    PointGeometry = null
-        //},
+        new LineSeries
+        {
+            Title = "Voltage",
+            Values = voltageValues,
+            //PointGeometry = null
+        },
         //new LineSeries
         //{
         //    Title = "Current",
