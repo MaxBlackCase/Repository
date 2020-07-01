@@ -36,7 +36,7 @@ namespace MyAppModBus {
 
       AddItemToComboBox();
       btnGetHoldReg.IsEnabled = false;
-      ScheduleGet();
+      //ScheduleGet();
     }
 
     //Инициализация портов
@@ -150,17 +150,16 @@ namespace MyAppModBus {
     /// <param name="e"></param>
     private void GetHoldReg( object sender, EventArgs e ) {
 
-      master = ModbusSerialMaster.CreateRtu( _serialPort );
+      ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
       try {
         textViewer.Text = "";
-        ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
         int i = 0;
         foreach ( ushort item in result ) {
           textViewer.Text += $"Регистр: {i} \t{item}\n";
           i++;
         }
 
-        SetValSingleRegister( result[9], result[10] );
+        SetValSingleRegister( result[ 9 ], result[ 10 ] );
 
       }
       catch ( Exception err ) {
@@ -219,7 +218,7 @@ namespace MyAppModBus {
     /// <summary>
     /// Получение данных концевиков
     /// </summary>
-    private void SetValSingleRegister(ushort registrNine, ushort registrTen ) {
+    private void SetValSingleRegister( ushort registrNine, ushort registrTen ) {
 
       try {
         if ( _serialPort.IsOpen ) {
@@ -363,27 +362,27 @@ namespace MyAppModBus {
 
 
       SeriesCollection = new SeriesCollection
-            {
-                //new LineSeries
-                //{
-                //    Title = "Voltage",
-                //    Values = voltageValues,
-                //    PointGeometry = null
-                //},
-                //new LineSeries
-                //{
-                //    Title = "Current",
-                //    Values = currentValues,
-                //    PointGeometry = null
-                //},
-                //new LineSeries
-                //{
-                //    Title = "Torque",
-                //    Values = torqueValues,
-                //    PointGeometry = null
-                //},
+      {
+        //new LineSeries
+        //{
+        //    Title = "Voltage",
+        //    Values = voltageValues,
+        //    PointGeometry = null
+        //},
+        //new LineSeries
+        //{
+        //    Title = "Current",
+        //    Values = currentValues,
+        //    PointGeometry = null
+        //},
+        //new LineSeries
+        //{
+        //    Title = "Torque",
+        //    Values = torqueValues,
+        //    PointGeometry = null
+        //},
       };
-      Labels = new[] { 1,2,3,4,5};
+      Labels = new[] { 1, 2, 3, 4, 5 };
       YFormatter = value => value;
       DataContext = this;
     }
