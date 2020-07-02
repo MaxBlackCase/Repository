@@ -9,15 +9,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
 using LiveCharts;
-using LiveCharts.Wpf;
 using System.Threading.Tasks;
-using System.Windows.Documents;
-using SciChart.Charting.Model.DataSeries;
-using System.ComponentModel;
-using LiveCharts.Configurations;
-using System.Threading;
-using SciChart.Core.Extensions;
-using System.Reflection.Emit;
 
 namespace MyAppModBus {
   /// <summary>
@@ -36,6 +28,7 @@ namespace MyAppModBus {
     public static SerialPort _serialPort = null;
     public static ModbusSerialMaster master = null;
 
+    
     public ChartValues<double> VoltageValues { get; private set; }
     public ChartValues<double> CurrentValues { get; private set; }
     public ChartValues<double> TorqueValues { get; private set; }
@@ -165,12 +158,13 @@ namespace MyAppModBus {
     /// <param name="sender"></param>
     /// <param name="e"></param>
 
-
+    private double countTime = 0;
     private void GetHoldReg( object sender, EventArgs e ) {
       ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
       try {
 
         textViewer.Text = "";
+        countTime += readWriteTimeOut;
 
         for ( int i = 0; i < result.Length; i++ ) {
           textViewer.Text += $"Регистр: {i} \t{result[ i ]}\n";
@@ -178,10 +172,13 @@ namespace MyAppModBus {
         }
         SetValSingleRegister( result[ 9 ], result[ 10 ] );
 
-        VoltageValues.Add( Convert.ToDouble( result[ 0 ] ) );
-        CurrentValues.Add( Convert.ToDouble( result[ 1 ] ) );
-        TorqueValues.Add( Convert.ToDouble( result[ 4 ] ) );
-        DataContext = this;
+        if ( countTime % readWriteTimeOut == 0 ) {
+          VoltageValues.Add( Convert.ToDouble( result[ 0 ] ) );
+          CurrentValues.Add( Convert.ToDouble( result[ 1 ] ) );
+          TorqueValues.Add( Convert.ToDouble( result[ 4 ] ) );
+        }
+          DataContext = this;
+        
 
       }
       catch ( Exception err ) {
