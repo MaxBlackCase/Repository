@@ -10,6 +10,15 @@ using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
 using LiveCharts;
 using LiveCharts.Wpf;
+using System.Threading.Tasks;
+using System.Windows.Documents;
+using SciChart.Charting.Model.DataSeries;
+using System.ComponentModel;
+using LiveCharts.Configurations;
+using System.Threading;
+using SciChart.Core.Extensions;
+using System.Reflection.Emit;
+
 namespace MyAppModBus {
   /// <summary>
   /// Логика взаимодействия для MainWindow.xaml
@@ -27,18 +36,15 @@ namespace MyAppModBus {
     public static SerialPort _serialPort = null;
     public static ModbusSerialMaster master = null;
 
-    public ChartValues<int> voltageValues = new ChartValues<int>();
-    public ChartValues<int> currentValues = new ChartValues<int>();
-    public ChartValues<int> torqueValues = new ChartValues<int>();
-
-    public SeriesCollection SeriesCollection { get; private set; }
-    public int[] Labels { get; set; }
-    public Func<int, string> YFormatter { get; set; }
+    public ChartValues<double> VoltageValues { get; private set; }
+    public ChartValues<double> CurrentValues { get; private set; }
+    public ChartValues<double> TorqueValues { get; private set; }
+    public Func<double, string> TimeAnimation { get; private set; }
+    public string[] Labels { get; private set; }
+    public string[] LebelFormatters { get; private set; }
 
     public MainWindow() {
       InitializeComponent();
-
-      //ScheduleGet();
       AddItemToComboBox();
       btnGetHoldReg.IsEnabled = false;
 
@@ -70,7 +76,7 @@ namespace MyAppModBus {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void ConnectToDevice( object sender, RoutedEventArgs e ) {
+    private async void ConnectToDevice( object sender, RoutedEventArgs e ) {
       _serialPort = new SerialPort();
       timer = new DispatcherTimer();
 
@@ -97,6 +103,8 @@ namespace MyAppModBus {
         timer.Tick += new EventHandler( GetHoldReg );
         timer.Interval = new TimeSpan( 0, 0, 0, 0, readWriteTimeOut );
         timer.Start();
+
+        await Task.Run( () => GraphLines() );
         #endregion
 
         //Сброс регистров
@@ -121,6 +129,8 @@ namespace MyAppModBus {
         disconnectComPort.Visibility = Visibility.Hidden;
         textViewer.Text = $"Ошибка: {err.Message}";
       }
+
+
     }
 
     /// <summary>
@@ -154,27 +164,24 @@ namespace MyAppModBus {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private int timeCount = 0;
+
 
     private void GetHoldReg( object sender, EventArgs e ) {
-
       ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
       try {
-        textViewer.Text = "";
-        int i = 0;
-        timeCount += readWriteTimeOut;
-        foreach ( ushort item in result ) {
-          textViewer.Text += $"Регистр: {i} \t{item}\n";
-          i++;
-        }
 
-        SetValSingleRegister( result[ 9 ], result[ 10 ] );
-        if ( timeCount % 1000 == 0 ) {
-          voltageValues.Add( result[ 0 ] );
-          currentValues.Add( result[ 1 ] );
-          torqueValues.Add( result[ 4 ] );
-          ScheduleGet();
+        textViewer.Text = "";
+
+        for ( int i = 0; i < result.Length; i++ ) {
+          textViewer.Text += $"Регистр: {i} \t{result[ i ]}\n";
+
         }
+        SetValSingleRegister( result[ 9 ], result[ 10 ] );
+
+        VoltageValues.Add( Convert.ToDouble( result[ 0 ] ) );
+        CurrentValues.Add( Convert.ToDouble( result[ 1 ] ) );
+        TorqueValues.Add( Convert.ToDouble( result[ 4 ] ) );
+        DataContext = this;
 
       }
       catch ( Exception err ) {
@@ -230,6 +237,7 @@ namespace MyAppModBus {
       #endregion
 
     }
+
     /// <summary>
     /// Получение данных концевиков
     /// </summary>
@@ -304,7 +312,6 @@ namespace MyAppModBus {
         textViewer.Text = $"Ошибка: {err.Message}";
       }
     }
-
     /// <summary>
     /// Снятие ограничений в регистрах
     /// </summary>
@@ -373,32 +380,17 @@ namespace MyAppModBus {
       }
     }
 
-    public void ScheduleGet() {
+    private async void GraphLines() {
 
-      SeriesCollection = new SeriesCollection
-      {
-        new LineSeries
-        {
-            Title = "Voltage",
-            Values = voltageValues,
-            PointGeometry = null
-        },
-        new LineSeries
-        {
-            Title = "Current",
-            Values = currentValues,
-            PointGeometry = null
-        },
-        new LineSeries
-        {
-            Title = "Torque",
-            Values = torqueValues,
-            PointGeometry = null
-        },
-      };
-      Labels = new[] { 50, 100, 150, 200, 250 };
-      YFormatter = value => value.ToString();
-      DataContext = this;
+
+      Task t1 = Task.Run( () => VoltageValues = new ChartValues<double>() );
+      Task t2 = Task.Run( () => CurrentValues = new ChartValues<double>() );
+      Task t3 = Task.Run( () => TorqueValues = new ChartValues<double>() );
+
+      await Task.WhenAll( new[] { t1, t2, t3 } );
+
+      Labels = new [] { "One", "Two", "Three", "Four"};
+      LebelFormatters = new[] { "1000", "2000", "3000", "4000" };
     }
 
   }
