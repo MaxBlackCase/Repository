@@ -10,6 +10,7 @@ using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
 using LiveCharts;
 using System.Threading.Tasks;
+using LiveCharts.Defaults;
 
 namespace MyAppModBus {
   /// <summary>
@@ -28,13 +29,7 @@ namespace MyAppModBus {
     public static SerialPort _serialPort = null;
     public static ModbusSerialMaster master = null;
 
-    
-    public ChartValues<double> VoltageValues { get; private set; }
-    public ChartValues<double> CurrentValues { get; private set; }
-    public ChartValues<double> TorqueValues { get; private set; }
-    public Func<double, string> TimeAnimation { get; private set; }
-    public string[] Labels { get; private set; }
-    public string[] LebelFormatters { get; private set; }
+
 
     public MainWindow() {
       InitializeComponent();
@@ -69,7 +64,7 @@ namespace MyAppModBus {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private async void ConnectToDevice( object sender, RoutedEventArgs e ) {
+    private void ConnectToDevice( object sender, RoutedEventArgs e ) {
       _serialPort = new SerialPort();
       timer = new DispatcherTimer();
 
@@ -96,8 +91,6 @@ namespace MyAppModBus {
         timer.Tick += new EventHandler( GetHoldReg );
         timer.Interval = new TimeSpan( 0, 0, 0, 0, readWriteTimeOut );
         timer.Start();
-
-        await Task.Run( () => GraphLines() );
         #endregion
 
         //Сброс регистров
@@ -159,6 +152,8 @@ namespace MyAppModBus {
     /// <param name="e"></param>
 
     private double countTime = 0;
+    private int countIndex = 0;
+    private double[] chartArr = new double[ 10000 ];
     private void GetHoldReg( object sender, EventArgs e ) {
       ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
       try {
@@ -172,13 +167,13 @@ namespace MyAppModBus {
         }
         SetValSingleRegister( result[ 9 ], result[ 10 ] );
 
+
+        chartArr[ countIndex ] = Convert.ToDouble( result[ 0 ] );
+
         if ( countTime % readWriteTimeOut == 0 ) {
-          VoltageValues.Add( Convert.ToDouble( result[ 0 ] ) );
-          CurrentValues.Add( Convert.ToDouble( result[ 1 ] ) );
-          TorqueValues.Add( Convert.ToDouble( result[ 4 ] ) );
         }
-          DataContext = this;
-        
+        DataContext = this;
+        countIndex++;
 
       }
       catch ( Exception err ) {
@@ -377,17 +372,9 @@ namespace MyAppModBus {
       }
     }
 
-    private async void GraphLines() {
+    private void GraphLines() {
 
 
-      Task t1 = Task.Run( () => VoltageValues = new ChartValues<double>() );
-      Task t2 = Task.Run( () => CurrentValues = new ChartValues<double>() );
-      Task t3 = Task.Run( () => TorqueValues = new ChartValues<double>() );
-
-      await Task.WhenAll( new[] { t1, t2, t3 } );
-
-      Labels = new [] { "One", "Two", "Three", "Four"};
-      LebelFormatters = new[] { "1000", "2000", "3000", "4000" };
     }
 
   }
