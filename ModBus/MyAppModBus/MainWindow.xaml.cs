@@ -8,9 +8,6 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Documents;
 using System.Collections.Generic;
 using InteractiveDataDisplay.WPF;
 
@@ -30,20 +27,24 @@ namespace MyAppModBus {
     private DispatcherTimer timer;
     public static SerialPort _serialPort = null;
     public static ModbusSerialMaster master = null;
+
     private Dictionary<int, double> volltage = new Dictionary<int, double>();
     private Dictionary<int, double> current = new Dictionary<int, double>();
     private Dictionary<int, double> torque = new Dictionary<int, double>();
+    private Dictionary<int, double> tempExternal = new Dictionary<int, double>();
+    private Dictionary<int, double> tempMotor = new Dictionary<int, double>();
+
     private LineGraph volltageLine = new LineGraph();
     private LineGraph currentLine = new LineGraph();
     private LineGraph torqueLine = new LineGraph();
-
+    private LineGraph externalLine = new LineGraph();
+    private LineGraph motorLine = new LineGraph();
 
     public MainWindow() {
       InitializeComponent();
       AddItemToComboBox();
       btnGetHoldReg.IsEnabled = false;
       GraphLines();
-
     }
 
     //Инициализация портов
@@ -152,7 +153,6 @@ namespace MyAppModBus {
       #endregion
     }
 
-
     /// <summary>
     /// Получение данных с регистров
     /// </summary>
@@ -173,18 +173,21 @@ namespace MyAppModBus {
           textViewer.Text += $"Регистр: {i} \t{result[ i ]}\n";
 
         }
+
         SetValSingleRegister( result[ 9 ], result[ 10 ] );
 
-
-
-        if ( countTime % readWriteTimeOut == 0) {
+        if ( countTime % (readWriteTimeOut * 0.1) == 0) {
           volltage.Add( countIndex, Convert.ToDouble( result[ 0 ] ) );
           current.Add( countIndex, Convert.ToDouble( result[ 1 ] ) );
           torque.Add( countIndex, Convert.ToDouble( result[ 4 ] ) );
+          tempExternal.Add( countIndex, Convert.ToDouble( result[ 2 ] ) );
+          tempMotor.Add( countIndex, Convert.ToDouble( result[ 3 ] ) );
 
           volltageLine.Plot( volltage.Keys, volltage.Values );
           currentLine.Plot( current.Keys, current.Values );
           torqueLine.Plot( torque.Keys, torque.Values );
+          externalLine.Plot( tempExternal.Keys, tempExternal.Values );
+          motorLine.Plot( tempMotor.Keys, tempMotor.Values );
 
         }
 
@@ -374,6 +377,7 @@ namespace MyAppModBus {
       }
 
     }
+
     /// <summary>
     /// Сброс регистров 
     /// </summary>
@@ -385,12 +389,18 @@ namespace MyAppModBus {
       }
     }
 
+    /// <summary>
+    /// Отрисовка графиков и их линий
+    /// </summary>
     private void GraphLines( ) {
 
       lines.Children.Add( volltageLine );
       lines.Children.Add( currentLine );
       lines.Children.Add( torqueLine );
+      lines_two.Children.Add( externalLine );
+      lines_two.Children.Add( motorLine );
 
+      //Линии первого графика
       volltageLine.Stroke = new SolidColorBrush( Color.FromRgb( 33, 150, 243 ) );
       volltageLine.Description = String.Format( $"Voltage" );
       volltageLine.StrokeThickness = 2;
@@ -400,6 +410,15 @@ namespace MyAppModBus {
       torqueLine.Stroke = new SolidColorBrush( Color.FromRgb( 251, 140, 0 ) );
       torqueLine.Description = String.Format( $"Torque" );
       torqueLine.StrokeThickness = 2;
+
+      //Линии второго графика
+      externalLine.Stroke = new SolidColorBrush( Color.FromRgb( 244, 67, 54 ) );
+      externalLine.Description = String.Format( $"Temp Extermal" );
+      externalLine.StrokeThickness = 2;
+
+      motorLine.Stroke = new SolidColorBrush( Color.FromRgb( 103, 58, 183 ) );
+      motorLine.Description = String.Format( $"Temp Motor" );
+      motorLine.StrokeThickness = 2;
 
     }
 
