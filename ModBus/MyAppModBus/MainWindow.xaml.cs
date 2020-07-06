@@ -163,8 +163,6 @@ namespace MyAppModBus {
 
     private double countTime = 0;
     private int countIndex = 0;
-    private ChartValues<double> t1 = new ChartValues<double>();
-    private ChartValues<double> t2 = new ChartValues<double>();
 
     private void GetHoldReg( object sender, EventArgs e ) {
       ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
