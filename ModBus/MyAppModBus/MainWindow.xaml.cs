@@ -8,9 +8,11 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
-using LiveCharts;
+using System.Linq;
 using System.Threading.Tasks;
-using LiveCharts.Defaults;
+using System.Windows.Documents;
+using System.Collections.Generic;
+using InteractiveDataDisplay.WPF;
 
 namespace MyAppModBus {
   /// <summary>
@@ -28,13 +30,19 @@ namespace MyAppModBus {
     private DispatcherTimer timer;
     public static SerialPort _serialPort = null;
     public static ModbusSerialMaster master = null;
-
+    private Dictionary<int, double> volltage = new Dictionary<int, double>();
+    private Dictionary<int, double> current = new Dictionary<int, double>();
+    private Dictionary<int, double> torque = new Dictionary<int, double>();
+    private LineGraph volltageLine = new LineGraph();
+    private LineGraph currentLine = new LineGraph();
+    private LineGraph torqueLine = new LineGraph();
 
 
     public MainWindow() {
       InitializeComponent();
       AddItemToComboBox();
       btnGetHoldReg.IsEnabled = false;
+      GraphLines();
 
     }
 
@@ -153,7 +161,7 @@ namespace MyAppModBus {
 
     private double countTime = 0;
     private int countIndex = 0;
-    private double[] chartArr = new double[ 10000 ];
+
     private void GetHoldReg( object sender, EventArgs e ) {
       ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
       try {
@@ -168,16 +176,21 @@ namespace MyAppModBus {
         SetValSingleRegister( result[ 9 ], result[ 10 ] );
 
 
-        chartArr[ countIndex ] = Convert.ToDouble( result[ 0 ] );
 
-        if ( countTime % readWriteTimeOut == 0 ) {
+        if ( countTime % readWriteTimeOut == 0) {
+          volltage.Add( countIndex, Convert.ToDouble( result[ 0 ] ) );
+          current.Add( countIndex, Convert.ToDouble( result[ 1 ] ) );
+          torque.Add( countIndex, Convert.ToDouble( result[ 4 ] ) );
+
+          volltageLine.Plot( volltage.Keys, volltage.Values );
+          currentLine.Plot( current.Keys, current.Values );
+          torqueLine.Plot( torque.Keys, torque.Values );
+
         }
-        DataContext = this;
-        countIndex++;
 
+        countIndex++;
       }
       catch ( Exception err ) {
-
         textViewer.Text = $"Ошибка: {err.Message}";
       }
 
@@ -372,10 +385,24 @@ namespace MyAppModBus {
       }
     }
 
-    private void GraphLines() {
+    private void GraphLines( ) {
 
+      lines.Children.Add( volltageLine );
+      lines.Children.Add( currentLine );
+      lines.Children.Add( torqueLine );
+
+      volltageLine.Stroke = new SolidColorBrush( Color.FromRgb( 33, 150, 243 ) );
+      volltageLine.Description = String.Format( $"Voltage" );
+      volltageLine.StrokeThickness = 2;
+      currentLine.Stroke = new SolidColorBrush( Color.FromRgb( 76, 175, 80 ) );
+      currentLine.Description = String.Format( $"Current" );
+      currentLine.StrokeThickness = 2;
+      torqueLine.Stroke = new SolidColorBrush( Color.FromRgb( 251, 140, 0 ) );
+      torqueLine.Description = String.Format( $"Torque" );
+      torqueLine.StrokeThickness = 2;
 
     }
+
 
   }
 }

@@ -1,4 +1,6 @@
-﻿<Window x:Class="MyAppModBus.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:MyAppModBus" xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf" xmlns:smtx="clr-namespace:ShowMeTheXAML;assembly=ShowMeTheXAML" mc:Ignorable="d" Title="MainWindow" Height="800" Width="1100" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Background="#212121" AllowsTransparency="True" WindowStyle="None" BorderBrush="#fff" FontFamily="Consolas">
+﻿<Window x:Class="MyAppModBus.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:MyAppModBus" xmlns:smtx="clr-namespace:ShowMeTheXAML;assembly=ShowMeTheXAML"
+xmlns:d3="clr-namespace:InteractiveDataDisplay.WPF;assembly=InteractiveDataDisplay.WPF"
+mc:Ignorable="d" Title="MainWindow" Height="800" Width="1100" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Background="#212121"  WindowStyle="SingleBorderWindow" BorderBrush="#fff" FontFamily="Consolas">
   <Window.Resources>
     <Style x:Key="LabelForToggleBtn">
       <Setter Property="TextBlock.Foreground" Value="#fff" />
@@ -120,29 +122,9 @@
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
-      <lvc:CartesianChart Grid.Row="0" AnimationsSpeed="00:00:0.5" Hoverable="False" DataTooltip="{x:Null}" Background="#383838" Margin="5">
-        <lvc:CartesianChart.Series>
-          <lvc:LineSeries Values="{Binding VoltageValues}" PointGeometry="{x:Null}" LineSmoothness="0.1" StrokeThickness="2" Stroke="#FFECB3" Fill="Transparent" />
-          <lvc:LineSeries Values="{Binding CurrentValues}" PointGeometry="{x:Null}" LineSmoothness="0.1" StrokeThickness="2" Stroke="#448AFF" Fill="Transparent" />
-          <lvc:LineSeries Values="{Binding TorqueValues}" PointGeometry="{x:Null}" LineSmoothness="0.1" StrokeThickness="2" Stroke="#FFC107" Fill="Transparent" />
-        </lvc:CartesianChart.Series>
-        <lvc:CartesianChart.AxisY>
-          <lvc:Axis LabelFormatter="{x:Null}" IsMerged="True" Title="Values" Foreground="#fff" Position="LeftBottom">
-            <lvc:Axis.Separator>
-              <lvc:Separator StrokeThickness="0.2" Stroke="#c4c4c4"></lvc:Separator>
-            </lvc:Axis.Separator>
-          </lvc:Axis>
-        </lvc:CartesianChart.AxisY>
-        <lvc:CartesianChart.AxisX>
-          <lvc:Axis Labels="{x:Null}" Title="Time" IsMerged="True" Foreground="#fff">
-            <lvc:Axis.Separator>
-              <lvc:Separator StrokeThickness="0.2" Stroke="#c4c4c4">
-                
-              </lvc:Separator>
-            </lvc:Axis.Separator>
-          </lvc:Axis>
-        </lvc:CartesianChart.AxisX>
-      </lvc:CartesianChart>
+      <d3:Chart BottomTitle="Argument" LeftTitle="Function" Name="MyLines" Background="#212121" Foreground="#fff">
+        <Grid Name="lines"/>
+      </d3:Chart>
     </Grid>
   </Grid>
 </Window>
