@@ -1,6 +1,4 @@
-﻿<Window x:Class="MyAppModBus.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:MyAppModBus" xmlns:smtx="clr-namespace:ShowMeTheXAML;assembly=ShowMeTheXAML"
-xmlns:d3="clr-namespace:InteractiveDataDisplay.WPF;assembly=InteractiveDataDisplay.WPF"
-mc:Ignorable="d" Title="MainWindow" Height="800" Width="1100" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Background="#212121"  WindowStyle="SingleBorderWindow" BorderBrush="#fff" FontFamily="Consolas">
+﻿<Window x:Class="MyAppModBus.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:MyAppModBus" xmlns:smtx="clr-namespace:ShowMeTheXAML;assembly=ShowMeTheXAML" xmlns:d3="clr-namespace:InteractiveDataDisplay.WPF;assembly=InteractiveDataDisplay.WPF" xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf" mc:Ignorable="d" Title="MainWindow" Height="800" Width="1100" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Background="#212121" WindowStyle="SingleBorderWindow" BorderBrush="#fff" FontFamily="Consolas">
   <Window.Resources>
     <Style x:Key="LabelForToggleBtn">
       <Setter Property="TextBlock.Foreground" Value="#fff" />
@@ -123,7 +121,10 @@ mc:Ignorable="d" Title="MainWindow" Height="800" Width="1100" ResizeMode="NoResi
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
       <d3:Chart BottomTitle="Argument" LeftTitle="Function" Name="MyLines" Background="#212121" Foreground="#fff">
-        <Grid Name="lines"/>
+        <d3:Chart.Title>
+          <TextBlock Text="График" FontSize="20" />
+        </d3:Chart.Title>
+        <Grid Name="lines" />
       </d3:Chart>
       <d3:Chart Grid.Row="1" BottomTitle="Argument" LeftTitle="Function" Name="MyLines_two" Background="#212121" Foreground="#fff">
         <Grid Name="lines_two" />

@@ -10,6 +10,8 @@ using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
 using System.Collections.Generic;
 using InteractiveDataDisplay.WPF;
+using LiveCharts;
+using LiveCharts.Wpf;
 
 namespace MyAppModBus {
   /// <summary>
@@ -161,6 +163,8 @@ namespace MyAppModBus {
 
     private double countTime = 0;
     private int countIndex = 0;
+    private ChartValues<double> t1 = new ChartValues<double>();
+    private ChartValues<double> t2 = new ChartValues<double>();
 
     private void GetHoldReg( object sender, EventArgs e ) {
       ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
@@ -176,7 +180,7 @@ namespace MyAppModBus {
 
         SetValSingleRegister( result[ 9 ], result[ 10 ] );
 
-        if ( countTime % (readWriteTimeOut * 0.1) == 0) {
+        if ( countTime % (readWriteTimeOut * 0.1) == 0 ) {
           volltage.Add( countIndex, Convert.ToDouble( result[ 0 ] ) );
           current.Add( countIndex, Convert.ToDouble( result[ 1 ] ) );
           torque.Add( countIndex, Convert.ToDouble( result[ 4 ] ) );
@@ -392,7 +396,7 @@ namespace MyAppModBus {
     /// <summary>
     /// Отрисовка графиков и их линий
     /// </summary>
-    private void GraphLines( ) {
+    private void GraphLines() {
 
       lines.Children.Add( volltageLine );
       lines.Children.Add( currentLine );
