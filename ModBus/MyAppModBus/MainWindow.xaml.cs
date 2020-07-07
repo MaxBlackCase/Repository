@@ -103,11 +103,6 @@ namespace MyAppModBus {
         #endregion
 
         master = ModbusSerialMaster.CreateRtu( _serialPort );
-        #region <Timer>
-        //timer.Tick += new EventHandler( GetHoldReg );
-        //timer.Interval = new TimeSpan( 0, 0, 0, 0, readWriteTimeOut );
-        //timer.Start();
-        #endregion
 
         //Сброс регистров
         ResetRegisters();
@@ -143,20 +138,15 @@ namespace MyAppModBus {
     private void DisconnectToDevice( object sender, RoutedEventArgs e ) {
       timer.Stop();
       _serialPort.Close();
+      _serialPort.Dispose();
+
       comboBoxMainPorts.IsEnabled = true;
       disconnectComPort.Visibility = Visibility.Hidden;
       textViewer.Text = $"Порт {_serialPort.PortName} закрыт";
       decButtonTimeout.IsEnabled = true;
       decTextBox.IsEnabled = true;
       StartRegsRequest.IsEnabled = false;
-      #region checkBoxWrite
-      checkBoxWrite_1.IsChecked = false;
-      checkBoxWrite_2.IsChecked = false;
-      checkBoxWrite_3.IsChecked = false;
-      checkBoxWrite_1.IsEnabled = false;
-      checkBoxWrite_2.IsEnabled = false;
-      checkBoxWrite_3.IsEnabled = false;
-      #endregion
+      StartRegsRequest.Content = "Запустить";
     }
 
     /// <summary>
@@ -302,55 +292,6 @@ namespace MyAppModBus {
 
     }
 
-
-    /// <summary>
-    /// Проверка записаных данных в регистры
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void CheckValToRegisters( object sender, RoutedEventArgs e ) {
-      try {
-        ToggleButton pressed = (ToggleButton)sender;
-        var indElem = CheckBoxWriteRegisters.Children.IndexOf( pressed );
-        ushort[] arrRegisters = new ushort[] { 6, 7, 8 };
-
-        if ( _serialPort.IsOpen && Convert.ToBoolean( pressed.IsChecked ) == true ) {
-          for ( var i = 0; i < arrRegisters.Length; i++ ) {
-            if ( i == indElem ) {
-              master.WriteSingleRegister( slaveID, arrRegisters[ i ], 1 );
-            }
-          }
-        }
-      }
-      catch ( Exception err ) {
-        textViewer.Text = $"Ошибка: {err.Message}";
-      }
-    }
-    /// <summary>
-    /// Снятие ограничений в регистрах
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void UncheckValToRegisters( object sender, RoutedEventArgs e ) {
-      try {
-        ToggleButton pressed = (ToggleButton)sender;
-        var indElem = CheckBoxWriteRegisters.Children.IndexOf( pressed );
-        ushort[] arrRegisters = new ushort[] { 6, 7, 8 };
-
-        if ( _serialPort.IsOpen && Convert.ToBoolean( pressed.IsChecked ) == false ) {
-          for ( var i = 0; i < arrRegisters.Length; i++ ) {
-            if ( i == indElem ) {
-              master.WriteSingleRegister( slaveID, arrRegisters[ i ], 0 );
-            }
-          }
-        }
-      }
-      catch ( Exception err ) {
-        textViewer.Text = $"Ошибка: {err.Message}";
-      }
-    }
-
-
     /// <summary>
     /// Ввод целочисленного значения в тектовое поле
     /// </summary>
@@ -429,26 +370,59 @@ namespace MyAppModBus {
 
     }
 
+    /// <summary>
+    /// Запрос из регистров Master(a) и запусе/остановка таймера
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void RegistersRequest( object sender, RoutedEventArgs e ) {
-      var btn = StartRegsRequest;
+      var BtnStartTimerAndRegistersRequest = StartRegsRequest;
       try {
-        if ( _serialPort.IsOpen && timer.IsEnabled == false) {
+        if ( _serialPort.IsOpen && timer.IsEnabled == false ) {
           #region <Timer>
           timer.Tick += new EventHandler( GetHoldReg );
           timer.Interval = new TimeSpan( 0, 0, 0, 0, readWriteTimeOut );
           timer.Start();
           #endregion
-          btn.Content = "Остановить";
+          BtnStartTimerAndRegistersRequest.Content = "Остановить";
         }
         else {
           timer.Stop();
-          btn.Content = "Запустить";
+          BtnStartTimerAndRegistersRequest.Content = "Запустить";
         }
       }
-      catch ( Exception err) {
-
+      catch ( Exception err ) {
         textViewer.Text = $"Ошибка: {err.Message}";
       }
     }
+
+    /// <summary>
+    /// Запись в регистры
+    /// </summary>
+    /// <param name="sender">Объект</param>
+    /// <param name="e">Событие</param>
+    private void CheсkValToRegisters( object sender, RoutedEventArgs e ) {
+      ToggleSwitch toggleSwitch = sender as ToggleSwitch;
+      var indElem = CheckBoxWriteRegisters.Children.IndexOf( toggleSwitch );
+      ushort[] arrRegisters = new ushort[] { 6, 7, 8 };
+      if ( toggleSwitch != null && _serialPort.IsOpen ) {
+        if ( toggleSwitch.IsOn == true ) {
+          for ( var i = 0; i < arrRegisters.Length; i++ ) {
+            if ( i == indElem ) {
+              master.WriteSingleRegister( slaveID, arrRegisters[ i ], 1 );
+            }
+          }
+        }
+        else {
+          for ( var i = 0; i < arrRegisters.Length; i++ ) {
+            if ( i == indElem ) {
+              master.WriteSingleRegister( slaveID, arrRegisters[ i ], 0 );
+            }
+          }
+        }
+      }
+    }
+
+
   }
 }
