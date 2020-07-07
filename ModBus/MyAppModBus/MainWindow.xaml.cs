@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using InteractiveDataDisplay.WPF;
 using LiveCharts;
 using LiveCharts.Wpf;
+using System.Threading.Tasks;
 
 namespace MyAppModBus {
   /// <summary>
@@ -178,7 +179,7 @@ namespace MyAppModBus {
 
         SetValSingleRegister( result[ 9 ], result[ 10 ] );
 
-        if ( countTime % (readWriteTimeOut * 0.1) == 0 ) {
+        if ( countTime % readWriteTimeOut == 0 ) {
           volltage.Add( countIndex, Convert.ToDouble( result[ 0 ] ) );
           current.Add( countIndex, Convert.ToDouble( result[ 1 ] ) );
           torque.Add( countIndex, Convert.ToDouble( result[ 4 ] ) );
@@ -390,6 +391,7 @@ namespace MyAppModBus {
         master.WriteSingleRegister( slaveID, arrRegisters[ i ], 0 );
       }
     }
+
 
     /// <summary>
     /// Отрисовка графиков и их линий

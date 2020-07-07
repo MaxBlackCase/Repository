@@ -124,7 +124,7 @@
         <d3:Chart.Title>
           <TextBlock Text="График" FontSize="20" />
         </d3:Chart.Title>
-        <Grid Name="lines" />
+        <Grid x:Name="lines" />
       </d3:Chart>
       <d3:Chart Grid.Row="1" BottomTitle="Argument" LeftTitle="Function" Name="MyLines_two" Background="#212121" Foreground="#fff">
         <Grid Name="lines_two" />
