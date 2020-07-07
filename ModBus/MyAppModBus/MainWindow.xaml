@@ -63,9 +63,11 @@
       </Grid.RowDefinitions>
       <Grid.ColumnDefinitions>
         <ColumnDefinition
-          Width="2*" />
+          Width="170*" />
         <ColumnDefinition
-          Width="*" />
+          Width="27*" />
+        <ColumnDefinition
+          Width="58*" />
       </Grid.ColumnDefinitions>
       <ComboBox
         Grid.Row="0"
@@ -79,7 +81,7 @@
       <Button
         Grid.Row="0"
         Grid.Column="1"
-        Margin="10 0 0 0"
+        Margin="5 0 0 0"
         Name="connectComPort"
         Content="Подключить"
         VerticalContentAlignment="Center"
@@ -88,21 +90,27 @@
         Foreground="White"
         BorderBrush="{x:Null}"
         FontFamily="Arial Rounded MT Bold"
-        FontWeight="Bold" />
+        FontWeight="Bold"
+        Grid.ColumnSpan="2" />
       <Button
         Grid.Row="0"
         Grid.Column="1"
-        Margin="10 0 0 0"
+        Margin="5 0 0 0"
         Name="disconnectComPort"
         Content="Отключить"
+        Foreground="White"
+        Background="#FF3F3F46"
+        BorderBrush="{x:Null}"
         VerticalAlignment="Bottom"
         Click="DisconnectToDevice"
-        Visibility="Hidden" />
+        Visibility="Hidden"
+        Grid.ColumnSpan="2"
+        Height="30" />
 
       <Grid
         Grid.Row="4"
         Grid.Column="0"
-        Grid.ColumnSpan="2">
+        Grid.ColumnSpan="3">
         <Grid.RowDefinitions>
           <RowDefinition />
         </Grid.RowDefinitions>
@@ -112,6 +120,42 @@
           <ColumnDefinition
             Width="1*" />
         </Grid.ColumnDefinitions>
+        <Grid
+          Grid.Row="0"
+          Grid.Column="0">
+          <Grid.RowDefinitions>
+            <RowDefinition
+              Height="*" />
+            <RowDefinition
+              Height="*" />
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition
+              Width="auto" />
+          </Grid.ColumnDefinitions>
+          <StackPanel
+            VerticalAlignment="Bottom"
+            Grid.Row="1"
+            Grid.Column="0">
+            <Button
+              Name="StartRegsRequest"
+              Content="Запустить"
+              MinWidth="100"
+              MinHeight="60"
+              Margin="0 5"
+              Click="RegistersRequest"
+              HorizontalAlignment="Left"
+              IsEnabled="False" />
+          </StackPanel>
+
+          <StackPanel
+            Grid.Row="0"
+            Grid.Column="0"
+            Orientation="Horizontal"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Left"
+            x:Name="LimSwPanel" />
+        </Grid>
         <StackPanel
           Grid.Row="0"
           Grid.Column="1"
@@ -140,35 +184,12 @@
             IsEnabled="False"
             Toggled="CheсkValToRegisters" />
         </StackPanel>
-        <StackPanel
-          Grid.Row="0"
-          Grid.Column="0"
-          VerticalAlignment="Bottom">
-          <Button
-            Name="StartRegsRequest"
-            Content="Запустить"
-            MinWidth="100"
-            MinHeight="60"
-            Margin="0 5"
-            Click="RegistersRequest"
-            HorizontalAlignment="Left"
-            IsEnabled="False" />
-        </StackPanel>
-
       </Grid>
 
       <StackPanel
-        Name="LimSwPanel"
-        Grid.Row="2"
-        Grid.Column="1"
-        Orientation="Horizontal"
-        HorizontalAlignment="Right"
-        Margin="0 10 0 0">
-      </StackPanel>
-      <StackPanel
         Grid.Row="3"
         Grid.Column="0"
-        Grid.ColumnSpan="2">
+        Grid.ColumnSpan="3">
         <Grid
           Margin="0 10">
           <Grid.RowDefinitions>
@@ -211,7 +232,7 @@
       <Grid
         Grid.Row="1"
         Grid.Column="0"
-        Grid.ColumnSpan="2">
+        Grid.ColumnSpan="3">
         <Grid.RowDefinitions>
           <RowDefinition
             Height="auto" />
@@ -267,22 +288,40 @@
             Width="1*" />
         </Grid.ColumnDefinitions>
         <Controls:RangeSlider
+          x:Name="ZoomUpSl"
           Grid.Row="0"
           Grid.Column="0"
           Orientation="Vertical"
-          Margin="5" />
+          Margin="5"
+          LowerValueChanged="ZoomUpSl_ValueChanged"
+          LargeChange="10"
+          TickFrequency="0.1"
+          SmallChange="0.001"
+          Value="500"
+          UpperValue="90"
+          LowerValue="0.1"
+          />
         <Controls:RangeSlider
+          x:Name="ViewPointUpSl"
           Grid.Row="1"
           Grid.Column="0"
           Grid.ColumnSpan="2"
           Orientation="Horizontal"
-          Margin="35 5 5 5" />
+          Margin="35 5 5 5"
+          TickFrequency="2"
+          Value="50"
+          UpperValue="100"
+          LowerValue="30"
+          MinRangeWidth="0.1"
+          SmallChange="0.01"
+          MinRange="0.01"
+          />
         <d3:Chart
+          x:Name="PlotUp"
           Grid.Column="1"
           Grid.Row="0"
           BottomTitle="Argument"
           LeftTitle="Function"
-          Name="MyLines"
           Background="#212121"
           Foreground="#fff">
           <d3:Chart.Title>

@@ -7,12 +7,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using System.Windows.Controls.Primitives;
 using System.Collections.Generic;
 using InteractiveDataDisplay.WPF;
 using MahApps.Metro.Controls;
 using ControlzEx.Theming;
-using System.Windows.Forms;
 
 namespace MyAppModBus {
   /// <summary>
@@ -114,6 +112,7 @@ namespace MyAppModBus {
         decTextBox.IsEnabled = false;
         decButtonTimeout.IsEnabled = false;
         comboBoxMainPorts.IsEnabled = false;
+        connectComPort.Visibility = Visibility.Hidden;
         disconnectComPort.Visibility = Visibility.Visible;
         textViewer.Text = $"Порт {_serialPort.PortName} Подключен";
 
@@ -142,6 +141,7 @@ namespace MyAppModBus {
 
       comboBoxMainPorts.IsEnabled = true;
       disconnectComPort.Visibility = Visibility.Hidden;
+      connectComPort.Visibility = Visibility.Visible;
       textViewer.Text = $"Порт {_serialPort.PortName} закрыт";
       decButtonTimeout.IsEnabled = true;
       decTextBox.IsEnabled = true;
@@ -266,7 +266,7 @@ namespace MyAppModBus {
                 Width = 20,
                 Height = 20,
                 Fill = Brushes.Green,
-                Margin = new Thickness( 10, 5, 10, 5 )
+                Margin = new Thickness( 0, 0, 10, 15 )
               };
               LimSwPanel.Children.Add( LimSwEllipse );
             }
@@ -276,7 +276,7 @@ namespace MyAppModBus {
                 Width = 20,
                 Height = 20,
                 Fill = Brushes.Red,
-                Margin = new Thickness( 10, 5, 10, 5 )
+                Margin = new Thickness( 0, 0, 10, 15 )
               };
               LimSwPanel.Children.Add( LimSwEllipse );
             }
@@ -421,6 +421,12 @@ namespace MyAppModBus {
           }
         }
       }
+    }
+
+
+    private void ZoomUpSl_ValueChanged( object sender, RoutedEventArgs e ) {
+      PlotUp.PlotOriginY = (50 * ZoomUpSl.UpperValue) - 50;
+      PlotUp.PlotHeight = -(50 * (100 - ZoomUpSl.LowerValue));
     }
 
 
