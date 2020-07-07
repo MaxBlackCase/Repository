@@ -293,7 +293,6 @@
           Grid.Column="0"
           Orientation="Vertical"
           Margin="5"
-          LowerValueChanged="ZoomUpSl_ValueChanged"
           LargeChange="10"
           TickFrequency="0.1"
           SmallChange="0.001"

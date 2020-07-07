@@ -424,10 +424,10 @@ namespace MyAppModBus {
     }
 
 
-    private void ZoomUpSl_ValueChanged( object sender, RoutedEventArgs e ) {
-      PlotUp.PlotOriginY = (50 * ZoomUpSl.UpperValue) - 50;
-      PlotUp.PlotHeight = -(50 * (100 - ZoomUpSl.LowerValue));
-    }
+    //private void ZoomUpSl_ValueChanged( object sender, RoutedEventArgs e ) {
+    //  PlotUp.PlotOriginY = (50 * ZoomUpSl.UpperValue) - 50;
+    //  PlotUp.PlotHeight = -(50 * (100 - ZoomUpSl.LowerValue));
+    //}
 
 
   }
