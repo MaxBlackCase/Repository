@@ -10,15 +10,15 @@ using System.Windows.Threading;
 using System.Windows.Controls.Primitives;
 using System.Collections.Generic;
 using InteractiveDataDisplay.WPF;
-using LiveCharts;
-using LiveCharts.Wpf;
-using System.Threading.Tasks;
+using MahApps.Metro.Controls;
+using ControlzEx.Theming;
+using System.Windows.Forms;
 
 namespace MyAppModBus {
   /// <summary>
   /// Логика взаимодействия для MainWindow.xaml
   /// </summary>
-  public partial class MainWindow : Window {
+  public partial class MainWindow : MetroWindow {
 
     const byte slaveID = 1;
 
@@ -43,10 +43,14 @@ namespace MyAppModBus {
     private LineGraph externalLine = new LineGraph();
     private LineGraph motorLine = new LineGraph();
 
+
+    /// <summary>
+    /// Главнео окно
+    /// </summary>
     public MainWindow() {
       InitializeComponent();
       AddItemToComboBox();
-      btnGetHoldReg.IsEnabled = false;
+      ThemeManager.Current.ChangeTheme( this, "Dark.Steel" );
       GraphLines();
     }
 
@@ -100,18 +104,18 @@ namespace MyAppModBus {
 
         master = ModbusSerialMaster.CreateRtu( _serialPort );
         #region <Timer>
-        timer.Tick += new EventHandler( GetHoldReg );
-        timer.Interval = new TimeSpan( 0, 0, 0, 0, readWriteTimeOut );
-        timer.Start();
+        //timer.Tick += new EventHandler( GetHoldReg );
+        //timer.Interval = new TimeSpan( 0, 0, 0, 0, readWriteTimeOut );
+        //timer.Start();
         #endregion
 
         //Сброс регистров
         ResetRegisters();
 
+        StartRegsRequest.IsEnabled = true;
         checkBoxWrite_1.IsEnabled = true;
         checkBoxWrite_2.IsEnabled = true;
         checkBoxWrite_3.IsEnabled = true;
-        btnGetHoldReg.IsEnabled = true;
         decTextBox.IsEnabled = false;
         decButtonTimeout.IsEnabled = false;
         comboBoxMainPorts.IsEnabled = false;
@@ -144,8 +148,7 @@ namespace MyAppModBus {
       textViewer.Text = $"Порт {_serialPort.PortName} закрыт";
       decButtonTimeout.IsEnabled = true;
       decTextBox.IsEnabled = true;
-      btnGetHoldReg.IsEnabled = false;
-      btnGetHoldReg.IsEnabled = false;
+      StartRegsRequest.IsEnabled = false;
       #region checkBoxWrite
       checkBoxWrite_1.IsChecked = false;
       checkBoxWrite_2.IsChecked = false;
@@ -426,6 +429,26 @@ namespace MyAppModBus {
 
     }
 
+    private void RegistersRequest( object sender, RoutedEventArgs e ) {
+      var btn = StartRegsRequest;
+      try {
+        if ( _serialPort.IsOpen && timer.IsEnabled == false) {
+          #region <Timer>
+          timer.Tick += new EventHandler( GetHoldReg );
+          timer.Interval = new TimeSpan( 0, 0, 0, 0, readWriteTimeOut );
+          timer.Start();
+          #endregion
+          btn.Content = "Остановить";
+        }
+        else {
+          timer.Stop();
+          btn.Content = "Запустить";
+        }
+      }
+      catch ( Exception err) {
 
+        textViewer.Text = $"Ошибка: {err.Message}";
+      }
+    }
   }
 }
