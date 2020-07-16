@@ -46,6 +46,14 @@ namespace MyAppModBus {
     private Dictionary<double, double>[] _arrDict = new Dictionary<double, double>[ 5 ];
     
 
+
+
+    private Dictionary<int, double> volltage = new Dictionary<int, double>();
+    private Dictionary<int, double> current = new Dictionary<int, double>();
+    private Dictionary<int, double> torque = new Dictionary<int, double>();
+    private Dictionary<int, double> tempExternal = new Dictionary<int, double>();
+    private Dictionary<int, double> tempMotor = new Dictionary<int, double>();
+
     /// <summary>
     /// Главнео окно
     /// </summary>
