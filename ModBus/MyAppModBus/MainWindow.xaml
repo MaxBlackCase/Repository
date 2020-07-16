@@ -19,9 +19,6 @@
                       SaveWindowPosition="True"
                       FontFamily="Arial Rounded MT Bold"
                       Foreground="#fff">
-  <Window.Resources>
-    <local:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter" />
-  </Window.Resources>
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="auto" />

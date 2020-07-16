@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO.Ports;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Data;
@@ -43,16 +44,8 @@ namespace MyAppModBus {
     private Dictionary<double, double> tempExternal = new Dictionary<double, double>();
     private Dictionary<double, double> tempMotor = new Dictionary<double, double>();
 
-    private Dictionary<double, double>[] _arrDict = new Dictionary<double, double>[ 5 ];
+    private Dictionary<double, double>[][] _arrDict = new Dictionary<double, double>[2][];
     
-
-
-
-    private Dictionary<int, double> volltage = new Dictionary<int, double>();
-    private Dictionary<int, double> current = new Dictionary<int, double>();
-    private Dictionary<int, double> torque = new Dictionary<int, double>();
-    private Dictionary<int, double> tempExternal = new Dictionary<int, double>();
-    private Dictionary<int, double> tempMotor = new Dictionary<int, double>();
 
     /// <summary>
     /// Главнео окно
@@ -60,13 +53,6 @@ namespace MyAppModBus {
     public MainWindow() {
       InitializeComponent();
       AddItemToComboBox();
-
-      _arrDict[ 0 ] = volltage;
-      _arrDict[ 1 ] = current;
-      _arrDict[ 2 ] = torque;
-      _arrDict[ 3 ] = torque;
-      _arrDict[ 4 ] = tempExternal;
-      _arrDict[ 5 ] = tempMotor;
       GraphLines( 1.5, nameLines);
     }
 
@@ -198,7 +184,6 @@ namespace MyAppModBus {
         if ( countTime % readWriteTimeOut == 0 ) {
 
           //for ( int valueIn = 0; valueIn < nameLinesOne.Length; valueIn++ ) {
-
           //  _arrDict[ valueIn ].Add( countTime, _numberRegisters[ 0 ][ valueIn ] );
           //}
 
@@ -209,8 +194,9 @@ namespace MyAppModBus {
           tempMotor.Add( countIndex, Convert.ToDouble( result[ 3 ] ) );
 
 
-
-
+          for ( int value = 0; value < _arrDict.GetLength(0); value++ ) {
+            _arrDict[ 0 ][ value ].Add( countTime, Convert.ToDouble( result[_numberRegisters[0][value]] ));
+          }
 
           //volltageLine.Plot( volltage.Keys, volltage.Values );
           //currentLine.Plot( current.Keys, current.Values );
@@ -375,43 +361,47 @@ namespace MyAppModBus {
     /// </summary>
     private void GraphLines( double thickness, string[][] nameLines) {
 
-      //_numberRegisters[ 0 ] = new int[ 3 ] { 0, 1, 4 };
-      //_numberRegisters[ 1 ] = new int[ 2 ] { 2, 3 };
+      _numberRegisters[ 0 ] = new int[ 3 ] { 0, 1, 4 };
+      _numberRegisters[ 1 ] = new int[ 2 ] { 2, 3 };
+
+      _arrDict[ 0 ] = new Dictionary<double, double>[ 3 ] { volltage, current, torque };
+      _arrDict[ 1 ] = new Dictionary<double, double>[ 2 ] { tempExternal, tempMotor };
 
       nameLines[ 0 ] = new string[] { "Volltage", "Current", "Torque" };
       nameLines[ 0 ] = new string[] { "External", "Motor" };
 
 
       //Линии первого графика
-      for ( int linesFirstChart = 0; linesFirstChart < nameLines.GetLength(0); linesFirstChart++ ) {
-         var lines = new LineGraph
-        {
+      //for ( int linesFirstChart = 0; linesFirstChart < nameLines.GetLength(0); linesFirstChart++ ) {
+      //   var lines = new LineGraph
+      //  {
 
-          Description = String.Format( $"{nameLines[0][ linesFirstChart ]}" ),
-          StrokeThickness = thickness,
-          Stroke = new SolidColorBrush( Color.FromRgb( 255, 150, (byte)(linesFirstChart * 10) ) )
+      //    Description = String.Format( $"{nameLines[0][ linesFirstChart ]}" ),
+      //    StrokeThickness = thickness,
+      //    Stroke = new SolidColorBrush( Color.FromRgb( 255, 150, (byte)(linesFirstChart * 10) ) )
 
-        };
+      //  };
 
-        lines_one.Children.Add( lines );
-        _linesArr[ 0 ][ linesFirstChart ] = lines;
+      //  lines_one.Children.Add( lines );
+      //  _linesArr[ 0 ][ linesFirstChart ] = lines;
 
-      }
+      //}
 
 
       //Линии второго графика
-      for ( int linesSecondChart = 0; linesSecondChart < nameLines.GetLength( 1 ); linesSecondChart++ ) {
-        var lines = new LineGraph
-        {
-          Description = String.Format($"{nameLines[1][linesSecondChart]}"),
-          StrokeThickness = thickness,
-          Stroke = new SolidColorBrush( Color.FromRgb( 255, 150, (byte)(linesSecondChart * 10) ) )
+      //for ( int linesSecondChart = 0; linesSecondChart < nameLines.GetLength( 1 ); linesSecondChart++ ) {
+      //  var lines = new LineGraph
+      //  {
 
-        };
+      //    Description = String.Format($"{nameLines[1][linesSecondChart]}"),
+      //    StrokeThickness = thickness,
+      //    Stroke = new SolidColorBrush( Color.FromRgb( 255, 150, (byte)(linesSecondChart * 10) ) )
 
-        lines_two.Children.Add( lines );
-        _linesArr[ 1 ][ linesSecondChart ] = lines;
-      }
+      //  };
+
+      //  lines_two.Children.Add( lines );
+      //  _linesArr[ 1 ][ linesSecondChart ] = lines;
+      //}
 
 
     }
