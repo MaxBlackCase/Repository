@@ -187,7 +187,7 @@ namespace MyAppModBus {
             _arrDict[ 0 ][ valueFirstChart ].Add( countTime, Convert.ToDouble( result[ _numberRegisters[ 0 ][ valueFirstChart ] ] ) );
           }
           for ( int valueSecondChart = 0; valueSecondChart < _arrDict[ 1 ].Count(); valueSecondChart++ ) {
-            _arrDict[ 1 ][ valueFirstChart ].Add( countTime, Convert.ToDouble( result[ _numberRegisters[ 1 ][ valueFirstChart ] ] ) );
+            _arrDict[ 1 ][ valueSecondChart ].Add( countTime, Convert.ToDouble( result[ _numberRegisters[ 1 ][ valueSecondChart ] ] ) );
           }
 
           //volltageLine.Plot( volltage.Keys, volltage.Values );
