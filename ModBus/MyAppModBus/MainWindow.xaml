@@ -329,7 +329,7 @@
               FontSize="20" />
           </d3:Chart.Title>
           <Grid
-            x:Name="lines" />
+            x:Name="lines_one" />
         </d3:Chart>
       </Grid>
       <Grid
