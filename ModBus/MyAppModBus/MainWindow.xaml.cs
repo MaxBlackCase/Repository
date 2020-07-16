@@ -44,8 +44,8 @@ namespace MyAppModBus {
     private Dictionary<double, double> tempExternal = new Dictionary<double, double>();
     private Dictionary<double, double> tempMotor = new Dictionary<double, double>();
 
-    private Dictionary<double, double>[][] _arrDict = new Dictionary<double, double>[2][];
-    
+    private Dictionary<double, double>[][] _arrDict = new Dictionary<double, double>[ 2 ][];
+
 
     /// <summary>
     /// Главнео окно
@@ -53,7 +53,7 @@ namespace MyAppModBus {
     public MainWindow() {
       InitializeComponent();
       AddItemToComboBox();
-      GraphLines( 1.5, nameLines);
+      GraphLines( 1.5, nameLines );
     }
 
     //Инициализация портов
@@ -183,19 +183,11 @@ namespace MyAppModBus {
         ///Занесение значений на график
         if ( countTime % readWriteTimeOut == 0 ) {
 
-          //for ( int valueIn = 0; valueIn < nameLinesOne.Length; valueIn++ ) {
-          //  _arrDict[ valueIn ].Add( countTime, _numberRegisters[ 0 ][ valueIn ] );
-          //}
-
-          volltage.Add( countIndex, Convert.ToDouble( result[ 0 ] ) );
-          current.Add( countIndex, Convert.ToDouble( result[ 1 ] ) );
-          torque.Add( countIndex, Convert.ToDouble( result[ 4 ] ) );
-          tempExternal.Add( countIndex, Convert.ToDouble( result[ 2 ] ) );
-          tempMotor.Add( countIndex, Convert.ToDouble( result[ 3 ] ) );
-
-
-          for ( int value = 0; value < _arrDict.GetLength(0); value++ ) {
-            _arrDict[ 0 ][ value ].Add( countTime, Convert.ToDouble( result[_numberRegisters[0][value]] ));
+          for ( int valueFirstChart = 0; valueFirstChart < _arrDict[0].Count(); valueFirstChart++ ) {
+            _arrDict[ 0 ][ valueFirstChart ].Add( countTime, Convert.ToDouble( result[ _numberRegisters[ 0 ][ valueFirstChart ] ] ) );
+          }
+          for ( int valueSecondChart = 0; valueSecondChart < _arrDict[ 1 ].Count(); valueSecondChart++ ) {
+            _arrDict[ 1 ][ valueFirstChart ].Add( countTime, Convert.ToDouble( result[ _numberRegisters[ 1 ][ valueFirstChart ] ] ) );
           }
 
           //volltageLine.Plot( volltage.Keys, volltage.Values );
@@ -359,7 +351,7 @@ namespace MyAppModBus {
     /// <summary>
     /// Отрисовка графиков и их линий
     /// </summary>
-    private void GraphLines( double thickness, string[][] nameLines) {
+    private void GraphLines( double thickness, string[][] nameLines ) {
 
       _numberRegisters[ 0 ] = new int[ 3 ] { 0, 1, 4 };
       _numberRegisters[ 1 ] = new int[ 2 ] { 2, 3 };
@@ -370,13 +362,12 @@ namespace MyAppModBus {
       nameLines[ 0 ] = new string[] { "Volltage", "Current", "Torque" };
       nameLines[ 0 ] = new string[] { "External", "Motor" };
 
-
-      //Линии первого графика
-      //for ( int linesFirstChart = 0; linesFirstChart < nameLines.GetLength(0); linesFirstChart++ ) {
-      //   var lines = new LineGraph
+      ///Линии первого графика
+      //for ( int linesFirstChart = 0; linesFirstChart < nameLines.GetLength( 0 ); linesFirstChart++ ) {
+      //  var lines = new LineGraph
       //  {
 
-      //    Description = String.Format( $"{nameLines[0][ linesFirstChart ]}" ),
+      //    Description = String.Format( $"{nameLines[ 0 ][ linesFirstChart ]}" ),
       //    StrokeThickness = thickness,
       //    Stroke = new SolidColorBrush( Color.FromRgb( 255, 150, (byte)(linesFirstChart * 10) ) )
 
