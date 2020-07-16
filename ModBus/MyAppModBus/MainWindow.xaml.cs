@@ -18,7 +18,7 @@ namespace MyAppModBus {
   /// <summary>
   /// Логика взаимодействия для MainWindow.xaml
   /// </summary>
-  public partial class MainWindow : MetroWindow {
+  public partial class MainWindow {
 
     const byte slaveID = 1;
 
@@ -31,11 +31,20 @@ namespace MyAppModBus {
     public static SerialPort _serialPort = null;
     public static ModbusSerialMaster master = null;
 
-    private readonly LineGraph _lines;
-    private LineGraph[,] _linesArr = new LineGraph[ 2, 3 ];
+    private LineGraph[][] _linesArr = new LineGraph[ 2 ][];
 
-    private readonly string[] nameLinesOne = new string[ 3 ] { "Volltage", "Current", "Torque" };
-    private readonly string[] nameLinesTwo = new string[ 2 ] { "External", "Motor" };
+    private string[][] nameLines = new string[ 2 ][];
+
+
+
+    private Dictionary<double, double> volltage = new Dictionary<double, double>();
+    private Dictionary<double, double> current = new Dictionary<double, double>();
+    private Dictionary<double, double> torque = new Dictionary<double, double>();
+    private Dictionary<double, double> tempExternal = new Dictionary<double, double>();
+    private Dictionary<double, double> tempMotor = new Dictionary<double, double>();
+
+    private Dictionary<double, double>[] _arrDict = new Dictionary<double, double>[ 5 ];
+    
 
     /// <summary>
     /// Главнео окно
@@ -43,8 +52,14 @@ namespace MyAppModBus {
     public MainWindow() {
       InitializeComponent();
       AddItemToComboBox();
-      ThemeManager.Current.ChangeTheme( this, "Dark.Blue" );
-      GraphLines( 1.5, nameLinesOne, nameLinesTwo, _lines );
+
+      _arrDict[ 0 ] = volltage;
+      _arrDict[ 1 ] = current;
+      _arrDict[ 2 ] = torque;
+      _arrDict[ 3 ] = torque;
+      _arrDict[ 4 ] = tempExternal;
+      _arrDict[ 5 ] = tempMotor;
+      GraphLines( 1.5, nameLines);
     }
 
     //Инициализация портов
@@ -174,11 +189,26 @@ namespace MyAppModBus {
         ///Занесение значений на график
         if ( countTime % readWriteTimeOut == 0 ) {
 
-          for ( int i = 0; i < _linesArr.GetLength( 0 ); i++ ) {
-          }
-          for ( int j = 0; j < _linesArr.GetLength( 1 ); j++ ) {
-            //_linesArr[ 1, j ].Plot( );
-          }
+          //for ( int valueIn = 0; valueIn < nameLinesOne.Length; valueIn++ ) {
+
+          //  _arrDict[ valueIn ].Add( countTime, _numberRegisters[ 0 ][ valueIn ] );
+          //}
+
+          volltage.Add( countIndex, Convert.ToDouble( result[ 0 ] ) );
+          current.Add( countIndex, Convert.ToDouble( result[ 1 ] ) );
+          torque.Add( countIndex, Convert.ToDouble( result[ 4 ] ) );
+          tempExternal.Add( countIndex, Convert.ToDouble( result[ 2 ] ) );
+          tempMotor.Add( countIndex, Convert.ToDouble( result[ 3 ] ) );
+
+
+
+
+
+          //volltageLine.Plot( volltage.Keys, volltage.Values );
+          //currentLine.Plot( current.Keys, current.Values );
+          //torqueLine.Plot( torque.Keys, torque.Values );
+          //externalLine.Plot( tempExternal.Keys, tempExternal.Values );
+          //motorLine.Plot( tempMotor.Keys, tempMotor.Values );
 
         }
 
@@ -335,33 +365,38 @@ namespace MyAppModBus {
     /// <summary>
     /// Отрисовка графиков и их линий
     /// </summary>
-    private void GraphLines( double thickness, string[] nameChartOne, string[] nameChartTwo, LineGraph lines = null) {
+    private void GraphLines( double thickness, string[][] nameLines) {
 
-      _numberRegisters[ 0 ] = new int[ 3 ] { 0, 1, 4 };
-      _numberRegisters[ 1 ] = new int[ 2 ] { 2, 3 };
+      //_numberRegisters[ 0 ] = new int[ 3 ] { 0, 1, 4 };
+      //_numberRegisters[ 1 ] = new int[ 2 ] { 2, 3 };
+
+      nameLines[ 0 ] = new string[] { "Volltage", "Current", "Torque" };
+      nameLines[ 0 ] = new string[] { "External", "Motor" };
 
 
       //Линии первого графика
-      for ( int i = 0; i < nameChartOne.Length; i++ ) {
-        lines = new LineGraph
+      for ( int linesFirstChart = 0; linesFirstChart < nameLines.GetLength(0); linesFirstChart++ ) {
+         var lines = new LineGraph
         {
-          Description = String.Format( $"{nameChartOne[ i ]}" ),
+          Description = String.Format( $"{nameLines[0][ linesFirstChart ]}" ),
           StrokeThickness = thickness,
-          Stroke = new SolidColorBrush( Color.FromRgb( (byte)(i * 10), 150, (byte)(i * 10) ) )
+          Stroke = new SolidColorBrush( Color.FromRgb( 255, 150, (byte)(linesFirstChart * 10) ) )
         };
         lines_one.Children.Add( lines );
-        _linesArr[ 0, i ] = lines;
+        _linesArr[ 0 ][ linesFirstChart ] = lines;
       }
 
 
-
       //Линии второго графика
-      for ( int j = 0; j < nameChartTwo.Length; j++ ) {
-        lines = new LineGraph();
-        lines.Description = nameChartTwo[ j ];
-        lines.StrokeThickness = thickness;
+      for ( int linesSecondChart = 0; linesSecondChart < nameLines.GetLength( 1 ); linesSecondChart++ ) {
+        var lines = new LineGraph
+        {
+          Description = String.Format($"{nameLines[1][linesSecondChart]}"),
+          StrokeThickness = thickness,
+          Stroke = new SolidColorBrush( Color.FromRgb( 255, 150, (byte)(linesSecondChart * 10) ) )
+        };
         lines_two.Children.Add( lines );
-        _linesArr[ 1, j ] = lines;
+        _linesArr[ 1 ][ linesSecondChart ] = lines;
       }
 
 
