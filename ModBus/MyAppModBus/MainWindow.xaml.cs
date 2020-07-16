@@ -34,6 +34,7 @@ namespace MyAppModBus {
     private Dictionary<int, double> torque = new Dictionary<int, double>();
     private Dictionary<int, double> tempExternal = new Dictionary<int, double>();
     private Dictionary<int, double> tempMotor = new Dictionary<int, double>();
+    
 
     private LineGraph volltageLine = new LineGraph();
     private LineGraph currentLine = new LineGraph();
@@ -342,9 +343,9 @@ namespace MyAppModBus {
     /// </summary>
     private void GraphLines() {
 
-      lines.Children.Add( volltageLine );
-      lines.Children.Add( currentLine );
-      lines.Children.Add( torqueLine );
+      lines_one.Children.Add( volltageLine );
+      lines_one.Children.Add( currentLine );
+      lines_one.Children.Add( torqueLine );
       lines_two.Children.Add( externalLine );
       lines_two.Children.Add( motorLine );
 
