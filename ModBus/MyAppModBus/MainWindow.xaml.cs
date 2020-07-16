@@ -378,12 +378,16 @@ namespace MyAppModBus {
       for ( int linesFirstChart = 0; linesFirstChart < nameLines.GetLength(0); linesFirstChart++ ) {
          var lines = new LineGraph
         {
+
           Description = String.Format( $"{nameLines[0][ linesFirstChart ]}" ),
           StrokeThickness = thickness,
           Stroke = new SolidColorBrush( Color.FromRgb( 255, 150, (byte)(linesFirstChart * 10) ) )
+
         };
+
         lines_one.Children.Add( lines );
         _linesArr[ 0 ][ linesFirstChart ] = lines;
+
       }
 
 
@@ -394,7 +398,9 @@ namespace MyAppModBus {
           Description = String.Format($"{nameLines[1][linesSecondChart]}"),
           StrokeThickness = thickness,
           Stroke = new SolidColorBrush( Color.FromRgb( 255, 150, (byte)(linesSecondChart * 10) ) )
+
         };
+
         lines_two.Children.Add( lines );
         _linesArr[ 1 ][ linesSecondChart ] = lines;
       }
@@ -407,6 +413,7 @@ namespace MyAppModBus {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
+
     private void RegistersRequest( object sender, RoutedEventArgs e ) {
       var BtnStartTimerAndRegistersRequest = StartRegsRequest;
       try {
