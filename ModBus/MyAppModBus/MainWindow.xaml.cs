@@ -31,13 +31,11 @@ namespace MyAppModBus {
     public static SerialPort _serialPort = null;
     public static ModbusSerialMaster master = null;
 
-    private Dictionary<double, double>[][] _arrDict = new Dictionary<double, double>[ 2 ][];
+    private readonly LineGraph _lines;
+    private LineGraph[,] _linesArr = new LineGraph[ 2, 3 ];
 
-    private LineGraph _lines;
-    private LineGraph[,] _linesArr = new LineGraph[ 2,3];
-
-    private string[] nameLinesOne = new string[ 3 ] { "Volltage", "Current", "Torque" };
-    private string[] nameLinesTwo = new string[ 2 ] { "External", "Motor" };
+    private readonly string[] nameLinesOne = new string[ 3 ] { "Volltage", "Current", "Torque" };
+    private readonly string[] nameLinesTwo = new string[ 2 ] { "External", "Motor" };
 
     /// <summary>
     /// Главнео окно
@@ -157,7 +155,7 @@ namespace MyAppModBus {
     private int[][] _numberRegisters = new int[ 2 ][];
     private void GetHoldReg( object sender, EventArgs e ) {
       ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
-      
+
       try {
 
         textViewer.Text = null;
@@ -172,21 +170,14 @@ namespace MyAppModBus {
         ///Запуск функции отображения концевиков
         SetValSingleRegister( result[ 9 ], result[ 10 ] );
 
+
         ///Занесение значений на график
         if ( countTime % readWriteTimeOut == 0 ) {
-          for ( int writeValueArrOne = 0; writeValueArrOne < _linesArr.GetLength( 0 ); writeValueArrOne++ ) {
-            _arrDict[ 0 ][ writeValueArrOne ] = new Dictionary<double, double>();
-            _arrDict[ 0 ][ writeValueArrOne ].Add(countTime, _numberRegisters[0][ writeValueArrOne ] );
-          }
-          for ( int writeValuArrTwo = 0; writeValuArrTwo < _linesArr.GetLength( 0 ); writeValuArrTwo++ ) {
-            _arrDict[ 1 ][ writeValuArrTwo ] = new Dictionary<double, double>();
-            _arrDict[ 1 ][ writeValuArrTwo ].Add( countTime, _numberRegisters[ 1 ][ writeValuArrTwo ] );
-          }
+
           for ( int i = 0; i < _linesArr.GetLength( 0 ); i++ ) {
-            _linesArr[ 0, i ].Plot( _arrDict[0][i].Keys, _arrDict[ 0 ][ i ].Values );
           }
           for ( int j = 0; j < _linesArr.GetLength( 1 ); j++ ) {
-            _linesArr[ 1, j ].Plot( _arrDict[ 1 ][ j ].Keys, _arrDict[ 1 ][ j ].Values );
+            //_linesArr[ 1, j ].Plot( );
           }
 
         }
@@ -344,7 +335,7 @@ namespace MyAppModBus {
     /// <summary>
     /// Отрисовка графиков и их линий
     /// </summary>
-    private void GraphLines( double thickness, string[] nameChartOne, string[] nameChartTwo, LineGraph lines ) {
+    private void GraphLines( double thickness, string[] nameChartOne, string[] nameChartTwo, LineGraph lines = null) {
 
       _numberRegisters[ 0 ] = new int[ 3 ] { 0, 1, 4 };
       _numberRegisters[ 1 ] = new int[ 2 ] { 2, 3 };
@@ -352,10 +343,12 @@ namespace MyAppModBus {
 
       //Линии первого графика
       for ( int i = 0; i < nameChartOne.Length; i++ ) {
-        lines = new LineGraph();
-        lines.Description = String.Format( $"{nameChartOne[ i ]}" );
-        lines.StrokeThickness = thickness;
-        lines.Stroke = new SolidColorBrush( Color.FromRgb( (byte)(i * 10), 150, (byte)(i * 10) ) );
+        lines = new LineGraph
+        {
+          Description = String.Format( $"{nameChartOne[ i ]}" ),
+          StrokeThickness = thickness,
+          Stroke = new SolidColorBrush( Color.FromRgb( (byte)(i * 10), 150, (byte)(i * 10) ) )
+        };
         lines_one.Children.Add( lines );
         _linesArr[ 0, i ] = lines;
       }
@@ -427,12 +420,10 @@ namespace MyAppModBus {
       }
     }
 
-
     //private void ZoomUpSl_ValueChanged( object sender, MahApps.Metro.Controls.RangeParameterChangedEventArgs e ) {
     //  PlotUp.PlotOriginY = (50 * ZoomUpSl.UpperValue) - 50;
     //  PlotUp.PlotHeight = -(50 * (100 - ZoomUpSl.LowerValue));
     //}
-
 
   }
 
