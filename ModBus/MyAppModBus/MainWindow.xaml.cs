@@ -43,6 +43,7 @@ namespace MyAppModBus {
     private LineGraph motorLine = new LineGraph();
 
 
+
     /// <summary>
     /// Главнео окно
     /// </summary>
@@ -179,6 +180,8 @@ namespace MyAppModBus {
           torque.Add( countIndex, Convert.ToDouble( result[ 4 ] ) );
           tempExternal.Add( countIndex, Convert.ToDouble( result[ 2 ] ) );
           tempMotor.Add( countIndex, Convert.ToDouble( result[ 3 ] ) );
+
+
 
           volltageLine.Plot( volltage.Keys, volltage.Values );
           currentLine.Plot( current.Keys, current.Values );
