@@ -37,6 +37,14 @@ namespace MyAppModBus {
     private readonly string[] nameLinesOne = new string[ 3 ] { "Volltage", "Current", "Torque" };
     private readonly string[] nameLinesTwo = new string[ 2 ] { "External", "Motor" };
 
+
+
+    private Dictionary<int, double> volltage = new Dictionary<int, double>();
+    private Dictionary<int, double> current = new Dictionary<int, double>();
+    private Dictionary<int, double> torque = new Dictionary<int, double>();
+    private Dictionary<int, double> tempExternal = new Dictionary<int, double>();
+    private Dictionary<int, double> tempMotor = new Dictionary<int, double>();
+
     /// <summary>
     /// Главнео окно
     /// </summary>
