@@ -1,4 +1,4 @@
-﻿<Controls:MetroWindow x:Class="MyAppModBus.MainWindow"
+<Controls:MetroWindow x:Class="MyAppModBus.MainWindow"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -254,7 +254,6 @@
         <d3:Chart x:Name="PlotUp"
                   Grid.Column="1"
                   Grid.Row="0"
-                  
                   BottomTitle="Argument"
                   LeftTitle="Function"
                   Background="#212121"
@@ -264,7 +263,29 @@
                        FontSize="20" />
           </d3:Chart.Title>
           <Grid x:Name="lines_one" />
+          <d3:Chart.LegendContent>
+            <d3:LegendItemsPanel>
+              <d3:LegendItemsPanel.Resources>
+                <DataTemplate x:Key="InteractiveDataDisplay.WPF.LineGraph">
+                  <StackPanel Orientation="Horizontal">
+                    <CheckBox IsChecked="{Binding Path=Visibility, Converter={StaticResource VisibilityToCheckedConverter}, Mode=TwoWay}" />
+                    <Line Width="15"
+                          Height="15"
+                          X1="0"
+                          Y1="0"
+                          X2="15"
+                          Y2="15"
+                          Stroke="{Binding Path=Stroke}"
+                          StrokeThickness="1.8" />
+                    <TextBlock Margin="5,0,0,0"
+                               Text="{Binding Path=Description}" />
+                  </StackPanel>
+                </DataTemplate>
+              </d3:LegendItemsPanel.Resources>
+            </d3:LegendItemsPanel>
+          </d3:Chart.LegendContent>
         </d3:Chart>
+
       </Grid>
       <Grid Grid.Row="1"
             Grid.Column="0">
@@ -279,6 +300,27 @@
                        FontSize="20" />
           </d3:Chart.Title>
           <Grid x:Name="lines_two" />
+          <d3:Chart.LegendContent>
+            <d3:LegendItemsPanel>
+              <d3:LegendItemsPanel.Resources>
+                <DataTemplate x:Key="InteractiveDataDisplay.WPF.LineGraph">
+                  <StackPanel Orientation="Horizontal">
+                    <CheckBox IsChecked="{Binding Path=Visibility, Converter={StaticResource VisibilityToCheckedConverter}, Mode=TwoWay}" />
+                    <Line Width="15"
+                          Height="15"
+                          X1="0"
+                          Y1="0"
+                          X2="15"
+                          Y2="15"
+                          Stroke="{Binding Path=Stroke}"
+                          StrokeThickness="1.8" />
+                    <TextBlock Margin="5,0,0,0"
+                               Text="{Binding Path=Description}" />
+                  </StackPanel>
+                </DataTemplate>
+              </d3:LegendItemsPanel.Resources>
+            </d3:LegendItemsPanel>
+          </d3:Chart.LegendContent>
         </d3:Chart>
       </Grid>
     </Grid>

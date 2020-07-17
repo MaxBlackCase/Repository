@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO.Ports;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Data;
@@ -18,7 +19,7 @@ namespace MyAppModBus {
   /// <summary>
   /// Логика взаимодействия для MainWindow.xaml
   /// </summary>
-  public partial class MainWindow : MetroWindow {
+  public partial class MainWindow {
 
     const byte slaveID = 1;
 
@@ -31,13 +32,22 @@ namespace MyAppModBus {
     public static SerialPort _serialPort = null;
     public static ModbusSerialMaster master = null;
 
+    private LineGraph[][] _linesArr = new LineGraph[ 2 ][];
+    private string[][] nameLines = new string[ 2 ][];
+
+
+    #region Словари для данныч линий 
+    private Dictionary<double, double> volltage = new Dictionary<double, double>();
+    private Dictionary<double, double> current = new Dictionary<double, double>();
+    private Dictionary<double, double> torque = new Dictionary<double, double>();
+    private Dictionary<double, double> tempExternal = new Dictionary<double, double>();
+    private Dictionary<double, double> tempMotor = new Dictionary<double, double>();
+
+
     private Dictionary<double, double>[][] _arrDict = new Dictionary<double, double>[ 2 ][];
+    #endregion
 
-    private LineGraph _lines;
-    private LineGraph[,] _linesArr = new LineGraph[ 2,3];
 
-    private string[] nameLinesOne = new string[ 3 ] { "Volltage", "Current", "Torque" };
-    private string[] nameLinesTwo = new string[ 2 ] { "External", "Motor" };
 
     /// <summary>
     /// Главнео окно
@@ -45,8 +55,7 @@ namespace MyAppModBus {
     public MainWindow() {
       InitializeComponent();
       AddItemToComboBox();
-      ThemeManager.Current.ChangeTheme( this, "Dark.Blue" );
-      GraphLines( 1.5, nameLinesOne, nameLinesTwo, _lines );
+      GraphLines( 1.8 );
     }
 
     //Инициализация портов
@@ -157,7 +166,7 @@ namespace MyAppModBus {
     private int[][] _numberRegisters = new int[ 2 ][];
     private void GetHoldReg( object sender, EventArgs e ) {
       ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
-      
+
       try {
 
         textViewer.Text = null;
@@ -172,21 +181,22 @@ namespace MyAppModBus {
         ///Запуск функции отображения концевиков
         SetValSingleRegister( result[ 9 ], result[ 10 ] );
 
+
         ///Занесение значений на график
         if ( countTime % readWriteTimeOut == 0 ) {
-          for ( int writeValueArrOne = 0; writeValueArrOne < _linesArr.GetLength( 0 ); writeValueArrOne++ ) {
-            _arrDict[ 0 ][ writeValueArrOne ] = new Dictionary<double, double>();
-            _arrDict[ 0 ][ writeValueArrOne ].Add(countTime, _numberRegisters[0][ writeValueArrOne ] );
+
+          for ( int valueFirstChart = 0; valueFirstChart < _arrDict[ 0 ].Count(); valueFirstChart++ ) {
+            _arrDict[ 0 ][ valueFirstChart ].Add( countTime, Convert.ToDouble( result[ _numberRegisters[ 0 ][ valueFirstChart ] ] ) );
           }
-          for ( int writeValuArrTwo = 0; writeValuArrTwo < _linesArr.GetLength( 0 ); writeValuArrTwo++ ) {
-            _arrDict[ 1 ][ writeValuArrTwo ] = new Dictionary<double, double>();
-            _arrDict[ 1 ][ writeValuArrTwo ].Add( countTime, _numberRegisters[ 1 ][ writeValuArrTwo ] );
+          for ( int valueSecondChart = 0; valueSecondChart < _arrDict[ 1 ].Count(); valueSecondChart++ ) {
+            _arrDict[ 1 ][ valueSecondChart ].Add( countTime, Convert.ToDouble( result[ _numberRegisters[ 1 ][ valueSecondChart ] ] ) );
           }
-          for ( int i = 0; i < _linesArr.GetLength( 0 ); i++ ) {
-            _linesArr[ 0, i ].Plot( _arrDict[0][i].Keys, _arrDict[ 0 ][ i ].Values );
+
+          for ( int valueFirstChart = 0; valueFirstChart < _linesArr[ 0 ].Length; valueFirstChart++ ) {
+            _linesArr[ 0 ][ valueFirstChart ].Plot( _arrDict[ 0 ][ valueFirstChart ].Keys, _arrDict[ 0 ][ valueFirstChart ].Values );
           }
-          for ( int j = 0; j < _linesArr.GetLength( 1 ); j++ ) {
-            _linesArr[ 1, j ].Plot( _arrDict[ 1 ][ j ].Keys, _arrDict[ 1 ][ j ].Values );
+          for ( int valueSecondChart = 0; valueSecondChart < _linesArr[ 1 ].Length; valueSecondChart++ ) {
+            _linesArr[ 1 ][ valueSecondChart ].Plot( _arrDict[ 1 ][ valueSecondChart ].Keys, _arrDict[ 1 ][ valueSecondChart ].Values );
           }
 
         }
@@ -344,34 +354,55 @@ namespace MyAppModBus {
     /// <summary>
     /// Отрисовка графиков и их линий
     /// </summary>
-    private void GraphLines( double thickness, string[] nameChartOne, string[] nameChartTwo, LineGraph lines ) {
+
+    private void GraphLines( double thickness ) {
+
+      var rand = new Random();
 
       _numberRegisters[ 0 ] = new int[ 3 ] { 0, 1, 4 };
       _numberRegisters[ 1 ] = new int[ 2 ] { 2, 3 };
 
+      _linesArr[ 0 ] = new LineGraph[ 3 ];
+      _linesArr[ 1 ] = new LineGraph[ 2 ];
 
-      //Линии первого графика
-      for ( int i = 0; i < nameChartOne.Length; i++ ) {
-        lines = new LineGraph();
-        lines.Description = String.Format( $"{nameChartOne[ i ]}" );
-        lines.StrokeThickness = thickness;
-        lines.Stroke = new SolidColorBrush( Color.FromRgb( (byte)(i * 10), 150, (byte)(i * 10) ) );
+      _arrDict[ 0 ] = new Dictionary<double, double>[ 3 ] { volltage, current, torque };
+      _arrDict[ 1 ] = new Dictionary<double, double>[ 2 ] { tempExternal, tempMotor };
+
+      nameLines[ 0 ] = new string[] { "Volltage", "Current", "Torque" };
+      nameLines[ 1 ] = new string[] { "External", "Motor" };
+
+
+      // Линии первого графика
+      for ( int linesFirstChart = 0; linesFirstChart < _arrDict[ 0 ].Length; linesFirstChart++ ) {
+        var lines = new LineGraph
+        {
+
+          Description = String.Format( $"{nameLines[ 0 ][ linesFirstChart ]}" ),
+          StrokeThickness = thickness,
+          Stroke = new SolidColorBrush(Color.FromRgb( (byte)rand.Next( 0, 255 ), (byte)rand.Next( 0, 255 ), (byte)rand.Next(0, 255)))
+
+        };
+
         lines_one.Children.Add( lines );
-        _linesArr[ 0, i ] = lines;
-      }
+        _linesArr[ 0 ][ linesFirstChart ] = lines;
 
+      }
 
 
       //Линии второго графика
-      for ( int j = 0; j < nameChartTwo.Length; j++ ) {
-        lines = new LineGraph();
-        lines.Description = nameChartTwo[ j ];
-        lines.StrokeThickness = thickness;
+      for ( int linesSecondChart = 0; linesSecondChart < _arrDict[ 1 ].Length; linesSecondChart++ ) {
+        var lines = new LineGraph
+        {
+
+          Description = String.Format( $"{nameLines[ 1 ][ linesSecondChart ]}" ),
+          StrokeThickness = thickness,
+          Stroke = new SolidColorBrush( Color.FromRgb( (byte)rand.Next( 0, 255 ), (byte)rand.Next( 0, 255 ), (byte)rand.Next( 0, 255 ) ) )
+
+        };
+
         lines_two.Children.Add( lines );
-        _linesArr[ 1, j ] = lines;
+        _linesArr[ 1 ][ linesSecondChart ] = lines;
       }
-
-
     }
 
     /// <summary>
@@ -379,6 +410,7 @@ namespace MyAppModBus {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
+
     private void RegistersRequest( object sender, RoutedEventArgs e ) {
       var BtnStartTimerAndRegistersRequest = StartRegsRequest;
       try {
@@ -427,12 +459,10 @@ namespace MyAppModBus {
       }
     }
 
-
     //private void ZoomUpSl_ValueChanged( object sender, MahApps.Metro.Controls.RangeParameterChangedEventArgs e ) {
     //  PlotUp.PlotOriginY = (50 * ZoomUpSl.UpperValue) - 50;
     //  PlotUp.PlotHeight = -(50 * (100 - ZoomUpSl.LowerValue));
     //}
-
 
   }
 
