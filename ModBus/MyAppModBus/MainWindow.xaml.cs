@@ -43,8 +43,10 @@ namespace MyAppModBus {
     private Dictionary<double, double> tempExternal = new Dictionary<double, double>();
     private Dictionary<double, double> tempMotor = new Dictionary<double, double>();
 
+
     private Dictionary<double, double>[][] _arrDict = new Dictionary<double, double>[ 2 ][];
     #endregion
+
 
 
     /// <summary>
@@ -352,6 +354,7 @@ namespace MyAppModBus {
     /// <summary>
     /// Отрисовка графиков и их линий
     /// </summary>
+
     private void GraphLines( double thickness ) {
 
       var rand = new Random();
@@ -384,6 +387,7 @@ namespace MyAppModBus {
         _linesArr[ 0 ][ linesFirstChart ] = lines;
 
       }
+
 
       //Линии второго графика
       for ( int linesSecondChart = 0; linesSecondChart < _arrDict[ 1 ].Length; linesSecondChart++ ) {
