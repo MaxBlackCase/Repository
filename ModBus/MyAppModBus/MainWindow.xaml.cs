@@ -355,7 +355,6 @@ namespace MyAppModBus
       }
     }
 
-
     /// <summary>
     /// Отрисовка графиков и их линий
     /// </summary>
@@ -384,7 +383,7 @@ namespace MyAppModBus
 
           Description = String.Format( $"{nameLines[ 0 ][ linesFirstChart ]}" ),
           StrokeThickness = thickness,
-          Stroke = new SolidColorBrush(Color.FromRgb( (byte)rand.Next( 0, 255 ), (byte)rand.Next( 0, 255 ), (byte)rand.Next(0, 255)))
+          Stroke = new SolidColorBrush(Color.FromRgb( (byte)rand.Next( 1, 255 ), (byte)rand.Next( 1, 255 ), (byte)rand.Next(1, 255)))
 
         };
 
@@ -393,16 +392,13 @@ namespace MyAppModBus
 
       }
 
-
       //Линии второго графика
       for ( int linesSecondChart = 0; linesSecondChart < _arrDict[ 1 ].Length; linesSecondChart++ ) {
         var lines = new LineGraph
         {
-
           Description = String.Format( $"{nameLines[ 1 ][ linesSecondChart ]}" ),
           StrokeThickness = thickness,
-          Stroke = new SolidColorBrush( Color.FromRgb( (byte)rand.Next( 0, 255 ), (byte)rand.Next( 0, 255 ), (byte)rand.Next( 0, 255 ) ) )
-
+          Stroke = new SolidColorBrush( Color.FromRgb( (byte)rand.Next( 1, 255 ), (byte)rand.Next( 1, 255 ), (byte)rand.Next( 1, 255 ) ) )
         };
 
         lines_two.Children.Add( lines );
@@ -415,7 +411,6 @@ namespace MyAppModBus
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-
     private void RegistersRequest( object sender, RoutedEventArgs e ) {
       var BtnStartTimerAndRegistersRequest = StartRegsRequest;
       try {
