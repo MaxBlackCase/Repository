@@ -26,7 +26,7 @@ namespace MyAppModBus
 
     private readonly ushort startAddress = 0;
     private readonly ushort numburOfPoints = 18;
-    private int readWriteTimeOut = 50;
+    private int readWriteTimeOut = 20;
 
     public static string result;
     private DispatcherTimer timer;
@@ -36,6 +36,7 @@ namespace MyAppModBus
     private LineGraph[][] _linesArr = new LineGraph[2][];
     private string[][] nameLines = new string[2][];
 
+    private UIElement[][] uiElements = new UIElement[2][];
 
     #region Словари для данныч линий 
     private Dictionary<double, double> volltage = new Dictionary<double, double>();
@@ -51,7 +52,7 @@ namespace MyAppModBus
 
 
     /// <summary>
-    /// Главнео окно
+    /// Главноe окно
     /// </summary>
     public MainWindow()
     {
@@ -95,11 +96,10 @@ namespace MyAppModBus
     {
       _serialPort = new SerialPort();
       timer = new DispatcherTimer();
-
       try
       {
-        if (_serialPort.IsOpen)
-        {
+        if ( _serialPort.IsOpen ) {
+
           _serialPort.Close();
           disconnectComPort.Visibility = Visibility.Hidden;
 
@@ -116,30 +116,33 @@ namespace MyAppModBus
         _serialPort.Open();
         #endregion
 
-        master = ModbusSerialMaster.CreateRtu(_serialPort);
-
+        master = ModbusSerialMaster.CreateRtu( _serialPort );
         //Сброс регистров
         ResetRegisters();
 
-        StartRegsRequest.IsEnabled = true;
-        checkBoxWrite_1.IsEnabled = true;
-        checkBoxWrite_2.IsEnabled = true;
-        checkBoxWrite_3.IsEnabled = true;
-        decTextBox.IsEnabled = false;
-        decButtonTimeout.IsEnabled = false;
-        comboBoxMainPorts.IsEnabled = false;
+        uiElements[0] = new UIElement[] { checkBoxWrite_1, checkBoxWrite_2, checkBoxWrite_3, StartRegsRequest };
+        uiElements[1] = new UIElement[] { decTextBox, decButtonTimeout, comboBoxMainPorts };
+
+
+        for (int i = 0; i < 1; i++)
+        {
+          foreach (var tr in uiElements[0])
+          {
+            tr.IsEnabled = true;
+          }
+          foreach (var fls in uiElements[1])
+          {
+            fls.IsEnabled = false;
+          }
+        }
+
         connectComPort.Visibility = Visibility.Hidden;
         disconnectComPort.Visibility = Visibility.Visible;
         textViewer.Text = $"Порт {_serialPort.PortName} Подключен";
 
       }
-      catch (Exception err)
-      {
-        _serialPort.Close();
-        connectComPort.Content = "Подключить";
-        comboBoxMainPorts.IsEnabled = true;
-        decButtonTimeout.IsEnabled = false;
-        disconnectComPort.Visibility = Visibility.Hidden;
+      catch ( Exception err ) {
+
         textViewer.Text = $"Ошибка: {err.Message}";
       }
 
@@ -157,13 +160,25 @@ namespace MyAppModBus
       _serialPort.Close();
       _serialPort.Dispose();
 
-      comboBoxMainPorts.IsEnabled = true;
+      for (int i = 0; i < 1; i++)
+      {
+        foreach (var tr in uiElements[0])
+        {
+          tr.IsEnabled = false;
+        }
+        foreach (var fls in uiElements[1])
+        {
+          fls.IsEnabled = true;
+        }
+        foreach (UIElement toggle in uiElements[0])
+        {
+          toggle.IsEnabled = false;
+        }
+      }
+
       disconnectComPort.Visibility = Visibility.Hidden;
       connectComPort.Visibility = Visibility.Visible;
       textViewer.Text = $"Порт {_serialPort.PortName} закрыт";
-      decButtonTimeout.IsEnabled = true;
-      decTextBox.IsEnabled = true;
-      StartRegsRequest.IsEnabled = false;
       StartRegsRequest.Content = "Запустить";
     }
 
@@ -175,10 +190,11 @@ namespace MyAppModBus
 
     private double countTime = 0;
     private int countIndex = 0;
-    private int[][] _numberRegisters = new int[2][];
-    private void GetHoldReg(object sender, EventArgs e)
-    {
-      ushort[] result = master.ReadHoldingRegisters(slaveID, startAddress, numburOfPoints);
+    private int[][] _numberRegisters = new int[ 2 ][];
+
+    private void GetHoldReg( object sender, EventArgs e ) {
+      ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
+
 
       try
       {
@@ -201,13 +217,16 @@ namespace MyAppModBus
         if (countTime % readWriteTimeOut == 0)
         {
 
-          for (int valueFirstChart = 0; valueFirstChart < _arrDict[0].Count(); valueFirstChart++)
-          {
-            _arrDict[0][valueFirstChart].Add(countTime, Convert.ToDouble(result[_numberRegisters[0][valueFirstChart]]));
+          for ( int valueFirstChart = 0; valueFirstChart < _arrDict[ 0 ].Count(); valueFirstChart++ ) {
+            _arrDict[ 0 ][ valueFirstChart ].Add( countTime / 1000, Convert.ToDouble( result[ _numberRegisters[ 0 ][ valueFirstChart ] ] ) );
+            //Очищение коллекции точек График 1
+            if (_arrDict[0][valueFirstChart].Count > 1000) { _arrDict[0][valueFirstChart].Clear(); }
           }
-          for (int valueSecondChart = 0; valueSecondChart < _arrDict[1].Count(); valueSecondChart++)
-          {
-            _arrDict[1][valueSecondChart].Add(countTime, Convert.ToDouble(result[_numberRegisters[1][valueSecondChart]]));
+          for ( int valueSecondChart = 0; valueSecondChart < _arrDict[ 1 ].Count(); valueSecondChart++ ) {
+            _arrDict[ 1 ][ valueSecondChart ].Add(countTime / 1000, Convert.ToDouble( result[ _numberRegisters[ 1 ][ valueSecondChart ] ] ) );
+            //Очищение коллекции точек График 2
+            if (_arrDict[1][valueSecondChart].Count > 1000){_arrDict[1][valueSecondChart].Clear(); }
+
           }
 
           for (int valueFirstChart = 0; valueFirstChart < _linesArr[0].Length; valueFirstChart++)
@@ -349,25 +368,26 @@ namespace MyAppModBus
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void DecimalButtonTimeoutClic(object sender, RoutedEventArgs e)
-    {
-      if (decTextBox.Text != "")
-      {
-        double valTextBox = Convert.ToDouble(decTextBox.Text);
 
-        if (valTextBox < 50)
-        {
-          readWriteTimeOut = 50;
+    public int ReadWriteTimeOut {
+      get => readWriteTimeOut;
+      set => readWriteTimeOut = value;
+    }
+    private void DecimalButtonTimeoutClic( object sender, RoutedEventArgs e ) {
+      if ( decTextBox.Text != "" ) {
+        double valTextBox = Convert.ToDouble( decTextBox.Text );
+
+        if ( valTextBox < 20 ) {
+          ReadWriteTimeOut = 20;
           textViewer.Text = $"Интервал не может быть меньше {readWriteTimeOut} ms, поэтому задан интервал по умолчанию {readWriteTimeOut} ms.";
         }
-        else if (valTextBox > 1000)
-        {
-          readWriteTimeOut = 1000;
+        else if ( valTextBox > 100 ) {
+          ReadWriteTimeOut = 100;
           textViewer.Text = $"Значение не может превышать значение в {readWriteTimeOut} ms, поэтому задано значение по умолчанию {readWriteTimeOut} ms.";
         }
-        else
-        {
-          readWriteTimeOut = (int)valTextBox;
+        else {
+          ReadWriteTimeOut = (int)valTextBox;
+
           textViewer.Text = $"Значение интервала опроса устроства: {readWriteTimeOut} ms";
         }
       }
@@ -386,7 +406,6 @@ namespace MyAppModBus
         master.WriteSingleRegister(slaveID, arrRegisters[i], 0);
       }
     }
-
 
     /// <summary>
     /// Отрисовка графиков и их линий
@@ -418,7 +437,8 @@ namespace MyAppModBus
 
           Description = String.Format($"{nameLines[0][linesFirstChart]}"),
           StrokeThickness = thickness,
-          Stroke = new SolidColorBrush(Color.FromRgb((byte)rand.Next(0, 255), (byte)rand.Next(0, 255), (byte)rand.Next(0, 255)))
+          Stroke = new SolidColorBrush(Color.FromRgb( (byte)rand.Next( 1, 255 ), (byte)rand.Next( 1, 255 ), (byte)rand.Next(1, 255)))
+
 
         };
 
@@ -427,16 +447,14 @@ namespace MyAppModBus
 
       }
 
-
       //Линии второго графика
       for (int linesSecondChart = 0; linesSecondChart < _arrDict[1].Length; linesSecondChart++)
       {
         var lines = new LineGraph
         {
-
-          Description = String.Format($"{nameLines[1][linesSecondChart]}"),
+          Description = String.Format( $"{nameLines[ 1 ][ linesSecondChart ]}" ),
           StrokeThickness = thickness,
-          Stroke = new SolidColorBrush(Color.FromRgb((byte)rand.Next(0, 255), (byte)rand.Next(0, 255), (byte)rand.Next(0, 255)))
+          Stroke = new SolidColorBrush( Color.FromRgb( (byte)rand.Next( 1, 255 ), (byte)rand.Next( 1, 255 ), (byte)rand.Next( 1, 255 ) ) )
 
         };
 
@@ -450,9 +468,8 @@ namespace MyAppModBus
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
+    private void RegistersRequest( object sender, RoutedEventArgs e ) {
 
-    private void RegistersRequest(object sender, RoutedEventArgs e)
-    {
       var BtnStartTimerAndRegistersRequest = StartRegsRequest;
       try
       {
