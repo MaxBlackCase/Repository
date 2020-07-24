@@ -5,7 +5,7 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:d3="clr-namespace:InteractiveDataDisplay.WPF;assembly=InteractiveDataDisplay.WPF"
                       xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
-                      xmlns:local="clr-namespace:MyAppModBus"
+                      xmlns:lc="clr-namespace:MyAppModBus"
                       mc:Ignorable="d"
                       Title="ModBus(RTU)"
                       MinHeight="720"
@@ -22,7 +22,7 @@
                       FontFamily="Arial Rounded MT Bold"
                       Foreground="#fff">
   <Window.Resources>
-    <local:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter" />
+    <lc:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter" />
   </Window.Resources>
   <Grid>
     <Grid.RowDefinitions>
