@@ -163,6 +163,14 @@ namespace MyAppModBus
     private double countTime = 0;
     private int countIndex = 0;
     private int[][] _numberRegisters = new int[ 2 ][];
+    private TimeSpan timeAxisX;
+
+    public TimeSpan Time {
+
+      get => timeAxisX;
+      set => timeAxisX = value;
+    }
+
     private void GetHoldReg( object sender, EventArgs e ) {
       ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
 
@@ -170,6 +178,8 @@ namespace MyAppModBus
 
         textViewer.Text = null;
         countTime += readWriteTimeOut;
+
+        var time = Time.TotalMilliseconds;
 
         ///Вывод всех регистров на экран
         for ( int i = 0; i < result.Length; i++ ) {
@@ -185,10 +195,10 @@ namespace MyAppModBus
         if ( countTime % readWriteTimeOut == 0 ) {
 
           for ( int valueFirstChart = 0; valueFirstChart < _arrDict[ 0 ].Count(); valueFirstChart++ ) {
-            _arrDict[ 0 ][ valueFirstChart ].Add( countTime / 1000, Convert.ToDouble( result[ _numberRegisters[ 0 ][ valueFirstChart ] ] ) );
+            _arrDict[ 0 ][ valueFirstChart ].Add( time, Convert.ToDouble( result[ _numberRegisters[ 0 ][ valueFirstChart ] ] ) );
           }
           for ( int valueSecondChart = 0; valueSecondChart < _arrDict[ 1 ].Count(); valueSecondChart++ ) {
-            _arrDict[ 1 ][ valueSecondChart ].Add( countTime / 1000, Convert.ToDouble( result[ _numberRegisters[ 1 ][ valueSecondChart ] ] ) );
+            _arrDict[ 1 ][ valueSecondChart ].Add( time, Convert.ToDouble( result[ _numberRegisters[ 1 ][ valueSecondChart ] ] ) );
           }
 
           for ( int valueFirstChart = 0; valueFirstChart < _linesArr[ 0 ].Length; valueFirstChart++ ) {
