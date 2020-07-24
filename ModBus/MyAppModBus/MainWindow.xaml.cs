@@ -49,7 +49,7 @@ namespace MyAppModBus
 
 
     /// <summary>
-    /// Главнео окно
+    /// Главноe окно
     /// </summary>
     public MainWindow() {
       InitializeComponent();
