@@ -24,7 +24,7 @@ namespace MyAppModBus
 
     private readonly ushort startAddress = 0;
     private readonly ushort numburOfPoints = 18;
-    private int readWriteTimeOut = 50;
+    private int readWriteTimeOut = 20;
 
     public static string result;
     private DispatcherTimer timer;
@@ -163,6 +163,7 @@ namespace MyAppModBus
     private double countTime = 0;
     private int countIndex = 0;
     private int[][] _numberRegisters = new int[ 2 ][];
+
     private void GetHoldReg( object sender, EventArgs e ) {
       ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
 
@@ -188,7 +189,7 @@ namespace MyAppModBus
             _arrDict[ 0 ][ valueFirstChart ].Add( countTime / 1000, Convert.ToDouble( result[ _numberRegisters[ 0 ][ valueFirstChart ] ] ) );
           }
           for ( int valueSecondChart = 0; valueSecondChart < _arrDict[ 1 ].Count(); valueSecondChart++ ) {
-            _arrDict[ 1 ][ valueSecondChart ].Add( countTime / 1000, Convert.ToDouble( result[ _numberRegisters[ 1 ][ valueSecondChart ] ] ) );
+            _arrDict[ 1 ][ valueSecondChart ].Add(countTime / 1000, Convert.ToDouble( result[ _numberRegisters[ 1 ][ valueSecondChart ] ] ) );
           }
 
           for ( int valueFirstChart = 0; valueFirstChart < _linesArr[ 0 ].Length; valueFirstChart++ ) {
@@ -318,20 +319,25 @@ namespace MyAppModBus
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
+
+    public int ReadWriteTimeOut {
+      get => readWriteTimeOut;
+      set => readWriteTimeOut = value;
+    }
     private void DecimalButtonTimeoutClic( object sender, RoutedEventArgs e ) {
       if ( decTextBox.Text != "" ) {
         double valTextBox = Convert.ToDouble( decTextBox.Text );
 
-        if ( valTextBox < 50 ) {
-          readWriteTimeOut = 50;
+        if ( valTextBox < 20 ) {
+          ReadWriteTimeOut = 20;
           textViewer.Text = $"Интервал не может быть меньше {readWriteTimeOut} ms, поэтому задан интервал по умолчанию {readWriteTimeOut} ms.";
         }
-        else if ( valTextBox > 1000 ) {
-          readWriteTimeOut = 1000;
+        else if ( valTextBox > 100 ) {
+          ReadWriteTimeOut = 100;
           textViewer.Text = $"Значение не может превышать значение в {readWriteTimeOut} ms, поэтому задано значение по умолчанию {readWriteTimeOut} ms.";
         }
         else {
-          readWriteTimeOut = (int)valTextBox;
+          ReadWriteTimeOut = (int)valTextBox;
           textViewer.Text = $"Значение интервала опроса устроства: {readWriteTimeOut} ms";
         }
       }
@@ -348,7 +354,6 @@ namespace MyAppModBus
         master.WriteSingleRegister( slaveID, arrRegisters[ i ], 0 );
       }
     }
-
 
     /// <summary>
     /// Отрисовка графиков и их линий
@@ -378,7 +383,7 @@ namespace MyAppModBus
 
           Description = String.Format( $"{nameLines[ 0 ][ linesFirstChart ]}" ),
           StrokeThickness = thickness,
-          Stroke = new SolidColorBrush(Color.FromRgb( (byte)rand.Next( 0, 255 ), (byte)rand.Next( 0, 255 ), (byte)rand.Next(0, 255)))
+          Stroke = new SolidColorBrush(Color.FromRgb( (byte)rand.Next( 1, 255 ), (byte)rand.Next( 1, 255 ), (byte)rand.Next(1, 255)))
 
         };
 
@@ -387,16 +392,13 @@ namespace MyAppModBus
 
       }
 
-
       //Линии второго графика
       for ( int linesSecondChart = 0; linesSecondChart < _arrDict[ 1 ].Length; linesSecondChart++ ) {
         var lines = new LineGraph
         {
-
           Description = String.Format( $"{nameLines[ 1 ][ linesSecondChart ]}" ),
           StrokeThickness = thickness,
-          Stroke = new SolidColorBrush( Color.FromRgb( (byte)rand.Next( 0, 255 ), (byte)rand.Next( 0, 255 ), (byte)rand.Next( 0, 255 ) ) )
-
+          Stroke = new SolidColorBrush( Color.FromRgb( (byte)rand.Next( 1, 255 ), (byte)rand.Next( 1, 255 ), (byte)rand.Next( 1, 255 ) ) )
         };
 
         lines_two.Children.Add( lines );
@@ -409,7 +411,6 @@ namespace MyAppModBus
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-
     private void RegistersRequest( object sender, RoutedEventArgs e ) {
       var BtnStartTimerAndRegistersRequest = StartRegsRequest;
       try {
