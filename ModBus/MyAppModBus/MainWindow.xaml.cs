@@ -34,6 +34,7 @@ namespace MyAppModBus
     private LineGraph[][] _linesArr = new LineGraph[ 2 ][];
     private string[][] nameLines = new string[ 2 ][];
 
+    private UIElement[][] uiElements = new UIElement[2][];
 
     #region Словари для данныч линий 
     private Dictionary<double, double> volltage = new Dictionary<double, double>();
@@ -86,8 +87,8 @@ namespace MyAppModBus
     private void ConnectToDevice( object sender, RoutedEventArgs e ) {
       _serialPort = new SerialPort();
       timer = new DispatcherTimer();
-
-      try {
+      try
+      {
         if ( _serialPort.IsOpen ) {
           _serialPort.Close();
           disconnectComPort.Visibility = Visibility.Hidden;
@@ -106,28 +107,31 @@ namespace MyAppModBus
         #endregion
 
         master = ModbusSerialMaster.CreateRtu( _serialPort );
-
         //Сброс регистров
         ResetRegisters();
 
-        StartRegsRequest.IsEnabled = true;
-        checkBoxWrite_1.IsEnabled = true;
-        checkBoxWrite_2.IsEnabled = true;
-        checkBoxWrite_3.IsEnabled = true;
-        decTextBox.IsEnabled = false;
-        decButtonTimeout.IsEnabled = false;
-        comboBoxMainPorts.IsEnabled = false;
+        uiElements[0] = new UIElement[] { checkBoxWrite_1, checkBoxWrite_2, checkBoxWrite_3, StartRegsRequest };
+        uiElements[1] = new UIElement[] { decTextBox, decButtonTimeout, comboBoxMainPorts };
+
+
+        for (int i = 0; i < 1; i++)
+        {
+          foreach (var tr in uiElements[0])
+          {
+            tr.IsEnabled = true;
+          }
+          foreach (var fls in uiElements[1])
+          {
+            fls.IsEnabled = false;
+          }
+        }
+
         connectComPort.Visibility = Visibility.Hidden;
         disconnectComPort.Visibility = Visibility.Visible;
         textViewer.Text = $"Порт {_serialPort.PortName} Подключен";
 
       }
       catch ( Exception err ) {
-        _serialPort.Close();
-        connectComPort.Content = "Подключить";
-        comboBoxMainPorts.IsEnabled = true;
-        decButtonTimeout.IsEnabled = false;
-        disconnectComPort.Visibility = Visibility.Hidden;
         textViewer.Text = $"Ошибка: {err.Message}";
       }
 
@@ -144,13 +148,25 @@ namespace MyAppModBus
       _serialPort.Close();
       _serialPort.Dispose();
 
-      comboBoxMainPorts.IsEnabled = true;
+      for (int i = 0; i < 1; i++)
+      {
+        foreach (var tr in uiElements[0])
+        {
+          tr.IsEnabled = false;
+        }
+        foreach (var fls in uiElements[1])
+        {
+          fls.IsEnabled = true;
+        }
+        foreach (UIElement toggle in uiElements[0])
+        {
+          toggle.IsEnabled = false;
+        }
+      }
+
       disconnectComPort.Visibility = Visibility.Hidden;
       connectComPort.Visibility = Visibility.Visible;
       textViewer.Text = $"Порт {_serialPort.PortName} закрыт";
-      decButtonTimeout.IsEnabled = true;
-      decTextBox.IsEnabled = true;
-      StartRegsRequest.IsEnabled = false;
       StartRegsRequest.Content = "Запустить";
     }
 
@@ -187,9 +203,11 @@ namespace MyAppModBus
 
           for ( int valueFirstChart = 0; valueFirstChart < _arrDict[ 0 ].Count(); valueFirstChart++ ) {
             _arrDict[ 0 ][ valueFirstChart ].Add( countTime / 1000, Convert.ToDouble( result[ _numberRegisters[ 0 ][ valueFirstChart ] ] ) );
+            if (_arrDict[0][valueFirstChart].Count > 1000) { _arrDict[0][valueFirstChart].Clear(); }
           }
           for ( int valueSecondChart = 0; valueSecondChart < _arrDict[ 1 ].Count(); valueSecondChart++ ) {
             _arrDict[ 1 ][ valueSecondChart ].Add(countTime / 1000, Convert.ToDouble( result[ _numberRegisters[ 1 ][ valueSecondChart ] ] ) );
+            if (_arrDict[1][valueSecondChart].Count > 1000){_arrDict[1][valueSecondChart].Clear(); }
           }
 
           for ( int valueFirstChart = 0; valueFirstChart < _linesArr[ 0 ].Length; valueFirstChart++ ) {
