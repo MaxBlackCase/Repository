@@ -1,9 +1,7 @@
-﻿using ControlzEx.Theming;
-using InteractiveDataDisplay.WPF;
+﻿using InteractiveDataDisplay.WPF;
 using MahApps.Metro.Controls;
 using Modbus.Device;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
@@ -15,7 +13,8 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace MyAppModBus {
+namespace MyAppModBus
+{
   /// <summary>
   /// Логика взаимодействия для MainWindow.xaml
   /// </summary>
