@@ -1,12 +1,11 @@
 ﻿using InteractiveDataDisplay.WPF;
 using MahApps.Metro.Controls;
 using Modbus.Device;
-using Syncfusion.UI.Xaml.Charts;
 using System;
 using System.Collections.Generic;
 using System.IO.Ports;
-using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -19,7 +18,8 @@ namespace MyAppModBus
   /// <summary>
   /// Логика взаимодействия для MainWindow.xaml
   /// </summary>
-  public partial class MainWindow {
+  public partial class MainWindow
+  {
 
     const byte slaveID = 1;
 
@@ -32,8 +32,8 @@ namespace MyAppModBus
     public static SerialPort _serialPort = null;
     public static ModbusSerialMaster master = null;
 
-    private LineGraph[][] _linesArr = new LineGraph[ 2 ][];
-    private string[][] nameLines = new string[ 2 ][];
+    private LineGraph[][] _linesArr = new LineGraph[2][];
+    private string[][] nameLines = new string[2][];
 
     private UIElement[][] uiElements = new UIElement[2][];
 
@@ -45,7 +45,7 @@ namespace MyAppModBus
     private Dictionary<double, double> tempMotor = new Dictionary<double, double>();
 
 
-    private Dictionary<double, double>[][] _arrDict = new Dictionary<double, double>[ 2 ][];
+    private Dictionary<double, double>[][] _arrDict = new Dictionary<double, double>[2][];
     #endregion
 
 
@@ -53,28 +53,33 @@ namespace MyAppModBus
     /// <summary>
     /// Главноe окно
     /// </summary>
-    public MainWindow() {
+    public MainWindow()
+    {
       InitializeComponent();
       AddItemToComboBox();
-      GetSfCharts();
       //GraphLines( 1.8 );
     }
 
     //Инициализация портов
-    private void AddItemToComboBox() {
+    private void AddItemToComboBox()
+    {
       //Получение портов
       string[] ports = SerialPort.GetPortNames();
-      foreach ( string port in ports ) {
-        if ( port == "" ) {
-          comboBoxMainPorts.Items.Add( "Отсутствует порт" );
+      foreach (string port in ports)
+      {
+        if (port == "")
+        {
+          comboBoxMainPorts.Items.Add("Отсутствует порт");
         }
-        else {
+        else
+        {
           string str = port.ToString();
           int maxLength = 3;
-          string result = str.Substring( 0, Math.Min( str.Length, maxLength ) );
+          string result = str.Substring(0, Math.Min(str.Length, maxLength));
 
-          if ( result == "COM" ) {
-            comboBoxMainPorts.Items.Add( port );
+          if (result == "COM")
+          {
+            comboBoxMainPorts.Items.Add(port);
           }
         }
       }
@@ -86,12 +91,14 @@ namespace MyAppModBus
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void ConnectToDevice( object sender, RoutedEventArgs e ) {
+    private void ConnectToDevice(object sender, RoutedEventArgs e)
+    {
       _serialPort = new SerialPort();
       timer = new DispatcherTimer();
       try
       {
-        if ( _serialPort.IsOpen ) {
+        if (_serialPort.IsOpen)
+        {
           _serialPort.Close();
           disconnectComPort.Visibility = Visibility.Hidden;
 
@@ -108,7 +115,7 @@ namespace MyAppModBus
         _serialPort.Open();
         #endregion
 
-        master = ModbusSerialMaster.CreateRtu( _serialPort );
+        master = ModbusSerialMaster.CreateRtu(_serialPort);
         //Сброс регистров
         ResetRegisters();
 
@@ -133,7 +140,8 @@ namespace MyAppModBus
         textViewer.Text = $"Порт {_serialPort.PortName} Подключен";
 
       }
-      catch ( Exception err ) {
+      catch (Exception err)
+      {
         textViewer.Text = $"Ошибка: {err.Message}";
       }
 
@@ -145,7 +153,8 @@ namespace MyAppModBus
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void DisconnectToDevice( object sender, RoutedEventArgs e ) {
+    private void DisconnectToDevice(object sender, RoutedEventArgs e)
+    {
       timer.Stop();
       _serialPort.Close();
       _serialPort.Dispose();
@@ -179,30 +188,34 @@ namespace MyAppModBus
     /// <param name="e"></param>
 
     private double countTime = 0;
-    private int countIndex = 0;
-    private int[][] _numberRegisters = new int[ 2 ][];
+    private double countIndex = 0;
+    private int[][] _numberRegisters = new int[2][];
+    public int Interval { get => readWriteTimeOut; }
+    private void GetHoldReg(object sender, EventArgs e)
+    {
+      ushort[] result = master.ReadHoldingRegisters(slaveID, startAddress, numburOfPoints);
 
-    private void GetHoldReg( object sender, EventArgs e ) {
-      ushort[] result = master.ReadHoldingRegisters( slaveID, startAddress, numburOfPoints );
-
-      try {
+      try
+      {
 
         textViewer.Text = null;
         countTime += readWriteTimeOut;
 
         ///Вывод всех регистров на экран
-        for ( int i = 0; i < result.Length; i++ ) {
-          textViewer.Text += $"Регистр: {i} \t{result[ i ]}\n";
+        for (int i = 0; i < result.Length; i++)
+        {
+          textViewer.Text += $"Регистр: {i} \t{result[i]}\n";
 
         }
 
         ///Запуск функции отображения концевиков
-        SetValSingleRegister( result[ 9 ], result[ 10 ] );
+        SetValSingleRegister(result[9], result[10]);
 
 
         ///Занесение значений на график
-        if ( countTime % readWriteTimeOut == 0 ) {
-
+        if (countTime % readWriteTimeOut == 0)
+        {
+          #region OldGraphs
           //for ( int valueFirstChart = 0; valueFirstChart < _arrDict[ 0 ].Count(); valueFirstChart++ ) {
           //  _arrDict[ 0 ][ valueFirstChart ].Add( countTime / 1000, Convert.ToDouble( result[ _numberRegisters[ 0 ][ valueFirstChart ] ] ) );
           //  //Очищение коллекции точек График 1
@@ -220,12 +233,15 @@ namespace MyAppModBus
           //for ( int valueSecondChart = 0; valueSecondChart < _linesArr[ 1 ].Length; valueSecondChart++ ) {
           //  _linesArr[ 1 ][ valueSecondChart ].Plot( _arrDict[ 1 ][ valueSecondChart ].Keys, _arrDict[ 1 ][ valueSecondChart ].Values );
           //}
+          #endregion
+
 
         }
 
         countIndex++;
       }
-      catch ( Exception err ) {
+      catch (Exception err)
+      {
         textViewer.Text = $"Ошибка: {err.Message}";
       }
 
@@ -281,47 +297,55 @@ namespace MyAppModBus
     /// <summary>
     /// Получение данных концевиков
     /// </summary>
-    private void SetValSingleRegister( ushort registrNine, ushort registrTen ) {
+    private void SetValSingleRegister(ushort registrNine, ushort registrTen)
+    {
 
-      try {
-        if ( _serialPort.IsOpen ) {
+      try
+      {
+        if (_serialPort.IsOpen)
+        {
 
-          int[] arrLimitSwitch = new int[ 2 ];
-          arrLimitSwitch[ 0 ] = Convert.ToInt32( registrNine );
-          arrLimitSwitch[ 1 ] = Convert.ToInt32( registrTen );
+          int[] arrLimitSwitch = new int[2];
+          arrLimitSwitch[0] = Convert.ToInt32(registrNine);
+          arrLimitSwitch[1] = Convert.ToInt32(registrTen);
 
 
-          for ( int i = 0; i < LimSwPanel.Children.Count; i++ ) {
+          for (int i = 0; i < LimSwPanel.Children.Count; i++)
+          {
             LimSwPanel.Children.Clear();
           }
 
-          foreach ( var item in arrLimitSwitch ) {
-            if ( item == 1 ) {
+          foreach (var item in arrLimitSwitch)
+          {
+            if (item == 1)
+            {
               Ellipse LimSwEllipse = new Ellipse
               {
                 Width = 20,
                 Height = 20,
                 Fill = Brushes.Green,
-                Margin = new Thickness( 0, 0, 10, 15 )
+                Margin = new Thickness(0, 0, 10, 15)
               };
-              LimSwPanel.Children.Add( LimSwEllipse );
+              LimSwPanel.Children.Add(LimSwEllipse);
             }
-            else {
+            else
+            {
               Ellipse LimSwEllipse = new Ellipse
               {
                 Width = 20,
                 Height = 20,
                 Fill = Brushes.Red,
-                Margin = new Thickness( 0, 0, 10, 15 )
+                Margin = new Thickness(0, 0, 10, 15)
               };
-              LimSwPanel.Children.Add( LimSwEllipse );
+              LimSwPanel.Children.Add(LimSwEllipse);
             }
           }
 
         }
 
       }
-      catch ( Exception err ) {
+      catch (Exception err)
+      {
 
         textViewer.Text = $"Ошибка: {err.Message}";
       }
@@ -333,8 +357,9 @@ namespace MyAppModBus
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void TextBoxDecimalPreviewTextInput( object sender, TextCompositionEventArgs e ) {
-      e.Handled = new Regex( "[^0-9]+" ).IsMatch( e.Text );
+    private void TextBoxDecimalPreviewTextInput(object sender, TextCompositionEventArgs e)
+    {
+      e.Handled = new Regex("[^0-9]+").IsMatch(e.Text);
     }
     /// <summary>
     /// Задает время опроса устройства в ms
@@ -342,23 +367,30 @@ namespace MyAppModBus
     /// <param name="sender"></param>
     /// <param name="e"></param>
 
-    public int ReadWriteTimeOut {
+    public int ReadWriteTimeOut
+    {
       get => readWriteTimeOut;
       set => readWriteTimeOut = value;
     }
-    private void DecimalButtonTimeoutClic( object sender, RoutedEventArgs e ) {
-      if ( decTextBox.Text != "" ) {
-        double valTextBox = Convert.ToDouble( decTextBox.Text );
 
-        if ( valTextBox < 20 ) {
+    private void DecimalButtonTimeoutClic(object sender, RoutedEventArgs e)
+    {
+      if (decTextBox.Text != "")
+      {
+        double valTextBox = Convert.ToDouble(decTextBox.Text);
+
+        if (valTextBox < 20)
+        {
           ReadWriteTimeOut = 20;
           textViewer.Text = $"Интервал не может быть меньше {readWriteTimeOut} ms, поэтому задан интервал по умолчанию {readWriteTimeOut} ms.";
         }
-        else if ( valTextBox > 100 ) {
+        else if (valTextBox > 100)
+        {
           ReadWriteTimeOut = 100;
           textViewer.Text = $"Значение не может превышать значение в {readWriteTimeOut} ms, поэтому задано значение по умолчанию {readWriteTimeOut} ms.";
         }
-        else {
+        else
+        {
           ReadWriteTimeOut = (int)valTextBox;
           textViewer.Text = $"Значение интервала опроса устроства: {readWriteTimeOut} ms";
         }
@@ -369,11 +401,13 @@ namespace MyAppModBus
     /// <summary>
     /// Сброс регистров 
     /// </summary>
-    private void ResetRegisters() {
+    private void ResetRegisters()
+    {
       ushort[] arrRegisters = new ushort[] { 6, 7, 8 };
 
-      for ( int i = 0; i < arrRegisters.Length; i++ ) {
-        master.WriteSingleRegister( slaveID, arrRegisters[ i ], 0 );
+      for (int i = 0; i < arrRegisters.Length; i++)
+      {
+        master.WriteSingleRegister(slaveID, arrRegisters[i], 0);
       }
     }
 
@@ -433,23 +467,28 @@ namespace MyAppModBus
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void RegistersRequest( object sender, RoutedEventArgs e ) {
+    private void RegistersRequest(object sender, RoutedEventArgs e)
+    {
       var BtnStartTimerAndRegistersRequest = StartRegsRequest;
-      try {
-        if ( _serialPort.IsOpen && timer.IsEnabled == false ) {
+      try
+      {
+        if (_serialPort.IsOpen && timer.IsEnabled == false)
+        {
           #region <Timer>
-          timer.Tick += new EventHandler( GetHoldReg );
-          timer.Interval = new TimeSpan( 0, 0, 0, 0, readWriteTimeOut );
+          timer.Tick += new EventHandler(GetHoldReg);
+          timer.Interval = new TimeSpan(0, 0, 0, 0, readWriteTimeOut);
           timer.Start();
           #endregion
           BtnStartTimerAndRegistersRequest.Content = "Остановить";
         }
-        else {
+        else
+        {
           timer.Stop();
           BtnStartTimerAndRegistersRequest.Content = "Запустить";
         }
       }
-      catch ( Exception err ) {
+      catch (Exception err)
+      {
         textViewer.Text = $"Ошибка: {err.Message}";
       }
     }
@@ -459,22 +498,30 @@ namespace MyAppModBus
     /// </summary>
     /// <param name="sender">Объект</param>
     /// <param name="e">Событие</param>
-    private void CheсkValToRegisters( object sender, RoutedEventArgs e ) {
+    private void CheсkValToRegisters(object sender, RoutedEventArgs e)
+    {
       ToggleSwitch toggleSwitch = sender as ToggleSwitch;
-      var indElem = CheckBoxWriteRegisters.Children.IndexOf( toggleSwitch );
+      var indElem = CheckBoxWriteRegisters.Children.IndexOf(toggleSwitch);
       ushort[] arrRegisters = new ushort[] { 6, 7, 8 };
-      if ( toggleSwitch != null && _serialPort.IsOpen ) {
-        if ( toggleSwitch.IsOn == true ) {
-          for ( var i = 0; i < arrRegisters.Length; i++ ) {
-            if ( i == indElem ) {
-              master.WriteSingleRegister( slaveID, arrRegisters[ i ], 1 );
+      if (toggleSwitch != null && _serialPort.IsOpen)
+      {
+        if (toggleSwitch.IsOn == true)
+        {
+          for (var i = 0; i < arrRegisters.Length; i++)
+          {
+            if (i == indElem)
+            {
+              master.WriteSingleRegister(slaveID, arrRegisters[i], 1);
             }
           }
         }
-        else {
-          for ( var i = 0; i < arrRegisters.Length; i++ ) {
-            if ( i == indElem ) {
-              master.WriteSingleRegister( slaveID, arrRegisters[ i ], 0 );
+        else
+        {
+          for (var i = 0; i < arrRegisters.Length; i++)
+          {
+            if (i == indElem)
+            {
+              master.WriteSingleRegister(slaveID, arrRegisters[i], 0);
             }
           }
         }
@@ -483,42 +530,19 @@ namespace MyAppModBus
 
     private void GetSfCharts()
     {
-      SfChart chart = new SfChart();
-      CategoryAxis primaryAxis = new CategoryAxis();
-      primaryAxis.Header = "Name";
-      chart.PrimaryAxis = primaryAxis;
-
-
-      NumericalAxis secondaryAxis = new NumericalAxis();
-      secondaryAxis.Header = "Height(in cm)";
-      chart.SecondaryAxis = secondaryAxis;
-
-      ColumnSeries series = new ColumnSeries();
-
-      series.ItemsSource = (new ViewModel()).Data;
-      series.XBindingPath = "Name";
-      series.YBindingPath = "Height";
-      series.Label = "Heights";
-      series.ShowTooltip = true;
-
-      chart.Header = "Chart";
-
-      series.AdornmentsInfo = new ChartAdornmentInfo() { ShowLabel = true };
-
-      chart.Series.Add(series);
-      ChartSf.Children.Add(chart);
-
-
     }
 
   }
 
-  public class VisibilityToCheckedConverter : IValueConverter {
-    public object Convert( object value, Type targetType, object parameter, System.Globalization.CultureInfo culture ) {
+  public class VisibilityToCheckedConverter : IValueConverter
+  {
+    public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    {
       return ((Visibility)value) == Visibility.Visible;
     }
 
-    public object ConvertBack( object value, Type targetType, object parameter, System.Globalization.CultureInfo culture ) {
+    public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    {
       return ((bool)value) ? Visibility.Visible : Visibility.Collapsed;
     }
   }

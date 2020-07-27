@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace MyAppModBus
 {
-  internal class Person
+  public class DataPints
   {
 
-    public string Name { get; set; }
-    public double Height{ get; set; }
+    public double Value { get; set; }
+    public string Time{ get; set; }
 
   }
 }
