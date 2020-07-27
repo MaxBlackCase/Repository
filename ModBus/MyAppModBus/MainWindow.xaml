@@ -5,8 +5,8 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:d3="clr-namespace:InteractiveDataDisplay.WPF;assembly=InteractiveDataDisplay.WPF"
                       xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
-                      xmlns:local="clr-namespace:MyAppModBus"
-                      xmlns:syncfusion="clr-namespace:Syncfusion.UI.Xaml.Charts;assembly=Syncfusion.SfChart.WPF"
+                      xmlns:lc="clr-namespace:MyAppModBus"
+                      xmlns:syn="http://schemas.syncfusion.com/wpf"
                       mc:Ignorable="d"
                       Title="ModBus(RTU)"
                       MinHeight="720"
@@ -23,8 +23,11 @@
                       FontFamily="Arial Rounded MT Bold"
                       Foreground="#fff">
   <Window.Resources>
-    <local:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter" />
+    <lc:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter" />
   </Window.Resources>
+  <Window.DataContext>
+    <lc:ViewModel />
+  </Window.DataContext>
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="auto" />
@@ -256,8 +259,8 @@
         </d3:Chart.LegendContent>
       </d3:Chart>-->
 
-      
-      
+      <Grid x:Name="ChartSf"></Grid>
+
       <d3:Chart Grid.Row="1"
                 BottomTitle="Argument"
                 LeftTitle="Function"

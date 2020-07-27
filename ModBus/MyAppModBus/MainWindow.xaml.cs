@@ -1,6 +1,7 @@
 ﻿using InteractiveDataDisplay.WPF;
 using MahApps.Metro.Controls;
 using Modbus.Device;
+using Syncfusion.UI.Xaml.Charts;
 using System;
 using System.Collections.Generic;
 using System.IO.Ports;
@@ -55,6 +56,7 @@ namespace MyAppModBus
     public MainWindow() {
       InitializeComponent();
       AddItemToComboBox();
+      GetSfCharts();
       //GraphLines( 1.8 );
     }
 
@@ -379,52 +381,52 @@ namespace MyAppModBus
     /// Отрисовка графиков и их линий
     /// </summary>
 
-    private void GraphLines( double thickness ) {
+    //private void GraphLines( double thickness ) {
 
-      var rand = new Random();
+    //  var rand = new Random();
 
-      _numberRegisters[ 0 ] = new int[ 3 ] { 0, 1, 4 };
-      _numberRegisters[ 1 ] = new int[ 2 ] { 2, 3 };
+    //  _numberRegisters[ 0 ] = new int[ 3 ] { 0, 1, 4 };
+    //  _numberRegisters[ 1 ] = new int[ 2 ] { 2, 3 };
 
-      _linesArr[ 0 ] = new LineGraph[ 3 ];
-      _linesArr[ 1 ] = new LineGraph[ 2 ];
+    //  _linesArr[ 0 ] = new LineGraph[ 3 ];
+    //  _linesArr[ 1 ] = new LineGraph[ 2 ];
 
-      _arrDict[ 0 ] = new Dictionary<double, double>[ 3 ] { volltage, current, torque };
-      _arrDict[ 1 ] = new Dictionary<double, double>[ 2 ] { tempExternal, tempMotor };
+    //  _arrDict[ 0 ] = new Dictionary<double, double>[ 3 ] { volltage, current, torque };
+    //  _arrDict[ 1 ] = new Dictionary<double, double>[ 2 ] { tempExternal, tempMotor };
 
-      nameLines[ 0 ] = new string[] { "Volltage", "Current", "Torque" };
-      nameLines[ 1 ] = new string[] { "External", "Motor" };
+    //  nameLines[ 0 ] = new string[] { "Volltage", "Current", "Torque" };
+    //  nameLines[ 1 ] = new string[] { "External", "Motor" };
 
 
-      // Линии первого графика
-      for ( int linesFirstChart = 0; linesFirstChart < _arrDict[ 0 ].Length; linesFirstChart++ ) {
-        var lines = new LineGraph
-        {
+    //  // Линии первого графика
+    //  for ( int linesFirstChart = 0; linesFirstChart < _arrDict[ 0 ].Length; linesFirstChart++ ) {
+    //    var lines = new LineGraph
+    //    {
 
-          Description = String.Format( $"{nameLines[ 0 ][ linesFirstChart ]}" ),
-          StrokeThickness = thickness,
-          Stroke = new SolidColorBrush(Color.FromRgb( (byte)rand.Next( 1, 255 ), (byte)rand.Next( 1, 255 ), (byte)rand.Next(1, 255)))
+    //      Description = String.Format( $"{nameLines[ 0 ][ linesFirstChart ]}" ),
+    //      StrokeThickness = thickness,
+    //      Stroke = new SolidColorBrush(Color.FromRgb( (byte)rand.Next( 1, 255 ), (byte)rand.Next( 1, 255 ), (byte)rand.Next(1, 255)))
 
-        };
+    //    };
 
-        lines_one.Children.Add( lines );
-        _linesArr[ 0 ][ linesFirstChart ] = lines;
+    //    lines_one.Children.Add( lines );
+    //    _linesArr[ 0 ][ linesFirstChart ] = lines;
 
-      }
+    //  }
 
-      //Линии второго графика
-      for ( int linesSecondChart = 0; linesSecondChart < _arrDict[ 1 ].Length; linesSecondChart++ ) {
-        var lines = new LineGraph
-        {
-          Description = String.Format( $"{nameLines[ 1 ][ linesSecondChart ]}" ),
-          StrokeThickness = thickness,
-          Stroke = new SolidColorBrush( Color.FromRgb( (byte)rand.Next( 1, 255 ), (byte)rand.Next( 1, 255 ), (byte)rand.Next( 1, 255 ) ) )
-        };
+    //  //Линии второго графика
+    //  for ( int linesSecondChart = 0; linesSecondChart < _arrDict[ 1 ].Length; linesSecondChart++ ) {
+    //    var lines = new LineGraph
+    //    {
+    //      Description = String.Format( $"{nameLines[ 1 ][ linesSecondChart ]}" ),
+    //      StrokeThickness = thickness,
+    //      Stroke = new SolidColorBrush( Color.FromRgb( (byte)rand.Next( 1, 255 ), (byte)rand.Next( 1, 255 ), (byte)rand.Next( 1, 255 ) ) )
+    //    };
 
-        lines_two.Children.Add( lines );
-        _linesArr[ 1 ][ linesSecondChart ] = lines;
-      }
-    }
+    //    lines_two.Children.Add( lines );
+    //    _linesArr[ 1 ][ linesSecondChart ] = lines;
+    //  }
+    //}
 
     /// <summary>
     /// Запрос из регистров Master(a) и запусе/остановка таймера
@@ -479,10 +481,35 @@ namespace MyAppModBus
       }
     }
 
-    //private void ZoomUpSl_ValueChanged( object sender, MahApps.Metro.Controls.RangeParameterChangedEventArgs e ) {
-    //  PlotUp.PlotOriginY = (50 * ZoomUpSl.UpperValue) - 50;
-    //  PlotUp.PlotHeight = -(50 * (100 - ZoomUpSl.LowerValue));
-    //}
+    private void GetSfCharts()
+    {
+      SfChart chart = new SfChart();
+      CategoryAxis primaryAxis = new CategoryAxis();
+      primaryAxis.Header = "Name";
+      chart.PrimaryAxis = primaryAxis;
+
+
+      NumericalAxis secondaryAxis = new NumericalAxis();
+      secondaryAxis.Header = "Height(in cm)";
+      chart.SecondaryAxis = secondaryAxis;
+
+      ColumnSeries series = new ColumnSeries();
+
+      series.ItemsSource = (new ViewModel()).Data;
+      series.XBindingPath = "Name";
+      series.YBindingPath = "Height";
+      series.Label = "Heights";
+      series.ShowTooltip = true;
+
+      chart.Header = "Chart";
+
+      series.AdornmentsInfo = new ChartAdornmentInfo() { ShowLabel = true };
+
+      chart.Series.Add(series);
+      ChartSf.Children.Add(chart);
+
+
+    }
 
   }
 
