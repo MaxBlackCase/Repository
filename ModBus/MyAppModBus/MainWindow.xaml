@@ -6,6 +6,7 @@
                       xmlns:d3="clr-namespace:InteractiveDataDisplay.WPF;assembly=InteractiveDataDisplay.WPF"
                       xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
                       xmlns:local="clr-namespace:MyAppModBus"
+                      xmlns:syncfusion="clr-namespace:Syncfusion.UI.Xaml.Charts;assembly=Syncfusion.SfChart.WPF"
                       mc:Ignorable="d"
                       Title="ModBus(RTU)"
                       MinHeight="720"
@@ -220,7 +221,7 @@
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
 
-      <d3:Chart x:Name="PlotUp"
+      <!--<d3:Chart x:Name="PlotUp"
                 Grid.Column="0"
                 Grid.Row="0"
                 BottomTitle="Argument"
@@ -253,8 +254,10 @@
             </d3:LegendItemsPanel.Resources>
           </d3:LegendItemsPanel>
         </d3:Chart.LegendContent>
-      </d3:Chart>
+      </d3:Chart>-->
 
+      
+      
       <d3:Chart Grid.Row="1"
                 BottomTitle="Argument"
                 LeftTitle="Function"
