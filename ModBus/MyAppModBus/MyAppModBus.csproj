@@ -107,6 +107,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\Base\Command.cs" />
+    <Compile Include="Commands\LambdaCommand.cs" />
     <Compile Include="Controllers\ControllerBase.cs" />
     <Compile Include="ViewModel\Base\ViewModelBase.cs" />
     <Compile Include="ViewModel\SfChartViewModel.cs" />
