@@ -1,9 +1,12 @@
 ﻿using InteractiveDataDisplay.WPF;
 using MahApps.Metro.Controls;
 using Modbus.Device;
+using MyAppModBus.ViewModel;
+using Syncfusion.UI.Xaml.Charts;
 using System;
 using System.Collections.Generic;
 using System.IO.Ports;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -20,22 +23,23 @@ namespace MyAppModBus
   /// </summary>
   public partial class MainWindow
   {
-
     const byte slaveID = 1;
 
     private readonly ushort startAddress = 0;
     private readonly ushort numburOfPoints = 18;
-    private int readWriteTimeOut = 20;
+    private int _readWriteTimeOut = 20;
 
     public static string result;
     private DispatcherTimer timer;
-    public static SerialPort _serialPort = null;
-    public static ModbusSerialMaster master = null;
+    private static SerialPort _serialPort = null;
+    private static ModbusSerialMaster _master = null;
 
-    private LineGraph[][] _linesArr = new LineGraph[2][];
-    private string[][] nameLines = new string[2][];
+    private LineGraph[][] _seriesArr = new LineGraph[2][];
+    private string[][] nameLineSeries = new string[2][];
 
     private UIElement[][] uiElements = new UIElement[2][];
+
+    private SfChartViewModel vmSfCh = new SfChartViewModel();
 
     #region Словари для данныч линий 
     private Dictionary<double, double> volltage = new Dictionary<double, double>();
@@ -48,8 +52,6 @@ namespace MyAppModBus
     private Dictionary<double, double>[][] _arrDict = new Dictionary<double, double>[2][];
     #endregion
 
-
-
     /// <summary>
     /// Главноe окно
     /// </summary>
@@ -57,11 +59,14 @@ namespace MyAppModBus
     {
       InitializeComponent();
       AddItemToComboBox();
-      //GraphLines( 1.8 );
+      vmSfCh.Serial = _serialPort;
+      vmSfCh.Master = _master;
+      vmSfCh.ReadWrite = _readWriteTimeOut;
+      vmSfCh.CountTime = countTime;
     }
 
     //Инициализация портов
-    private void AddItemToComboBox()
+    internal void AddItemToComboBox()
     {
       //Получение портов
       string[] ports = SerialPort.GetPortNames();
@@ -109,13 +114,13 @@ namespace MyAppModBus
         _serialPort.BaudRate = 119200;
         _serialPort.Parity = Parity.None;
         _serialPort.StopBits = StopBits.One;
-        _serialPort.ReadTimeout = readWriteTimeOut;
-        _serialPort.WriteTimeout = readWriteTimeOut;
+        _serialPort.ReadTimeout = _readWriteTimeOut;
+        _serialPort.WriteTimeout = _readWriteTimeOut;
         _serialPort.DtrEnable = true;
         _serialPort.Open();
         #endregion
 
-        master = ModbusSerialMaster.CreateRtu(_serialPort);
+        _master = ModbusSerialMaster.CreateRtu(_serialPort);
         //Сброс регистров
         ResetRegisters();
 
@@ -187,19 +192,23 @@ namespace MyAppModBus
     /// <param name="sender"></param>
     /// <param name="e"></param>
 
-    private double countTime = 0;
-    private double countIndex = 0;
+    internal double countTime = 0;
+    internal double countIndex = 0;
     private int[][] _numberRegisters = new int[2][];
-    public int Interval { get => readWriteTimeOut; }
+
+    private DateTime _tSpan;
+
     private void GetHoldReg(object sender, EventArgs e)
     {
-      ushort[] result = master.ReadHoldingRegisters(slaveID, startAddress, numburOfPoints);
+      ushort[] result = _master.ReadHoldingRegisters(slaveID, startAddress, numburOfPoints);
 
       try
       {
 
         textViewer.Text = null;
-        countTime += readWriteTimeOut;
+        countTime += _readWriteTimeOut;
+        _tSpan = DateTime.Now;
+
 
         ///Вывод всех регистров на экран
         for (int i = 0; i < result.Length; i++)
@@ -213,7 +222,7 @@ namespace MyAppModBus
 
 
         ///Занесение значений на график
-        if (countTime % readWriteTimeOut == 0)
+        if (countTime % _readWriteTimeOut == 0)
         {
           #region OldGraphs
           //for ( int valueFirstChart = 0; valueFirstChart < _arrDict[ 0 ].Count(); valueFirstChart++ ) {
@@ -235,6 +244,8 @@ namespace MyAppModBus
           //}
           #endregion
 
+          #region NewGraphs
+          #endregion
 
         }
 
@@ -369,8 +380,8 @@ namespace MyAppModBus
 
     public int ReadWriteTimeOut
     {
-      get => readWriteTimeOut;
-      set => readWriteTimeOut = value;
+      get => _readWriteTimeOut;
+      set => _readWriteTimeOut = value;
     }
 
     private void DecimalButtonTimeoutClic(object sender, RoutedEventArgs e)
@@ -382,17 +393,17 @@ namespace MyAppModBus
         if (valTextBox < 20)
         {
           ReadWriteTimeOut = 20;
-          textViewer.Text = $"Интервал не может быть меньше {readWriteTimeOut} ms, поэтому задан интервал по умолчанию {readWriteTimeOut} ms.";
+          textViewer.Text = $"Интервал не может быть меньше {_readWriteTimeOut} ms, поэтому задан интервал по умолчанию {_readWriteTimeOut} ms.";
         }
         else if (valTextBox > 100)
         {
           ReadWriteTimeOut = 100;
-          textViewer.Text = $"Значение не может превышать значение в {readWriteTimeOut} ms, поэтому задано значение по умолчанию {readWriteTimeOut} ms.";
+          textViewer.Text = $"Значение не может превышать значение в {_readWriteTimeOut} ms, поэтому задано значение по умолчанию {_readWriteTimeOut} ms.";
         }
         else
         {
           ReadWriteTimeOut = (int)valTextBox;
-          textViewer.Text = $"Значение интервала опроса устроства: {readWriteTimeOut} ms";
+          textViewer.Text = $"Значение интервала опроса устроства: {_readWriteTimeOut} ms";
         }
       }
 
@@ -407,7 +418,7 @@ namespace MyAppModBus
 
       for (int i = 0; i < arrRegisters.Length; i++)
       {
-        master.WriteSingleRegister(slaveID, arrRegisters[i], 0);
+        _master.WriteSingleRegister(slaveID, arrRegisters[i], 0);
       }
     }
 
@@ -476,7 +487,7 @@ namespace MyAppModBus
         {
           #region <Timer>
           timer.Tick += new EventHandler(GetHoldReg);
-          timer.Interval = new TimeSpan(0, 0, 0, 0, readWriteTimeOut);
+          timer.Interval = new TimeSpan(0, 0, 0, 0, _readWriteTimeOut);
           timer.Start();
           #endregion
           BtnStartTimerAndRegistersRequest.Content = "Остановить";
@@ -511,7 +522,7 @@ namespace MyAppModBus
           {
             if (i == indElem)
             {
-              master.WriteSingleRegister(slaveID, arrRegisters[i], 1);
+              _master.WriteSingleRegister(slaveID, arrRegisters[i], 1);
             }
           }
         }
@@ -521,15 +532,45 @@ namespace MyAppModBus
           {
             if (i == indElem)
             {
-              master.WriteSingleRegister(slaveID, arrRegisters[i], 0);
+              _master.WriteSingleRegister(slaveID, arrRegisters[i], 0);
             }
           }
         }
       }
     }
 
+    public List<DataPoints> Data { get; set; }
     private void GetSfCharts()
     {
+
+      Data = new List<DataPoints>() {
+
+        new DataPoints {Name = "David", Height = 180},
+        new DataPoints {Name = "Max", Height = 150},
+        new DataPoints {Name = "Ulya", Height = 178},
+        new DataPoints {Name = "Brad", Height = 162},
+
+      };
+
+      SfChart ch = new SfChart();
+
+      CategoryAxis primaryAxis = new CategoryAxis();
+
+      primaryAxis.Header = @"/Name/";
+
+      ch.PrimaryAxis = primaryAxis;
+
+      NumericalAxis seceondoryAxis = new NumericalAxis();
+      seceondoryAxis.Header = "Height(in cm)";
+      ch.SecondaryAxis = seceondoryAxis;
+
+      ColumnSeries sers = new ColumnSeries();
+
+      sers.ItemsSource = this.Data;
+      sers.XBindingPath = "Name";
+      sers.YBindingPath = "Height";
+
+      ch.Series.Add(sers);
     }
 
   }

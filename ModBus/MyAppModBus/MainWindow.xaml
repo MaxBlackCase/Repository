@@ -21,7 +21,7 @@
                       WindowStartupLocation="CenterScreen"
                       ResizeMode="CanResizeWithGrip"
                       SaveWindowPosition="True"
-                      FontFamily="Arial Rounded MT Bold"
+                      FontFamily="SegoeUI"
                       Foreground="#fff">
   <Window.Resources>
     <lc:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter" />
@@ -260,29 +260,9 @@
         </d3:Chart.LegendContent>
       </d3:Chart>-->
 
-      <chart:SfChart x:Name="ChartSf">
-        <chart:SfChart.PrimaryAxis>
-          <chart:CategoryAxis LabelFormat="mm:ss"
-                              Interval="{Binding Interval}">
-            <chart:ChartAxis.Header>
-              <TextBlock Margin="5"
-                         Text="Time"
-                         FontSize="14"
-                         FontFamily="SegoeUI" />
-            </chart:ChartAxis.Header>
-          </chart:CategoryAxis>
-        </chart:SfChart.PrimaryAxis>
-        <chart:SfChart.SecondaryAxis>
-          <chart:NumericalAxis RangePadding="Round"
-                               Minimum="0"
-                               Maximum="5500"
-                               FontFamily="SegoeUI">
-            <chart:ChartAxis.Header>
-              <TextBlock Margin="5" Text="Value" FontSize="14" FontFamily="SegoeUI" />
-            </chart:ChartAxis.Header>
-          </chart:NumericalAxis>
-        </chart:SfChart.SecondaryAxis>
-      </chart:SfChart>
+      <!--<chart:SfChart x:Name="SfChart" />-->
+      <TextBlock Grid.Row="0"
+                 Grid.Column="0" />
 
       <d3:Chart Grid.Row="1"
                 BottomTitle="Argument"
