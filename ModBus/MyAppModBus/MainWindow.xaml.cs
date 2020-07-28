@@ -1,6 +1,7 @@
 ﻿using InteractiveDataDisplay.WPF;
 using MahApps.Metro.Controls;
 using Modbus.Device;
+using MyAppModBus.Controllers;
 using MyAppModBus.ViewModel;
 using Syncfusion.UI.Xaml.Charts;
 using System;
@@ -23,11 +24,13 @@ namespace MyAppModBus
   /// </summary>
   public partial class MainWindow
   {
+
     const byte slaveID = 1;
 
     private readonly ushort startAddress = 0;
     private readonly ushort numburOfPoints = 18;
-    private int _readWriteTimeOut = 20;
+    private string _text;
+    private double _countTime;
 
     public static string result;
     private DispatcherTimer timer;
@@ -36,6 +39,7 @@ namespace MyAppModBus
 
     private LineGraph[][] _seriesArr = new LineGraph[2][];
     private string[][] nameLineSeries = new string[2][];
+    private int _readWriteTimeOut = 20;
 
     private UIElement[][] uiElements = new UIElement[2][];
 
@@ -58,38 +62,33 @@ namespace MyAppModBus
     public MainWindow()
     {
       InitializeComponent();
-      AddItemToComboBox();
-      vmSfCh.Serial = _serialPort;
-      vmSfCh.Master = _master;
-      vmSfCh.ReadWrite = _readWriteTimeOut;
-      vmSfCh.CountTime = countTime;
     }
 
     //Инициализация портов
-    internal void AddItemToComboBox()
-    {
-      //Получение портов
-      string[] ports = SerialPort.GetPortNames();
-      foreach (string port in ports)
-      {
-        if (port == "")
-        {
-          comboBoxMainPorts.Items.Add("Отсутствует порт");
-        }
-        else
-        {
-          string str = port.ToString();
-          int maxLength = 3;
-          string result = str.Substring(0, Math.Min(str.Length, maxLength));
+    //internal void AddItemToComboBox()
+    //{
+    //  //Получение портов
+    //  string[] ports = SerialPort.GetPortNames();
+    //  foreach (string port in ports)
+    //  {
+    //    if (port == "")
+    //    {
+    //      comboBoxMainPorts.Items.Add("Отсутствует порт");
+    //    }
+    //    else
+    //    {
+    //      string str = port.ToString();
+    //      int maxLength = 3;
+    //      string result = str.Substring(0, Math.Min(str.Length, maxLength));
 
-          if (result == "COM")
-          {
-            comboBoxMainPorts.Items.Add(port);
-          }
-        }
-      }
-      comboBoxMainPorts.SelectedIndex = 0;
-    }
+    //      if (result == "COM")
+    //      {
+    //        comboBoxMainPorts.Items.Add(port);
+    //      }
+    //    }
+    //  }
+    //  comboBoxMainPorts.SelectedIndex = 0;
+    //}
 
     /// <summary>
     /// Подключение по SerilaPort(RTU) к Master устройству
@@ -110,7 +109,7 @@ namespace MyAppModBus
         }
 
         #region <Настройки RTU подключения>
-        _serialPort.PortName = comboBoxMainPorts.Text;
+        _serialPort.PortName = "COM27";
         _serialPort.BaudRate = 119200;
         _serialPort.Parity = Parity.None;
         _serialPort.StopBits = StopBits.One;
@@ -539,39 +538,38 @@ namespace MyAppModBus
       }
     }
 
-    public List<DataPoints> Data { get; set; }
-    private void GetSfCharts()
-    {
+    //private void GetSfCharts()
+    //{
 
-      Data = new List<DataPoints>() {
+    //  Data = new List<DataPoints>() {
 
-        new DataPoints {Name = "David", Height = 180},
-        new DataPoints {Name = "Max", Height = 150},
-        new DataPoints {Name = "Ulya", Height = 178},
-        new DataPoints {Name = "Brad", Height = 162},
+    //    new DataPoints {Name = "David", Height = 180},
+    //    new DataPoints {Name = "Max", Height = 150},
+    //    new DataPoints {Name = "Ulya", Height = 178},
+    //    new DataPoints {Name = "Brad", Height = 162},
 
-      };
+    //  };
 
-      SfChart ch = new SfChart();
+    //  SfChart ch = new SfChart();
 
-      CategoryAxis primaryAxis = new CategoryAxis();
+    //  CategoryAxis primaryAxis = new CategoryAxis();
 
-      primaryAxis.Header = @"/Name/";
+    //  primaryAxis.Header = @"/Name/";
 
-      ch.PrimaryAxis = primaryAxis;
+    //  ch.PrimaryAxis = primaryAxis;
 
-      NumericalAxis seceondoryAxis = new NumericalAxis();
-      seceondoryAxis.Header = "Height(in cm)";
-      ch.SecondaryAxis = seceondoryAxis;
+    //  NumericalAxis seceondoryAxis = new NumericalAxis();
+    //  seceondoryAxis.Header = "Height(in cm)";
+    //  ch.SecondaryAxis = seceondoryAxis;
 
-      ColumnSeries sers = new ColumnSeries();
+    //  ColumnSeries sers = new ColumnSeries();
 
-      sers.ItemsSource = this.Data;
-      sers.XBindingPath = "Name";
-      sers.YBindingPath = "Height";
+    //  sers.ItemsSource = this.Data;
+    //  sers.XBindingPath = "Name";
+    //  sers.YBindingPath = "Height";
 
-      ch.Series.Add(sers);
-    }
+    //  ch.Series.Add(sers);
+    //}
 
   }
 

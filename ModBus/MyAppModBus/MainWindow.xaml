@@ -8,6 +8,7 @@
                       xmlns:lc="clr-namespace:MyAppModBus"
                       xmlns:chart="http://schemas.syncfusion.com/wpf"
                       xmlns:vm="clr-namespace:MyAppModBus.ViewModel"
+                      xmlns:ctr="clr-namespace:MyAppModBus.Controllers"
                       mc:Ignorable="d"
                       Title="ModBus(RTU)"
                       MinHeight="720"
@@ -60,7 +61,8 @@
                 Height="30"
                 VerticalContentAlignment="Center"
                 Grid.Column="0"
-                Name="comboBoxMainPorts"
+                ItemsSource="{Binding PortList}"
+                x:Name="comboBoxMainPorts"
                 Background="White"
                 Foreground="#FF212121" />
       <Button Grid.Row="0"
