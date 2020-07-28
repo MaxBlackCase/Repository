@@ -16,24 +16,23 @@ namespace MyAppModBus.ViewModel
   internal class SfChartViewModel : ViewModelBase
   {
 
-    const byte slaveID = 1;
-
-    //private  ushort startAddress = 0;
-    //private  ushort numburOfPoints = 18;
-    //private string _text;
-    //private double _countTime;
-    //private SerialPort _serial;
-    //private ModbusSerialMaster _master;
-    //private int _readWrite;
-    
     private List<string> _portList = new List<string>();
 
     private ControllerBase ctr = new ControllerBase();
 
-    public List<string> PortList {
+    #region Свойства
+
+    /// <summary>
+    /// Список портов
+    /// </summary>
+    public List<string> PortList
+    {
       get => _portList;
       set => Set(ref _portList, value);
     }
+
+    #endregion
+
     public SfChartViewModel()
     {
       ctr.AddItemToComboBox(PortList);
