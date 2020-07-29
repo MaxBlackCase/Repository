@@ -1,6 +1,7 @@
 ﻿using MyAppModBus.Controllers;
 using MyAppModBus.ViewModel.Base;
 using System.Collections.Generic;
+using System.Windows.Input;
 
 namespace MyAppModBus.ViewModel
 {
@@ -13,6 +14,7 @@ namespace MyAppModBus.ViewModel
     private int _readWriteTimeOut;
     private string _errMessage;
     private string _visibilityButton;
+
     #region Свойства
 
     /// <summary>
@@ -41,6 +43,20 @@ namespace MyAppModBus.ViewModel
       get => _visibilityButton;
       set => Set(ref _visibilityButton, value);
     }
+
+    #endregion
+
+    #region Команды
+
+    public ICommand CloseAppCommand { get; }
+
+    private bool CanCloseAppCommandExecute() => true;
+    private void OnCloseAppCommandExecuted(object p) {
+    
+
+
+    }
+
 
     #endregion
 
