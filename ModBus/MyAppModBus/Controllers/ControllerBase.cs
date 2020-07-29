@@ -11,15 +11,15 @@ namespace MyAppModBus.Controllers
   internal class ControllerBase
   {
 
-    private DispatcherTimer _timer = new DispatcherTimer();
-    private SerialPort _serialPort = null;
+    private DispatcherTimer _timer = null;
+    private SerialPort _serial = null;
     private ModbusSerialMaster _master;
     const byte slaveID = 1;
     const ushort startAddress = 0;
     const ushort numburOfPoints = 18;
 
 
-    private SfChartViewModel vm = new SfChartViewModel();
+    private SfChartViewModel vm;
 
     public ControllerBase()
     {
@@ -55,13 +55,13 @@ namespace MyAppModBus.Controllers
       return _portList;
     }
 
-    internal SerialPort ConnectToDevice(SerialPort _serial)
+    internal SerialPort ConnectToDevice()
     {
       try
       {
-        if (_serialPort.IsOpen)
+        if (_serial.IsOpen)
         {
-          _serialPort.Close();
+          _serial.Close();
           //disconnectComPort.Visibility = Visibility.Hidden;
         }
         #region <Настройки RTU подключения>
@@ -75,7 +75,8 @@ namespace MyAppModBus.Controllers
         _serial.Open();
         #endregion
 
-        _master = ModbusSerialMaster.CreateRtu(_serialPort);
+        _serial = new SerialPort();
+        _master = ModbusSerialMaster.CreateRtu(_serial);
 
         #region UIElements
         //uiElements[0] = new UIElement[] { checkBoxWrite_1, checkBoxWrite_2, checkBoxWrite_3, StartRegsRequest };
@@ -98,7 +99,7 @@ namespace MyAppModBus.Controllers
 
         vm.VisibilityButton = "Hidden";
         vm.VisibilityButton = "Visible";
-        vm.ErrMessage = $"Порт {_serialPort.PortName} Подключен";
+        vm.ErrMessage = $"Порт {_serial.PortName} Подключен";
 
       }
       catch (Exception err)

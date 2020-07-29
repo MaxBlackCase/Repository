@@ -1,15 +1,6 @@
-﻿using Microsoft.Toolkit.Win32.UI.Controls.Interop.WinRT;
-using Modbus.Device;
-using MyAppModBus.Controllers;
+﻿using MyAppModBus.Controllers;
 using MyAppModBus.ViewModel.Base;
-using System;
 using System.Collections.Generic;
-using System.IO.Ports;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Windows.Documents;
-using System.Windows.Forms;
-using TestDataGenerator;
 
 namespace MyAppModBus.ViewModel
 {
@@ -17,12 +8,11 @@ namespace MyAppModBus.ViewModel
   internal class SfChartViewModel : ViewModelBase
   {
 
-    private ControllerBase ctr = new ControllerBase();
+    //private ControllerBase ctr = new ControllerBase();
     private List<string> _portList = new List<string>();
     private int _readWriteTimeOut;
     private string _errMessage;
     private string _visibilityButton;
-    private SerialPort _serialPort;
     #region Свойства
 
     /// <summary>
@@ -52,20 +42,14 @@ namespace MyAppModBus.ViewModel
       set => Set(ref _visibilityButton, value);
     }
 
-    public SerialPort SerialPort
-    {
-      get => _serialPort;
-      set => Set(ref _serialPort, value);
-    }
-    
-
-
     #endregion
 
     public SfChartViewModel()
     {
+
+      ControllerBase ctr = new ControllerBase();
+
       ctr.AddItemToComboBox(PortList);
-      ctr.ConnectToDevice(SerialPort);
     }
 
   }

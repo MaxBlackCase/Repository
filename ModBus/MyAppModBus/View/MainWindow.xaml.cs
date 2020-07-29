@@ -1,21 +1,4 @@
-﻿using InteractiveDataDisplay.WPF;
-using MahApps.Metro.Controls;
-using Modbus.Device;
-using MyAppModBus.Controllers;
-using MyAppModBus.ViewModel;
-using Syncfusion.UI.Xaml.Charts;
-using System;
-using System.Collections.Generic;
-using System.IO.Ports;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Data;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Shapes;
-using System.Windows.Threading;
+﻿using MyAppModBus.ViewModel;
 
 namespace MyAppModBus
 {
@@ -25,41 +8,18 @@ namespace MyAppModBus
   public partial class MainWindow
   {
 
-    const byte slaveID = 1;
-
-    private readonly ushort startAddress = 0;
-    private readonly ushort numburOfPoints = 18;
-
-    public static string result;
-
-    private LineGraph[][] _seriesArr = new LineGraph[2][];
-    private string[][] nameLineSeries = new string[2][];
-    private int _readWriteTimeOut = 20;
-
-    private UIElement[][] uiElements = new UIElement[2][];
-
-    private SfChartViewModel vmSfCh = new SfChartViewModel();
-
-    #region Словари для данныч линий 
-    private Dictionary<double, double> volltage = new Dictionary<double, double>();
-    private Dictionary<double, double> current = new Dictionary<double, double>();
-    private Dictionary<double, double> torque = new Dictionary<double, double>();
-    private Dictionary<double, double> tempExternal = new Dictionary<double, double>();
-    private Dictionary<double, double> tempMotor = new Dictionary<double, double>();
-
-
-    private Dictionary<double, double>[][] _arrDict = new Dictionary<double, double>[2][];
-    #endregion
-
     /// <summary>
     /// Главноe окно
     /// </summary>
     public MainWindow()
     {
       InitializeComponent();
+      this.DataContext = new SfChartViewModel();
     }
 
-    //Инициализация портов
+    /// <summary>
+    /// Инициализация портов
+    /// </summary>
     //internal void AddItemToComboBox()
     //{
     //  //Получение портов
