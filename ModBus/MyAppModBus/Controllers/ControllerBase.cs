@@ -217,29 +217,31 @@ namespace MyAppModBus.Controllers
 
       }
 
-      //internal ObservableCollection<string> RegistersRequest(ObservableCollection<string> _registers, string _readWrite, bool _uiElement, ref string _errMessage)
-      //{
-      //   try
-      //   {
-      //      if (_serial.IsOpen && _uiElement)
-      //      {
-      //         #region <Timer>
-      //            _timer.Tick += new EventHandler(GetRegisterToDevice);
-      //            _timer.Interval = new TimeSpan(0, 0, 0, 0, Convert.ToInt32(_readWrite));
-      //            _timer.Start();
-      //         #endregion
-      //      }
-      //      else
-      //      {
-      //         _timer.Stop();
-      //      }
-      //   }
-      //   catch (Exception err)
-      //   {
-      //      _errMessage.Text = $"Ошибка: {err.Message}";
-      //   }
-      //   return _registers;
-      //}
+      internal string RegistersRequest( string _queryRegisters)
+      {
+         try
+         {
+            if (_serial.IsOpen && _queryRegisters == "Off")
+            {
+               #region <Timer>
+               //_timer.Tick += new EventHandler(GetRegisterToDevice);
+               //_timer.Interval = new TimeSpan(0, 0, 0, 0, Convert.ToInt32(_readWrite));
+               //_timer.Start();
+               _queryRegisters = "On";
+               #endregion
+            }
+            else
+            {
+               //_timer.Stop();
+               _queryRegisters = "Off";
+            }
+         }
+         catch (Exception err)
+         {
+            //_errMessage.Text = $"Ошибка: {err.Message}";
+         }
+         return _queryRegisters;
+      }
 
       internal string ConvertToInt(string _readWrite,ref string _errMessage)
       {

@@ -23,6 +23,7 @@ namespace MyAppModBus.ViewModel
       private string _elemHidden = "Hidden";
       private string _readWrite;
       private ObservableCollection<string> _registers;
+      private string _queryRegisters = "Off";
 
       private ObservableCollection<ViewRegisterModel> _viewRegisterModels;
 
@@ -75,6 +76,9 @@ namespace MyAppModBus.ViewModel
       public string ElemHidden { get => _elemHidden; set => Set(ref _elemHidden, value); }
 
       public ObservableCollection<string> Registers { get => _registers; set => Set(ref _registers, value); }
+
+      public string QueryRegistrs { get => _queryRegisters; set => Set(ref _queryRegisters, value); }
+
       #endregion
 
       #region Команды
@@ -114,10 +118,7 @@ namespace MyAppModBus.ViewModel
       private bool CanGetRegistersValuesExute(object p) => true;
       private void OnGetRegistersValuesExuted(object p)
       {
-         _timer.Tick += new EventHandler(ctr.GetRegisterToDevice());
-         _timer.Interval = new TimeSpan(0, 0, 0, 0, Convert.ToInt32(_readWrite));
-         _timer.Start();
-         Registers = ctr.GetRegisterToDevice(_registers, _readWrite, ref _errMessage);
+         QueryRegistrs = ctr.RegistersRequest(_queryRegisters);
       }
       #endregion
 

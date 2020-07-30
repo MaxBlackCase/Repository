@@ -115,7 +115,7 @@
                       Grid.Row="1"
                       Grid.Column="0">
             <Button Name="StartRegsRequest"
-                    Content="Запустить"
+                    Content="{Binding QueryRegistrs}"
                     MinWidth="100"
                     IsEnabled="{Binding ElemDisable}"
                     Command="{Binding GetRegistersValues}"
