@@ -325,42 +325,15 @@ namespace MyAppModBus
     //{
     //  e.Handled = new Regex("[^0-9]+").IsMatch(e.Text);
     //}
+
     /// <summary>
     /// Задает время опроса устройства в ms
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
 
-    //public int ReadWriteTimeOut
-    //{
-    //  get => _readWriteTimeOut;
-    //  set => _readWriteTimeOut = value;
-    //}
 
-    //private void DecimalButtonTimeoutClic(object sender, RoutedEventArgs e)
-    //{
-    //  if (decTextBox.Text != "")
-    //  {
-    //    double valTextBox = Convert.ToDouble(decTextBox.Text);
 
-    //    if (valTextBox < 20)
-    //    {
-    //      ReadWriteTimeOut = 20;
-    //      textViewer.Text = $"Интервал не может быть меньше {_readWriteTimeOut} ms, поэтому задан интервал по умолчанию {_readWriteTimeOut} ms.";
-    //    }
-    //    else if (valTextBox > 100)
-    //    {
-    //      ReadWriteTimeOut = 100;
-    //      textViewer.Text = $"Значение не может превышать значение в {_readWriteTimeOut} ms, поэтому задано значение по умолчанию {_readWriteTimeOut} ms.";
-    //    }
-    //    else
-    //    {
-    //      ReadWriteTimeOut = (int)valTextBox;
-    //      textViewer.Text = $"Значение интервала опроса устроства: {_readWriteTimeOut} ms";
-    //    }
-    //  }
-
-    //}
 
     /// <summary>
     /// Сброс регистров 
