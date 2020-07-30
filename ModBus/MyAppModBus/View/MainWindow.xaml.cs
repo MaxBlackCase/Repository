@@ -14,7 +14,6 @@ namespace MyAppModBus
     public MainWindow()
     {
       InitializeComponent();
-      this.DataContext = new SfChartViewModel();
     }
 
     /// <summary>

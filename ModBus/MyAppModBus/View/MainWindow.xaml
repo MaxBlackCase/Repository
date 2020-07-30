@@ -24,9 +24,9 @@
   <!--<Window.Resources>
     <lc:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter" />
   </Window.Resources>-->
-  <!--<Window.DataContext>
+  <Window.DataContext>
     <vm:SfChartViewModel />
-  </Window.DataContext>-->
+  </Window.DataContext>
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="auto" />
@@ -58,7 +58,9 @@
                 Height="30"
                 VerticalContentAlignment="Center"
                 Grid.Column="0"
+                IsEnabled="{Binding ElemEnable}"
                 ItemsSource="{Binding PortList}"
+                SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
                 x:Name="comboBoxMainPorts"
                 Background="White"
                 Foreground="#FF212121" />
@@ -68,9 +70,9 @@
               Name="connectComPort"
               Content="Подключить"
               VerticalContentAlignment="Center"
-              
+              Command="{Binding ConnectToDevice}"
+              Visibility="{Binding ElemVisible}"
               Background="#FF3F3F46"
-              Visibility="{Binding VisibilityButton}"
               Foreground="White"
               BorderBrush="{x:Null}"
               FontFamily="Arial Rounded MT Bold"
@@ -80,12 +82,13 @@
               Grid.Column="1"
               Margin="5 0 0 0"
               Name="disconnectComPort"
+              Command="{Binding DisconnectToDevice}"
+              Visibility="{Binding ElemHidden}"
               Content="Отключить"
               Foreground="White"
               Background="#FF3F3F46"
               BorderBrush="{x:Null}"
               VerticalAlignment="Bottom"
-              Visibility="Hidden"
               Grid.ColumnSpan="2"
               Height="30" />
 
@@ -114,10 +117,10 @@
             <Button Name="StartRegsRequest"
                     Content="Запустить"
                     MinWidth="100"
+                    IsEnabled="{Binding ElemDisable}"
                     MinHeight="60"
                     Margin="0 5"
-                    HorizontalAlignment="Left"
-                    IsEnabled="False" />
+                    HorizontalAlignment="Left" />
           </StackPanel>
 
           <StackPanel Grid.Row="0"
@@ -167,6 +170,7 @@
           <Border BorderBrush="Black"
                   CornerRadius="15">
             <TextBox Name="decTextBox"
+                     IsEnabled="{Binding ElemEnable}"
                      MaxLength="4"
                      Grid.Row="0"
                      Grid.Column="0"
@@ -185,6 +189,7 @@
                   Margin="10 0 0 0"
                   Foreground="White"
                   Background="#FF3F3F46"
+                  IsEnabled="{Binding ElemEnable}"
                   BorderBrush="{x:Null}" />
         </Grid>
       </StackPanel>

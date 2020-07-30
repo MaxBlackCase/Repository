@@ -1,5 +1,4 @@
 ﻿using Modbus.Device;
-using MyAppModBus.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO.Ports;
@@ -19,8 +18,6 @@ namespace MyAppModBus.Controllers
     const ushort numburOfPoints = 18;
 
 
-    private SfChartViewModel vm;
-
     public ControllerBase()
     {
 
@@ -31,10 +28,12 @@ namespace MyAppModBus.Controllers
     /// </summary>
     /// <param name="_portName">Имя Порта</param>
     /// <returns></returns>
-    internal List<string> AddItemToComboBox(List<string> _portList)
+    internal void AddItemToComboBox(ref List<string> _portList)
     {
       //Получение портов
       string[] ports = SerialPort.GetPortNames();
+      _portList = new List<string>();
+
       for (var i = 0; i < ports.Length; i++)
       {
         if (ports[i] != null)
@@ -52,11 +51,10 @@ namespace MyAppModBus.Controllers
           _portList.Add("Порт Отсутствует");
         }
       }
-      return _portList;
     }
-
-    internal SerialPort ConnectToDevice()
+    internal string ConnectToDevice(string _portName, string _errMessage)
     {
+      _serial = new SerialPort();
       try
       {
         if (_serial.IsOpen)
@@ -65,17 +63,13 @@ namespace MyAppModBus.Controllers
           //disconnectComPort.Visibility = Visibility.Hidden;
         }
         #region <Настройки RTU подключения>
-        _serial.PortName = vm.PortList.ToString();
-        _serial.BaudRate = 119200;
+        _serial.PortName = _portName;
+        _serial.BaudRate = 19200;
         _serial.Parity = Parity.None;
         _serial.StopBits = StopBits.One;
-        _serial.ReadTimeout = vm.ReadWriteTimeOut;
-        _serial.WriteTimeout = vm.ReadWriteTimeOut;
         _serial.DtrEnable = true;
         _serial.Open();
         #endregion
-
-        _serial = new SerialPort();
         _master = ModbusSerialMaster.CreateRtu(_serial);
 
         #region UIElements
@@ -96,20 +90,81 @@ namespace MyAppModBus.Controllers
         //}
         #endregion
 
-
-        vm.VisibilityButton = "Hidden";
-        vm.VisibilityButton = "Visible";
-        vm.ErrMessage = $"Порт {_serial.PortName} Подключен";
+        //_propsArgs = Visibility.Hidden;
+        _errMessage = string.Format("{0} порт подключен", _portName);
 
       }
       catch (Exception err)
       {
-        vm.ErrMessage = $"Ошибка: {err.Message}";
+        _errMessage = err.Message;
+      }
+      return _errMessage;
+
+    }
+
+    internal string DisconnectToDevice(string _portName, string _errMessage)
+    {
+      if (_serial.IsOpen)
+      {
+        _serial.Close();
+        _serial.Dispose();
+        _errMessage = string.Format("Порт {0} закрыт", _portName);
       }
 
-      return _serial;
+      return _errMessage;
+    }
+
+    internal bool SetElementEnable(bool _elemEnable)
+    {
+      if (_elemEnable == true && _serial.IsOpen)
+      {
+        _elemEnable = false;
+      }
+      else
+      {
+        _elemEnable = true;
+      }
+      return _elemEnable;
+    }
+    internal bool SetElementDisable(bool _elemDisable)
+    {
+      if (_elemDisable == true && _serial.IsOpen)
+      {
+        _elemDisable = false;
+      }
+      else
+      {
+        _elemDisable = true;
+      }
+      return _elemDisable;
+    }
+
+    internal string SetElementVisible(string _elemVis)
+    {
+      if (_elemVis == Visibility.Visible.ToString() && _serial.IsOpen)
+      {
+        _elemVis = Visibility.Hidden.ToString();
+      }
+      else
+      {
+        _elemVis = Visibility.Visible.ToString();
+      }
+      return _elemVis;
+    }
+    internal string SetElementHidden(string _elemHid)
+    {
+      if (_elemHid == Visibility.Hidden.ToString() && _serial.IsOpen)
+      {
+        _elemHid = Visibility.Visible.ToString();
+      }
+      else
+      {
+        _elemHid = Visibility.Hidden.ToString();
+      }
+      return _elemHid;
     }
 
   }
 
 }
+
