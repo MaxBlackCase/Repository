@@ -4,7 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO.Ports;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace MyAppModBus.Controllers
@@ -18,7 +21,7 @@ namespace MyAppModBus.Controllers
       const byte slaveID = 1;
       const ushort startAddress = 0;
       const ushort numburOfPoints = 18;
-      private string _readWrite;
+      private int _readWriteConvert = 50;
       private ObservableCollection<ViewRegisterModel> _viewRegs;
 
       public ControllerBase()
@@ -55,10 +58,10 @@ namespace MyAppModBus.Controllers
             }
          }
       }
-      internal string ConnectToDevice(string _portName, string _errMessage, string _readWrite)
+      internal string ConnectToDevice(string _portName, string _errMessage)
       {
          _serial = new SerialPort();
-         _readWrite = ConvertToInt(_readWrite,ref _errMessage);
+         //_readWriteConvert = ConvertToInt(_readWriteConvert, _errMessage);
          try
          {
             if (_serial.IsOpen)
@@ -67,8 +70,8 @@ namespace MyAppModBus.Controllers
             }
             #region <Настройки RTU подключения>
             _serial.PortName = _portName;
-            _serial.ReadTimeout = Convert.ToInt32(_readWrite);
-            _serial.WriteTimeout = Convert.ToInt32(_readWrite);
+            _serial.ReadTimeout = _readWriteConvert;
+            _serial.WriteTimeout = _readWriteConvert;
             _serial.BaudRate = 19200;
             _serial.Parity = Parity.None;
             _serial.StopBits = StopBits.One;
@@ -243,28 +246,48 @@ namespace MyAppModBus.Controllers
          return _queryRegisters;
       }
 
-      internal string ConvertToInt(string _readWrite,ref string _errMessage)
+      internal string ConvertToInt(string _readWrite, string _errMessage)
       {
-         var valStr = Convert.ToInt32(_readWrite);
 
-         if (_readWrite != "")
+         if (_readWrite != null)
          {
-            if (valStr < 20)
+         _readWriteConvert = Convert.ToInt32(_readWrite);
+            if (_readWriteConvert < 20)
             {
-               _errMessage = $"Интервал не может быть меньше {_readWrite} ms, поэтому задан интервал по умолчанию {_readWrite} ms.";
-               valStr = 20;
+               _readWriteConvert = 20;
+               _errMessage = string.Format("Интервал не может быть меньше {0} ms, поэтому задан интервал по умолчанию {0} ms.",_readWriteConvert);
             }
-            else if (valStr > 100)
+            else if (_readWriteConvert > 100)
             {
-               _errMessage = $"Значение не может превышать значение в {_readWrite} ms, поэтому задано значение по умолчанию {_readWrite} ms.";
-               valStr = 100;
+               _readWriteConvert = 100;
+               _errMessage = string.Format("Значение не может превышать значение в {0} ms, поэтому задано значение по умолчанию {0} ms.", _readWriteConvert);
             }
             else
             {
-               _errMessage = $"Значение интервала опроса устроства: {_readWrite} ms";
+               _errMessage = string.Format("Значение интервала опроса устроства: {0} ms", _readWriteConvert);
             }
          }
-         return valStr.ToString();
+         return _errMessage;
+      }
+
+      internal string CheckReadWriteOnRegular(string _pullTimeString)
+      {
+
+         string pattern = @"^[0-9]";
+
+         while (true)
+         {
+            if (Regex.IsMatch(_pullTimeString, pattern, RegexOptions.IgnoreCase))
+            {
+               _pullTimeString = string.Format("{0} ms.", _pullTimeString);
+               break;
+            }
+            else
+            {
+               _pullTimeString = "Error";
+            }
+         }
+         return _pullTimeString;
       }
    }
 
