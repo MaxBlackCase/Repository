@@ -21,9 +21,9 @@
                       SaveWindowPosition="True"
                       FontFamily="Arial Rounded MT Bold"
                       Foreground="#fff">
-  <Window.Resources>
+  <!--<Window.Resources>
     <lc:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter" />
-  </Window.Resources>
+  </Window.Resources>-->
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="auto" />
