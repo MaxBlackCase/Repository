@@ -119,6 +119,7 @@
                     MinWidth="100"
                     IsEnabled="{Binding ElemDisable}"
                     Command="{Binding GetRegistersValues}"
+                    
                     MinHeight="60"
                     Margin="0 5"
                     HorizontalAlignment="Left" />
@@ -178,7 +179,7 @@
                      Grid.ColumnSpan="1"
                      HorizontalContentAlignment="Right"
                      Text="{Binding ReadWrite}"
-                     KeyDown="{Binding TextSelectedRegular}"
+                     PreviewTextInput="CheckReadWriteOnRegular"
                      Controls:TextBoxHelper.ClearTextButton="True"
                      Controls:TextBoxHelper.Watermark="введите значение в ms" />
           </Border>
