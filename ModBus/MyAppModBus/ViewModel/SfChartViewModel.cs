@@ -1,6 +1,5 @@
 ﻿using MyAppModBus.Commands;
 using MyAppModBus.Controllers;
-using MyAppModBus.Models;
 using MyAppModBus.ViewModel.Base;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,8 +19,8 @@ namespace MyAppModBus.ViewModel {
     private string _readWrite;
     private ObservableCollection<string> _registers;
     private string _queryRegisters = "Start";
-
-    private ObservableCollection<ViewRegisterModel> _viewRegisterModels;
+    private string _stateSerialPort = "Подключить";
+    private (string, string) _colorEndFittings = ("Red", "Red");
 
     private ControllerBase ctr = null;
 
@@ -65,6 +64,12 @@ namespace MyAppModBus.ViewModel {
     public string ElemHidden {
       get => _elemHidden; set => Set( ref _elemHidden, value );
       }
+    public string StateSerialPort {
+      get => _stateSerialPort; set => Set( ref _stateSerialPort, value );
+      }
+    public (string, string) ColorEndFittings {
+      get=>_colorEndFittings; set=>Set(ref _colorEndFittings, value);
+      }
 
     public ObservableCollection<string> Registers {
       get => _registers; set => Set( ref _registers, value );
@@ -78,37 +83,21 @@ namespace MyAppModBus.ViewModel {
 
     #region Команды
 
-    #region Команда поключения к COM порту и отображение UI элементов
+    #region Команда поключения/отключения к/от COM порта и отображение UI элементов
     public ICommand ConnectToDevice {
       get;
       }
     private bool CanSelectItemCommandExecute( object p ) => true;
     private void OnSelectItemCommandExecuted( object p ) {
 
-      ErrMessage = ctr.ConnectToDevice( _selectedItem );
+      var conToDeviceItem = ctr.ConnectToDevice( _selectedItem );
+
+      ErrMessage = conToDeviceItem.Item1;
+      StateSerialPort = conToDeviceItem.Item2;
       ElemEnable = ctr.SetElementEnable( _elemEnable );
       ElemDisable = ctr.SetElementDisable( _elemEnable );
-      ElemVisible = ctr.SetElementVisible( _elemVisible );
-      ElemHidden = ctr.SetElementHidden( _elemHidden );
 
       }
-    #endregion
-
-    #region Команда отключения от COM порта
-
-    public ICommand DisconnectToDevice {
-      get;
-      }
-    private bool CanDisconnectToDeviceExecute( object p ) => true;
-    private void OnDisconnectToDeviceExecuted( object p ) {
-      ErrMessage = ctr.DisconnectToDevice( _selectedItem );
-      ElemEnable = ctr.SetElementEnable( _elemEnable );
-      ElemDisable = ctr.SetElementDisable( _elemEnable );
-      ElemVisible = ctr.SetElementVisible( _elemVisible );
-      ElemHidden = ctr.SetElementHidden( _elemHidden );
-      ctr.DisconnectToDevice( _selectedItem );
-      }
-
     #endregion
 
     #region Запрос регистров
@@ -117,13 +106,13 @@ namespace MyAppModBus.ViewModel {
       }
     private bool CanGetRegistersValuesExute( object p ) => true;
     private void OnGetRegistersValuesExecuted( object p ) {
-      var item1 = ctr.RegistersRequest( _queryRegisters ).Item1;
-      var item2 = ctr.RegistersRequest( _queryRegisters ).Item2;
-      var item3 = ctr.RegistersRequest( _queryRegisters ).Item3;
+      var regRequests = ctr.RegistersRequest( _queryRegisters );
 
-      QueryRegistrs = item2;
-      Registers = item1;
-      ErrMessage = item3;
+      Registers = regRequests.Item1;
+      QueryRegistrs = regRequests.Item2;
+      ErrMessage = regRequests.Item3;
+      ColorEndFittings = regRequests.Item4;
+
       }
     #endregion
 
@@ -144,7 +133,6 @@ namespace MyAppModBus.ViewModel {
     public SfChartViewModel() {
       #region Команды
       ConnectToDevice = new LambdaCommand( OnSelectItemCommandExecuted, CanSelectItemCommandExecute );
-      DisconnectToDevice = new LambdaCommand( OnDisconnectToDeviceExecuted, CanDisconnectToDeviceExecute );
       GetRegistersValues = new LambdaCommand( OnGetRegistersValuesExecuted, CanGetRegistersValuesExute );
       ConverToInt = new LambdaCommand( OnConverToIntExecuted, CanConverToIntExecute );
       #endregion

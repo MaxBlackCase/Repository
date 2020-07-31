@@ -5,20 +5,22 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO.Ports;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace MyAppModBus.Controllers {
   internal class ControllerBase {
 
     private DispatcherTimer _timer = new DispatcherTimer();
-    private SerialPort _serial = null;
+    private SerialPort _serial = new SerialPort();
     private ModbusSerialMaster _master;
     const byte slaveID = 1;
     private string _errMessage;
     const ushort startAddress = 0;
     const ushort numburOfPoints = 18;
     private int _readWriteConvert = 50;
-    private string _portNameGlob;
+    private (string, string) _corEndFittings;
     private ObservableCollection<ViewRegisterModel> _viewRegs = new ObservableCollection<ViewRegisterModel>();
     private ObservableCollection<string> _registers = new ObservableCollection<string>();
 
@@ -56,12 +58,9 @@ namespace MyAppModBus.Controllers {
     /// <param name="_portName">Имя Порта</param>
     /// <param name="_errMessage">Сообщение</param>
     /// <returns></returns>
-    internal string ConnectToDevice( string _portName ) {
-      _serial = new SerialPort();
+    internal (string, string) ConnectToDevice( string _portName ) {
+      var _stateSerialPort = "";
       try {
-        if (_serial.IsOpen) {
-          _serial.Close();
-          }
         #region <Настройки RTU подключения>
         _serial.PortName = _portName;
         _serial.ReadTimeout = _readWriteConvert;
@@ -73,15 +72,19 @@ namespace MyAppModBus.Controllers {
         _serial.Open();
         #endregion
         _master = ModbusSerialMaster.CreateRtu( _serial );
-
         _errMessage = string.Format( "{0} порт подключен", _portName );
-
+        _stateSerialPort = "Отключить";
         }
       catch (Exception err) {
-        _errMessage = err.Message;
+        if (_serial.IsOpen) {
+          DisconnectToDevice();
+          _errMessage = string.Format( "{0} порт Отключен", _portName );
+          _stateSerialPort = "Подключить";
+          } else {
+          _errMessage = err.Message.ToString();
+          }
         }
-      return _errMessage;
-
+      return (_errMessage, _stateSerialPort);
       }
 
     /// <summary>
@@ -90,15 +93,10 @@ namespace MyAppModBus.Controllers {
     /// <param name="_portName">Имя порта</param>
     /// <param name="_errMessage">Сообщение</param>
     /// <returns></returns>
-    internal string DisconnectToDevice( string _portName ) {
-      if (_serial.IsOpen) {
-        _serial.Close();
-        _serial.Dispose();
-        _timer.Stop();
-        _errMessage = string.Format( "Порт {0} закрыт", _portName );
-        }
-      _portNameGlob = _portName;
-      return _errMessage;
+    internal void DisconnectToDevice() {
+      _serial.Close();
+      _serial.Dispose();
+      _timer.Stop();
       }
 
     #region Elements IsEnable, IsVisibility
@@ -151,6 +149,12 @@ namespace MyAppModBus.Controllers {
     internal double countIndex = 0;
     private int[][] _numberRegisters = new int[ 2 ][];
 
+
+    /// <summary>
+    /// Получение данных из регистров
+    /// </summary>
+    /// <param name="sender">Объект</param>
+    /// <param name="e">Событие</param>
     private void GetRegisterToDevice( object sender, EventArgs e ) {
       _viewRegs.Clear();
       _registers.Clear();
@@ -195,27 +199,35 @@ namespace MyAppModBus.Controllers {
 
         //}
         #endregion
-        countIndex++;
+
+        SetColorEllipses( result[ 9 ], result[ 10 ] );
+
+       countIndex++;
         } else {
-        DisconnectToDevice( _portNameGlob );
+        _timer.Stop();
         }
       }
-    internal (ObservableCollection<string>, string, string) RegistersRequest( string _queryRegisters ) {
-      if (!_timer.IsEnabled) {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="_queryRegisters">Значение кнопки</param>
+    /// <returns></returns>
+    internal (ObservableCollection<string>, string, string, (string, string)) RegistersRequest( string _queryRegisters ) {
+      if (!_timer.IsEnabled && _serial.IsOpen) {
         #region <Timer>
         _timer.Tick += new EventHandler( GetRegisterToDevice );
         _timer.Interval = new TimeSpan( 0, 0, 0, 0, Convert.ToInt32( _readWriteConvert ) );
         _timer.Start();
-        _queryRegisters = "Stop";
+        _queryRegisters = "Start";
         _errMessage = "Запущено...";
         #endregion
         } else {
         _timer.Stop();
         _errMessage = "Остановлено";
-        _queryRegisters = "Start";
+        _queryRegisters = "Stop";
         }
-      
-      return (_registers, _queryRegisters, _errMessage);
+
+      return (_registers, _queryRegisters, _errMessage, _corEndFittings);
       }
 
     internal string ConvertToInt( string _readWrite ) {
@@ -233,6 +245,22 @@ namespace MyAppModBus.Controllers {
           }
         }
       return _errMessage;
+      }
+
+    internal (string, string) SetColorEllipses(ushort valOne, ushort valTwo) {
+
+      if (valOne == 1) {
+        _corEndFittings.Item1 = "Green";
+        } else {
+        _corEndFittings.Item1 = "Red";
+        }
+      if (valTwo == 1) {
+        _corEndFittings.Item2 = "Green";
+        } else {
+        _corEndFittings.Item2 = "Red";
+        }
+
+      return _corEndFittings;
       }
 
     }

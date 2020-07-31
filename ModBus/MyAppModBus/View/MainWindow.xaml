@@ -68,29 +68,15 @@
               Grid.Column="1"
               Margin="5 0 0 0"
               Name="connectComPort"
-              Content="Подключить"
+              Content="{Binding StateSerialPort}"
               VerticalContentAlignment="Center"
               Command="{Binding ConnectToDevice}"
-              Visibility="{Binding ElemVisible}"
               Background="#FF3F3F46"
               Foreground="White"
               BorderBrush="{x:Null}"
               FontFamily="Arial Rounded MT Bold"
               FontWeight="Bold"
               Grid.ColumnSpan="2" />
-      <Button Grid.Row="0"
-              Grid.Column="1"
-              Margin="5 0 0 0"
-              Name="disconnectComPort"
-              Command="{Binding DisconnectToDevice}"
-              Visibility="{Binding ElemHidden}"
-              Content="Отключить"
-              Foreground="White"
-              Background="#FF3F3F46"
-              BorderBrush="{x:Null}"
-              VerticalAlignment="Bottom"
-              Grid.ColumnSpan="2"
-              Height="30" />
 
       <Grid Grid.Row="4"
             Grid.Column="0"
@@ -114,6 +100,12 @@
           <StackPanel VerticalAlignment="Bottom"
                       Grid.Row="1"
                       Grid.Column="0">
+            <StackPanel Orientation="Horizontal">
+              <Ellipse Width="25"
+                       Height="25"
+                       Fill="{Binding ColorEndFittings.Item1}" Margin="0 0 10 0"></Ellipse>
+              <Ellipse Width="25" Height="25" Fill="{Binding ColorEndFittings.Item2}"></Ellipse>
+            </StackPanel>
             <Button Name="StartRegsRequest"
                     Content="{Binding QueryRegistrs}"
                     MinWidth="100"
