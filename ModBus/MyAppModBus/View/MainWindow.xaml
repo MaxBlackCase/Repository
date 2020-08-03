@@ -101,10 +101,20 @@
                       Grid.Row="1"
                       Grid.Column="0">
             <StackPanel Orientation="Horizontal">
-              <Ellipse Width="25"
-                       Height="25"
-                       Fill="{Binding ColorEndFittings.Item1}" Margin="0 0 10 0"></Ellipse>
-              <Ellipse Width="25" Height="25" Fill="{Binding ColorEndFittings.Item2}"></Ellipse>
+              <ItemsControl ItemsSource="{Binding ColorEndFittings}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+                <!--<Ellipse Width="25"
+                         Height="25"
+                         Fill="Red"
+                         Margin="0 0 10 0"></Ellipse>
+                <Ellipse Width="25"
+                         Height="25"
+                         Fill="Red"></Ellipse>-->
             </StackPanel>
             <Button Name="StartRegsRequest"
                     Content="{Binding QueryRegistrs}"
@@ -132,21 +142,21 @@
                     VerticalAlignment="Top"
                     x:Name="CheckBoxWriteRegisters"
                     HorizontalAlignment="Right">
-          <!--<Controls:ToggleSwitch Name="checkBoxWrite_1"
+          <Controls:ToggleSwitch Name="checkBoxWrite_1"
                                  OffContent="Volltage"
                                  OnContent="Volltage"
-                                 IsEnabled="false"
-                                 Toggled="CheсkValToRegisters" />
+                                 IsEnabled="{Binding ElemDisable}"
+                                 Command="{Binding GetRegistersValues}" />
           <Controls:ToggleSwitch Name="checkBoxWrite_2"
                                  OffContent="Транс"
                                  OnContent="Транс"
-                                 IsEnabled="False"
-                                 Toggled="CheсkValToRegisters" />
+                                 IsEnabled="{Binding ElemDisable}"
+                                 Command="{Binding GetRegistersValues}" />
           <Controls:ToggleSwitch Name="checkBoxWrite_3"
                                  OffContent="Охлаждение"
                                  OnContent="Охлаждение"
-                                 IsEnabled="False"
-                                 Toggled="CheсkValToRegisters" />-->
+                                 IsEnabled="{Binding ElemDisable}"
+                                 Command="{Binding GetRegistersValues}" />
         </StackPanel>
       </Grid>
 
@@ -169,6 +179,7 @@
                      Grid.Row="0"
                      Grid.Column="0"
                      Grid.ColumnSpan="1"
+                     
                      HorizontalContentAlignment="Right"
                      Text="{Binding ReadWrite}"
                      PreviewTextInput="CheckReadWriteOnRegular"

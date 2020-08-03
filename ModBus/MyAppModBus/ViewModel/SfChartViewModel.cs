@@ -3,8 +3,10 @@ using MyAppModBus.Controllers;
 using MyAppModBus.ViewModel.Base;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Windows.Input;
-
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace MyAppModBus.ViewModel {
   internal class SfChartViewModel : ViewModelBase {
@@ -20,7 +22,7 @@ namespace MyAppModBus.ViewModel {
     private ObservableCollection<string> _registers;
     private string _queryRegisters = "Start";
     private string _stateSerialPort = "Подключить";
-    private (string, string) _colorEndFittings = ("Red", "Red");
+    private ObservableCollection<Ellipse> _colorEndFittings;
 
     private ControllerBase ctr = null;
 
@@ -67,14 +69,12 @@ namespace MyAppModBus.ViewModel {
     public string StateSerialPort {
       get => _stateSerialPort; set => Set( ref _stateSerialPort, value );
       }
-    public (string, string) ColorEndFittings {
-      get=>_colorEndFittings; set=>Set(ref _colorEndFittings, value);
+    public ObservableCollection<Ellipse> ColorEndFittings {
+      get => _colorEndFittings; set => Set( ref _colorEndFittings, value );
       }
-
     public ObservableCollection<string> Registers {
       get => _registers; set => Set( ref _registers, value );
       }
-
     public string QueryRegistrs {
       get => _queryRegisters; set => Set( ref _queryRegisters, value );
       }
@@ -94,6 +94,7 @@ namespace MyAppModBus.ViewModel {
 
       ErrMessage = conToDeviceItem.Item1;
       StateSerialPort = conToDeviceItem.Item2;
+      QueryRegistrs = conToDeviceItem.Item3;
       ElemEnable = ctr.SetElementEnable( _elemEnable );
       ElemDisable = ctr.SetElementDisable( _elemEnable );
 
@@ -106,7 +107,7 @@ namespace MyAppModBus.ViewModel {
       }
     private bool CanGetRegistersValuesExute( object p ) => true;
     private void OnGetRegistersValuesExecuted( object p ) {
-      var regRequests = ctr.RegistersRequest( _queryRegisters );
+      var regRequests = ctr.RegistersRequest();
 
       Registers = regRequests.Item1;
       QueryRegistrs = regRequests.Item2;
@@ -128,6 +129,20 @@ namespace MyAppModBus.ViewModel {
 
     #endregion
 
+    #region Запись в регистры
+
+    public ICommand WriteToRegisters {
+      get;
+      }
+
+    private bool CanWriteToRegistersExute( object p ) => true;
+    private void OnWriteToRegistersExuted( object p ) {
+
+      //var wrtRegs = ctr.WriteValuesToRegisters();
+
+      }
+    #endregion
+
     #endregion
 
     public SfChartViewModel() {
@@ -135,6 +150,7 @@ namespace MyAppModBus.ViewModel {
       ConnectToDevice = new LambdaCommand( OnSelectItemCommandExecuted, CanSelectItemCommandExecute );
       GetRegistersValues = new LambdaCommand( OnGetRegistersValuesExecuted, CanGetRegistersValuesExute );
       ConverToInt = new LambdaCommand( OnConverToIntExecuted, CanConverToIntExecute );
+      WriteToRegisters = new LambdaCommand( OnWriteToRegistersExuted, CanWriteToRegistersExute );
       #endregion
 
       ctr = new ControllerBase();
