@@ -63,11 +63,7 @@ namespace MyAppModBus.Controllers {
     /// <returns></returns>
     internal (string, string, string) ConnectToDevice( string _portName ) {
       try {
-        if (_serial.IsOpen) {
-          DisconnectToDevice();
-          _errMessage = string.Format( "{0} порт Отключен", _portName );
-          _stateSerialPort = "Подключить";
-          } else {
+        if (!_serial.IsOpen) {
           #region <Настройки RTU подключения>
           _serial.PortName = _portName;
           _serial.ReadTimeout = _readWriteConvert;
@@ -82,6 +78,9 @@ namespace MyAppModBus.Controllers {
           _errMessage = string.Format( "{0} порт подключен", _portName );
           _stateSerialPort = "Отключить";
           _queryRegisters = "Start";
+          } else {
+          DisconnectToDevice();
+          _errMessage = string.Format( "{0} порт Отключен", _portName );
           }
         }
       catch (Exception err) {
@@ -97,16 +96,21 @@ namespace MyAppModBus.Controllers {
     /// <param name="_errMessage">Сообщение</param>
     /// <returns></returns>
     internal void DisconnectToDevice() {
-      var cleanRegs = new ushort[ 3 ] { 6, 7, 8 };
-      for (int i = 0; i < cleanRegs.Length; i++) {
-        _master.WriteSingleRegister( slaveID, cleanRegs[ i ], 0 );
+      if (_serial.IsOpen && _timer.IsEnabled ) {
+        // <Сброс регистров>
+        var cleanRegs = new ushort[ 3 ] { 6, 7, 8 };
+        for (int i = 0; i < cleanRegs.Length; i++) {
+          _master.WriteSingleRegister( slaveID, cleanRegs[ i ], 0 );
+          }
+        //</Сброс регистров>
         }
       _timer.Stop();
       _serial.Close();
       _serial.Dispose();
+      _master.Dispose();
+      _errMessage = "Остановлено";
+      _stateSerialPort = "Подключить";
       _queryRegisters = "Start";
-
-      
       }
 
     #region Elements IsEnable, IsVisibility
@@ -144,21 +148,15 @@ namespace MyAppModBus.Controllers {
         }
       return _elemVis;
       }
-    internal string SetElementHidden( string _elemHid ) {
-      if (_elemHid == Visibility.Hidden.ToString() && _serial.IsOpen) {
-        _elemHid = Visibility.Visible.ToString();
-        } else {
-        _elemHid = Visibility.Hidden.ToString();
-        }
-      return _elemHid;
-      }
+    //internal string SetElementHidden( string _elemHid ) {
+    //  if (_elemHid == Visibility.Hidden.ToString() && _serial.IsOpen) {
+    //    _elemHid = Visibility.Visible.ToString();
+    //    } else {
+    //    _elemHid = Visibility.Hidden.ToString();
+    //    }
+    //  return _elemHid;
+    //  }
     #endregion
-
-
-    internal double countTime = 0;
-    internal double countIndex = 0;
-    private int[][] _numberRegisters = new int[ 2 ][];
-
 
     /// <summary>
     /// Получение данных из регистров
@@ -213,8 +211,6 @@ namespace MyAppModBus.Controllers {
           #endregion
 
           SetColorEllipses( result[ 9 ], result[ 10 ] );
-
-          countIndex++;
           } else {
           _timer.Stop();
           }
@@ -231,19 +227,24 @@ namespace MyAppModBus.Controllers {
     /// <param name="_queryRegisters">Значение кнопки</param>
     /// <returns></returns>
     internal (ObservableCollection<string>, string, string, ObservableCollection<Ellipse>) RegistersRequest() {
-      if (!_timer.IsEnabled && _serial.IsOpen) {
-        #region <Timer>
-        _timer.Tick += new EventHandler( GetRegisterToDevice );
-        _timer.Interval = new TimeSpan( 0, 0, 0, 0, Convert.ToInt32( _readWriteConvert ) );
-        _timer.Start();
-        _queryRegisters = "Stop";
-        _errMessage = "Запущено...";
-        #endregion
-        } else {
-        _timer.Stop();
-        _errMessage = "Остановлено";
-        _queryRegisters = "Start";
+      try {
+        if (!_timer.IsEnabled && _serial.IsOpen) {
+          #region <Timer>
+          _timer.Tick += new EventHandler( GetRegisterToDevice );
+          _timer.Interval = new TimeSpan( 0, 0, 0, 0, Convert.ToInt32( _readWriteConvert ) );
+          _timer.Start();
+          _queryRegisters = "Stop";
+          _errMessage = "Запущено...";
+          #endregion
+          } else {
+          _timer.Stop();
+          _queryRegisters = "Start";
+          }
         }
+      catch (Exception err) {
+        _errMessage = err.Message.ToString();
+        }
+
       return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings);
       }
     internal string ConvertToInt( string _readWrite ) {
@@ -293,7 +294,7 @@ namespace MyAppModBus.Controllers {
     internal string WriteValuesToRegisters( object _indTogElem ) {
 
       _indTogElem = Convert.ToInt32( _indTogElem );
-      if (_serial.IsOpen) {
+      if (_timer.IsEnabled && _serial.IsOpen) {
         switch (_indTogElem) {
         case 1:
           if (elemBool[ 0 ] == false) {
@@ -326,7 +327,6 @@ namespace MyAppModBus.Controllers {
         } else {
         _errMessage = "Запись в регистры не возможна, отсутствует подключение";
         }
-
       return _errMessage;
       }
 
