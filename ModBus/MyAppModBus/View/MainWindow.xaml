@@ -97,25 +97,22 @@
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto" />
           </Grid.ColumnDefinitions>
+          <StackPanel Orientation="Horizontal"
+                      VerticalAlignment="Top"
+                      Grid.Row="0"
+                      Grid.Column="0">
+            <ItemsControl ItemsSource="{Binding ColorEndFittings}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+            </ItemsControl>
+          </StackPanel>
           <StackPanel VerticalAlignment="Bottom"
                       Grid.Row="1"
                       Grid.Column="0">
-            <StackPanel Orientation="Horizontal">
-              <ItemsControl ItemsSource="{Binding ColorEndFittings}">
-                <ItemsControl.ItemsPanel>
-                  <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" />
-                  </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-              </ItemsControl>
-              <!--<Ellipse Width="25"
-                         Height="25"
-                         Fill="Red"
-                         Margin="0 0 10 0"></Ellipse>
-                <Ellipse Width="25"
-                         Height="25"
-                         Fill="Red"></Ellipse>-->
-            </StackPanel>
+            
             <Button Name="StartRegsRequest"
                     Content="{Binding QueryRegistrs}"
                     MinWidth="100"
