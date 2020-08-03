@@ -60,7 +60,7 @@
                 Grid.Column="0"
                 IsEnabled="{Binding ElemEnable}"
                 ItemsSource="{Binding PortList}"
-                SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                SelectedItem="{Binding SelectedItem}"
                 x:Name="comboBoxMainPorts"
                 Background="White"
                 Foreground="#FF212121" />
@@ -108,7 +108,7 @@
                   </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
               </ItemsControl>
-                <!--<Ellipse Width="25"
+              <!--<Ellipse Width="25"
                          Height="25"
                          Fill="Red"
                          Margin="0 0 10 0"></Ellipse>
@@ -121,7 +121,6 @@
                     MinWidth="100"
                     IsEnabled="{Binding ElemDisable}"
                     Command="{Binding GetRegistersValues}"
-                    
                     MinHeight="60"
                     Margin="0 5"
                     HorizontalAlignment="Left" />
@@ -143,20 +142,27 @@
                     x:Name="CheckBoxWriteRegisters"
                     HorizontalAlignment="Right">
           <Controls:ToggleSwitch Name="checkBoxWrite_1"
-                                 OffContent="Volltage"
-                                 OnContent="Volltage"
+                                 Header="Volltage"
+                                 OffContent="Выкл"
+                                 OnContent="Вкл"
                                  IsEnabled="{Binding ElemDisable}"
-                                 Command="{Binding GetRegistersValues}" />
+                                 Command="{Binding WriteToRegisters}"
+                                 CommandParameter="1" />
+
           <Controls:ToggleSwitch Name="checkBoxWrite_2"
-                                 OffContent="Транс"
-                                 OnContent="Транс"
+                                 Header="Трансформатор"
+                                 OffContent="Выкл"
+                                 OnContent="Вкл"
                                  IsEnabled="{Binding ElemDisable}"
-                                 Command="{Binding GetRegistersValues}" />
+                                 Command="{Binding WriteToRegisters}"
+                                 CommandParameter="2" />
           <Controls:ToggleSwitch Name="checkBoxWrite_3"
-                                 OffContent="Охлаждение"
-                                 OnContent="Охлаждение"
+                                 Header="Охлаждение"
+                                 OffContent="Выкл"
+                                 OnContent="Вкл"
                                  IsEnabled="{Binding ElemDisable}"
-                                 Command="{Binding GetRegistersValues}" />
+                                 Command="{Binding WriteToRegisters}"
+                                 CommandParameter="3" />
         </StackPanel>
       </Grid>
 
@@ -179,7 +185,6 @@
                      Grid.Row="0"
                      Grid.Column="0"
                      Grid.ColumnSpan="1"
-                     
                      HorizontalContentAlignment="Right"
                      Text="{Binding ReadWrite}"
                      PreviewTextInput="CheckReadWriteOnRegular"

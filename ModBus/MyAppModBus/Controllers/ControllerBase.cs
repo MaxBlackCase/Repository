@@ -1,15 +1,10 @@
-﻿using MahApps.Metro.Controls;
-using Modbus.Device;
+﻿using Modbus.Device;
 using MyAppModBus.Models;
-using MyAppModBus.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO.Ports;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
@@ -102,10 +97,16 @@ namespace MyAppModBus.Controllers {
     /// <param name="_errMessage">Сообщение</param>
     /// <returns></returns>
     internal void DisconnectToDevice() {
+      var cleanRegs = new ushort[ 3 ] { 6, 7, 8 };
+      for (int i = 0; i < cleanRegs.Length; i++) {
+        _master.WriteSingleRegister( slaveID, cleanRegs[ i ], 0 );
+        }
+      _timer.Stop();
       _serial.Close();
       _serial.Dispose();
-      _timer.Stop();
       _queryRegisters = "Start";
+
+      
       }
 
     #region Elements IsEnable, IsVisibility
@@ -123,10 +124,10 @@ namespace MyAppModBus.Controllers {
       return _elemEnable;
       }
     internal bool SetElementDisable( bool _elemDisable ) {
-      if (_elemDisable == true && _serial.IsOpen) {
-        _elemDisable = false;
-        } else {
+      if (_elemDisable == false && _serial.IsOpen) {
         _elemDisable = true;
+        } else {
+        _elemDisable = false;
         }
       return _elemDisable;
       }
@@ -284,25 +285,49 @@ namespace MyAppModBus.Controllers {
           }
         _clnEllipseFittings.Add( _ellipseFittings );
         }
-      //if (valTwo == 1) {
-      //  _corEndFittings.Item2 = Colors.Green.ToString();
-      //  } else {
-      //  _corEndFittings.Item2 = Colors.Red.ToString();
-      //  }
+
       }
 
 
-    internal void WriteValuesToRegisters() {
-      //ToggleSwitch toggleSwitch = sender as ToggleSwitch;
-      if (toggleSwitch != null) {
-        if (toggleSwitch.IsOn == true) {
-          togElem.IsActive = true;
-          progress.Visibility = Visibility.Visible;
-          } else {
-          progress.IsActive = false;
-          progress.Visibility = Visibility.Collapsed;
+    private bool[] elemBool = new bool[ 3 ] { false, false, false };
+    internal string WriteValuesToRegisters( object _indTogElem ) {
+
+      _indTogElem = Convert.ToInt32( _indTogElem );
+      if (_serial.IsOpen) {
+        switch (_indTogElem) {
+        case 1:
+          if (elemBool[ 0 ] == false) {
+            _master.WriteSingleRegister( slaveID, 6, 1 );
+            elemBool[ 0 ] = true;
+            } else {
+            _master.WriteSingleRegister( slaveID, 6, 0 );
+            elemBool[ 0 ] = false;
+            }
+          break;
+        case 2:
+          if (elemBool[ 1 ] == false) {
+            _master.WriteSingleRegister( slaveID, 7, 1 );
+            elemBool[ 1 ] = true;
+            } else {
+            _master.WriteSingleRegister( slaveID, 7, 0 );
+            elemBool[ 1 ] = false;
+            }
+          break;
+        case 3:
+          if (elemBool[ 2 ] == false) {
+            _master.WriteSingleRegister( slaveID, 8, 1 );
+            elemBool[ 2 ] = true;
+            } else {
+            _master.WriteSingleRegister( slaveID, 8, 0 );
+            elemBool[ 2 ] = false;
+            }
+          break;
           }
+        } else {
+        _errMessage = "Запись в регистры не возможна, отсутствует подключение";
         }
+
+      return _errMessage;
       }
 
     //private void GetSfCharts() {

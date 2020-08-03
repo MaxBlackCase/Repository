@@ -1,4 +1,5 @@
-﻿using MyAppModBus.Commands;
+﻿using ControlzEx.Standard;
+using MyAppModBus.Commands;
 using MyAppModBus.Controllers;
 using MyAppModBus.ViewModel.Base;
 using System.Collections.Generic;
@@ -138,7 +139,8 @@ namespace MyAppModBus.ViewModel {
     private bool CanWriteToRegistersExute( object p ) => true;
     private void OnWriteToRegistersExuted( object p ) {
 
-      //var wrtRegs = ctr.WriteValuesToRegisters();
+       var wrtRegs = ctr.WriteValuesToRegisters(p);
+      ErrMessage = wrtRegs;
 
       }
     #endregion
