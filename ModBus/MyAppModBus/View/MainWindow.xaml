@@ -22,9 +22,6 @@
                       SaveWindowPosition="True"
                       FontFamily="SegoeUI"
                       Foreground="#fff">
-  <!--<Window.Resources>
-    <lc:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter" />
-  </Window.Resources>-->
   <Window.DataContext>
     <vm:SfChartViewModel />
   </Window.DataContext>
@@ -230,43 +227,100 @@
     </Grid>
     <Grid Grid.Row="0"
           Grid.RowSpan="2"
-          Grid.Column="1"
-          Margin="10">
+          Grid.Column="1">
       <Grid.RowDefinitions>
         <RowDefinition Height="1*" />
         <RowDefinition Height="1*" />
       </Grid.RowDefinitions>
       <chart:SfChart Header="Chart One"
+                     Palette="Metro"
                      AreaBorderBrush="Gray"
                      AreaBorderThickness="2"
                      Grid.Row="0">
         <chart:SfChart.PrimaryAxis>
           <chart:TimeSpanAxis Header="Time"
+                              FontSize="12"
+                              LabelFormat="mmss"
                               LabelsPosition="Inside"
-                              EnableAutoIntervalOnZooming="True" />
+                              EnableScrollBar="True"
+                              />
         </chart:SfChart.PrimaryAxis>
         <chart:SfChart.SecondaryAxis>
-          <chart:NumericalAxis Header="Value"
-                               EnableAutoIntervalOnZooming="True" />
+          <chart:NumericalAxis Header="Value" FontSize="12" EnableScrollBar="True" LabelsPosition="Inside" />
         </chart:SfChart.SecondaryAxis>
         <chart:SfChart.Legend>
           <chart:ChartLegend DockPosition="Bottom"
                              CheckBoxVisibility="Visible"
-                             Orientation="Horizontal" />
+                             Orientation="Horizontal"
+                             LegendPosition="Outside"
+                             IconVisibility="Visible" />
         </chart:SfChart.Legend>
-        <chart:LineSeries Label="Volt"
-                          ItemsSource="{Binding PointsSeries.Capacity}"
-                          XBindingPath="XTime"
-                          YBindingPath="YValue"
-                          LegendIcon="SeriesType"
-                          StrokeThickness="2"></chart:LineSeries>
-        <!--<chart:FastLineBitmapSeries EnableAntiAliasing="True"
-                                    Label="Транс"
-                                    ItemsSource="{Binding PointsSeries}"
-                                    XBindingPath="XTime"
-                                    YBindingPath="YValue"
-                                    LegendIcon="SeriesType"
-                                    StrokeThickness="2"></chart:FastLineBitmapSeries>-->
+        <chart:FastLineSeries Label="Volt"
+                              EnableAnimation="True"
+                              ItemsSource="{Binding PointSeriesVolt}"
+                              XBindingPath="XTime"
+                              YBindingPath="YValue"
+                              Interior="#FFEB3B"
+                              LegendIcon="SeriesType"
+                              StrokeThickness="2"></chart:FastLineSeries>
+        <chart:FastLineSeries EnableAnimation="True"
+                              Label="Транс"
+                              ItemsSource="{Binding PointSeriesCurr}"
+                              XBindingPath="XTime"
+                              YBindingPath="YValue"
+                              Interior="#FF5252"
+                              LegendIcon="SeriesType"
+                              StrokeThickness="2"></chart:FastLineSeries>
+        <chart:FastLineSeries EnableAnimation="True"
+                              Label="Транс"
+                              ItemsSource="{Binding PointSeriesTorq}"
+                              XBindingPath="XTime"
+                              YBindingPath="YValue"
+                              Interior="#448AFF"
+                              LegendIcon="SeriesType"
+                              StrokeThickness="2"></chart:FastLineSeries>
+      </chart:SfChart>
+      <chart:SfChart Header="Chart Two"
+                     Palette="Metro"
+                     AreaBorderBrush="Gray"
+                     AreaBorderThickness="2"
+                     Grid.Row="1">
+        <chart:SfChart.PrimaryAxis>
+          <chart:TimeSpanAxis Header="Time"
+                              FontSize="12"
+                              LabelFormat="mmss"
+                              LabelsPosition="Inside"
+                              EnableScrollBar="True" />
+        </chart:SfChart.PrimaryAxis>
+        <chart:SfChart.SecondaryAxis>
+          <chart:NumericalAxis Header="Value"
+                               FontSize="12"
+                               EnableScrollBar="True"
+                               LabelsPosition="Inside" />
+        </chart:SfChart.SecondaryAxis>
+        <chart:SfChart.Legend>
+          <chart:ChartLegend DockPosition="Bottom"
+                             CheckBoxVisibility="Visible"
+                             Orientation="Horizontal"
+                             LegendPosition="Outside"
+                             IconVisibility="Visible" />
+        </chart:SfChart.Legend>
+        <chart:FastLineSeries Label="Extern"
+                              EnableAnimation="True"
+                              ItemsSource="{Binding PointSeriesVolt}"
+                              XBindingPath="XTime"
+                              YBindingPath="YValue"
+                              Interior="#FFEB3B"
+                              LegendIcon="SeriesType"
+                              StrokeThickness="2"></chart:FastLineSeries>
+        <chart:FastLineSeries EnableAnimation="True"
+                              Label="Motor"
+                              ItemsSource="{Binding PointSeriesCurr}"
+                              XBindingPath="XTime"
+                              YBindingPath="YValue"
+                              Interior="#FF5252"
+                              LegendIcon="SeriesType"
+                              StrokeThickness="2"></chart:FastLineSeries>
       </chart:SfChart>
     </Grid>
   </Grid>

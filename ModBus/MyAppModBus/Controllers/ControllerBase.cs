@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO.Ports;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
@@ -26,7 +28,9 @@ namespace MyAppModBus.Controllers {
     private ObservableCollection<string> _registers = new ObservableCollection<string>();
     private Ellipse _ellipseFittings;
     private ObservableCollection<Ellipse> _clnEllipseFittings = new ObservableCollection<Ellipse>();
-    private List<ChartPoints> _volt = new List<ChartPoints>();
+    private ObservableCollection<ChartPoints> _volt = new ObservableCollection<ChartPoints>();
+    private ObservableCollection<ChartPoints> _curr = new ObservableCollection<ChartPoints>();
+    private ObservableCollection<ChartPoints> _torq = new ObservableCollection<ChartPoints>();
 
     public ControllerBase() {
 
@@ -108,6 +112,11 @@ namespace MyAppModBus.Controllers {
         }
         //</Сброс регистров>
       }
+      _countTimes = 0;
+      _volt.Clear();
+      _curr.Clear();
+      _torq.Clear();
+
       _timer.Stop();
       _serial.Close();
       _serial.Dispose();
@@ -220,7 +229,16 @@ namespace MyAppModBus.Controllers {
           #endregion
 
           SetColorEllipses( result[ 9 ], result[ 10 ] );
-          _volt = SetPointsSeries( result[ 1 ], _volt );
+
+          if( true ) {
+
+          }
+
+          if( _countTimes % _readWriteConvert == 0 ) {
+            SetPointsSeries( result[ 0 ], _volt );
+            SetPointsSeries( result[ 1 ], _curr );
+            SetPointsSeries( result[ 4 ], _torq );
+          }
         }
         else {
           _timer.Stop();
@@ -232,12 +250,14 @@ namespace MyAppModBus.Controllers {
       }
 
     }
+
+    //private List<ObservableCollection> lstChartSeries
     /// <summary>
     /// 
     /// </summary>
     /// <param name="_queryRegisters">Значение кнопки</param>
     /// <returns></returns>
-    internal (ObservableCollection<string>, string, string, ObservableCollection<Ellipse>, List<ChartPoints>) RegistersRequest() {
+    internal (ObservableCollection<string>, string, string, ObservableCollection<Ellipse>, (ObservableCollection<ChartPoints>, ObservableCollection<ChartPoints>, ObservableCollection<ChartPoints>)) RegistersRequest() {
       try {
         if( _serial.IsOpen ) {
           #region <Timer>
@@ -260,7 +280,7 @@ namespace MyAppModBus.Controllers {
       catch( Exception err ) {
         _errMessage = err.Message.ToString();
       }
-      return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings, _volt);
+      return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings, (_volt, _curr, _torq));
     }
     internal string ConvertToInt( string _readWrite ) {
 
@@ -306,7 +326,6 @@ namespace MyAppModBus.Controllers {
         _clnEllipseFittings.Add( _ellipseFittings );
       }
     }
-
 
     private bool[] elemBool = new bool[ 3 ] { false, false, false };
     internal string WriteValuesToRegisters( object _indTogElem ) {
@@ -390,12 +409,10 @@ namespace MyAppModBus.Controllers {
     //  ch.Series.Add( sers );
     //  }
 
-    private List<ChartPoints> SetPointsSeries( ushort _valRegister, List<ChartPoints> _chartSer ) {
+    private void SetPointsSeries( ushort _valRegister, ObservableCollection<ChartPoints> _lineSeries ) {
       var _time = TimeSpan.FromMilliseconds( _countTimes );
       var _value = Convert.ToDouble( _valRegister );
-      _chartSer.Add( new ChartPoints { XTime = _time, YValue = _value } );
-
-      return _chartSer;
+      _lineSeries.Add( new ChartPoints { XTime = _time, YValue = _value } );
     }
 
   }
