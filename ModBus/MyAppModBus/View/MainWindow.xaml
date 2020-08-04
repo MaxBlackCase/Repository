@@ -5,7 +5,7 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:d3="clr-namespace:InteractiveDataDisplay.WPF;assembly=InteractiveDataDisplay.WPF"
                       xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
-                      xmlns:lc="clr-namespace:MyAppModBus"
+                      xmlns:vm="clr-namespace:MyAppModBus.ViewModel"
                       mc:Ignorable="d"
                       Title="ModBus(RTU)"
                       MinHeight="720"
@@ -19,11 +19,14 @@
                       WindowStartupLocation="CenterScreen"
                       ResizeMode="CanResizeWithGrip"
                       SaveWindowPosition="True"
-                      FontFamily="Arial Rounded MT Bold"
+                      FontFamily="SegoeUI"
                       Foreground="#fff">
   <!--<Window.Resources>
     <lc:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter" />
   </Window.Resources>-->
+  <Window.DataContext>
+    <vm:SfChartViewModel />
+  </Window.DataContext>
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="auto" />
@@ -55,35 +58,25 @@
                 Height="30"
                 VerticalContentAlignment="Center"
                 Grid.Column="0"
-                Name="comboBoxMainPorts"
+                IsEnabled="{Binding ElemEnable}"
+                ItemsSource="{Binding PortList}"
+                SelectedItem="{Binding SelectedItem}"
+                x:Name="comboBoxMainPorts"
                 Background="White"
                 Foreground="#FF212121" />
       <Button Grid.Row="0"
               Grid.Column="1"
               Margin="5 0 0 0"
               Name="connectComPort"
-              Content="Подключить"
+              Content="{Binding StateSerialPort}"
               VerticalContentAlignment="Center"
-              Click="ConnectToDevice"
+              Command="{Binding ConnectToDevice}"
               Background="#FF3F3F46"
               Foreground="White"
               BorderBrush="{x:Null}"
               FontFamily="Arial Rounded MT Bold"
               FontWeight="Bold"
               Grid.ColumnSpan="2" />
-      <Button Grid.Row="0"
-              Grid.Column="1"
-              Margin="5 0 0 0"
-              Name="disconnectComPort"
-              Content="Отключить"
-              Foreground="White"
-              Background="#FF3F3F46"
-              BorderBrush="{x:Null}"
-              VerticalAlignment="Bottom"
-              Click="DisconnectToDevice"
-              Visibility="Hidden"
-              Grid.ColumnSpan="2"
-              Height="30" />
 
       <Grid Grid.Row="4"
             Grid.Column="0"
@@ -104,17 +97,30 @@
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto" />
           </Grid.ColumnDefinitions>
+          <StackPanel Orientation="Horizontal"
+                      VerticalAlignment="Top"
+                      Grid.Row="0"
+                      Grid.Column="0">
+            <ItemsControl ItemsSource="{Binding ColorEndFittings}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+            </ItemsControl>
+          </StackPanel>
           <StackPanel VerticalAlignment="Bottom"
                       Grid.Row="1"
                       Grid.Column="0">
+            
             <Button Name="StartRegsRequest"
-                    Content="Запустить"
+                    Content="{Binding QueryRegistrs}"
                     MinWidth="100"
+                    IsEnabled="{Binding ElemDisable}"
+                    Command="{Binding GetRegistersValues}"
                     MinHeight="60"
                     Margin="0 5"
-                    Click="RegistersRequest"
-                    HorizontalAlignment="Left"
-                    IsEnabled="False" />
+                    HorizontalAlignment="Left" />
           </StackPanel>
 
           <StackPanel Grid.Row="0"
@@ -133,20 +139,27 @@
                     x:Name="CheckBoxWriteRegisters"
                     HorizontalAlignment="Right">
           <Controls:ToggleSwitch Name="checkBoxWrite_1"
-                                 OffContent="Volltage"
-                                 OnContent="Volltage"
-                                 IsEnabled="false"
-                                 Toggled="CheсkValToRegisters" />
+                                 Header="Volltage"
+                                 OffContent="Выкл"
+                                 OnContent="Вкл"
+                                 IsEnabled="{Binding ElemDisable}"
+                                 Command="{Binding WriteToRegisters}"
+                                 CommandParameter="1" />
+
           <Controls:ToggleSwitch Name="checkBoxWrite_2"
-                                 OffContent="Транс"
-                                 OnContent="Транс"
-                                 IsEnabled="False"
-                                 Toggled="CheсkValToRegisters" />
+                                 Header="Трансформатор"
+                                 OffContent="Выкл"
+                                 OnContent="Вкл"
+                                 IsEnabled="{Binding ElemDisable}"
+                                 Command="{Binding WriteToRegisters}"
+                                 CommandParameter="2" />
           <Controls:ToggleSwitch Name="checkBoxWrite_3"
-                                 OffContent="Охлаждение"
-                                 OnContent="Охлаждение"
-                                 IsEnabled="False"
-                                 Toggled="CheсkValToRegisters" />
+                                 Header="Охлаждение"
+                                 OffContent="Выкл"
+                                 OnContent="Вкл"
+                                 IsEnabled="{Binding ElemDisable}"
+                                 Command="{Binding WriteToRegisters}"
+                                 CommandParameter="3" />
         </StackPanel>
       </Grid>
 
@@ -164,25 +177,28 @@
           <Border BorderBrush="Black"
                   CornerRadius="15">
             <TextBox Name="decTextBox"
-                     MaxLength="4"
+                     IsEnabled="{Binding ElemEnable}"
+                     MaxLength="3"
                      Grid.Row="0"
                      Grid.Column="0"
                      Grid.ColumnSpan="1"
                      HorizontalContentAlignment="Right"
+                     Text="{Binding ReadWrite}"
+                     PreviewTextInput="CheckReadWriteOnRegular"
                      Controls:TextBoxHelper.ClearTextButton="True"
-                     Controls:TextBoxHelper.Watermark="введите значение в ms"
-                     PreviewTextInput="TextBoxDecimalPreviewTextInput" />
+                     Controls:TextBoxHelper.Watermark="введите значение в ms" />
           </Border>
 
           <Button Grid.Row="0"
                   Grid.Column="3"
                   Content="Задать"
                   Name="decButtonTimeout"
-                  Click="DecimalButtonTimeoutClic"
                   Grid.ColumnSpan="2"
                   Margin="10 0 0 0"
                   Foreground="White"
                   Background="#FF3F3F46"
+                  IsEnabled="{Binding ElemEnable}"
+                  Command="{Binding ConverToInt}"
                   BorderBrush="{x:Null}" />
         </Grid>
       </StackPanel>
@@ -194,18 +210,20 @@
           <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0"
-                   Text="Выводимые данные"
-                   VerticalAlignment="Center"
-                   FontSize="14"
+                   Margin="0 5"
+                   Padding="5"
+                   Background="#212121"
                    Foreground="#fff"
-                   Margin="0 10" />
+                   Name="textViewer"
+                   Height="auto"
+                   Text="{Binding ErrMessage}"
+                   TextWrapping="Wrap" />
         <ScrollViewer Grid.Row="1"
                       CanContentScroll="True">
-          <TextBlock Padding="15"
-                     Background="#fff"
-                     Foreground="#212121"
-                     Name="textViewer"
-                     TextWrapping="Wrap" />
+
+          <ListBox Width="auto"
+                   Height="auto"
+                   ItemsSource="{Binding Registers}" />
         </ScrollViewer>
       </Grid>
     </Grid>
@@ -220,7 +238,7 @@
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
 
-      <d3:Chart x:Name="PlotUp"
+      <!--<d3:Chart x:Name="PlotUp"
                 Grid.Column="0"
                 Grid.Row="0"
                 BottomTitle="Argument"
@@ -253,7 +271,11 @@
             </d3:LegendItemsPanel.Resources>
           </d3:LegendItemsPanel>
         </d3:Chart.LegendContent>
-      </d3:Chart>
+      </d3:Chart>-->
+
+      <!--<chart:SfChart x:Name="SfChart" />-->
+      <TextBlock Grid.Row="0"
+                 Grid.Column="0" />
 
       <d3:Chart Grid.Row="1"
                 BottomTitle="Argument"
@@ -271,7 +293,7 @@
             <d3:LegendItemsPanel.Resources>
               <DataTemplate x:Key="InteractiveDataDisplay.WPF.LineGraph">
                 <StackPanel Orientation="Horizontal">
-                  <CheckBox IsChecked="{Binding Path=Visibility, Converter={StaticResource VisibilityToCheckedConverter}, Mode=TwoWay}" />
+                  <!--<CheckBox IsChecked="{Binding Path=Visibility, Converter={StaticResource VisibilityToCheckedConverter}, Mode=TwoWay}" />-->
                   <Line Width="15"
                         Height="15"
                         X1="0"
