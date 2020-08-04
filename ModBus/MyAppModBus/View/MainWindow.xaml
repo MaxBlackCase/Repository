@@ -236,6 +236,7 @@
                      Palette="Metro"
                      AreaBorderBrush="Gray"
                      AreaBorderThickness="2"
+                     BorderBrush="LightGray"
                      Grid.Row="0">
         <chart:SfChart.PrimaryAxis>
           <chart:TimeSpanAxis Header="Time"
@@ -255,6 +256,11 @@
                              LegendPosition="Outside"
                              IconVisibility="Visible" />
         </chart:SfChart.Legend>
+        <chart:SfChart.Behaviors>
+          <chart:ChartZoomPanBehavior ZoomRelativeToCursor="True"
+                                      EnableSelectionZooming="True">
+          </chart:ChartZoomPanBehavior>
+        </chart:SfChart.Behaviors>
         <chart:FastLineSeries Label="Volltage"
                               EnableAnimation="True"
                               ItemsSource="{Binding PointSeriesVolt}"
@@ -305,6 +311,11 @@
                              LegendPosition="Outside"
                              IconVisibility="Visible" />
         </chart:SfChart.Legend>
+        <chart:SfChart.Behaviors>
+          <chart:ChartZoomPanBehavior ZoomRelativeToCursor="True"
+                                      EnableSelectionZooming="True">
+          </chart:ChartZoomPanBehavior>
+        </chart:SfChart.Behaviors>
         <chart:FastLineSeries Label="External"
                               EnableAnimation="True"
                               ItemsSource="{Binding PointSeriesExternal}"
