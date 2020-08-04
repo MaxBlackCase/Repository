@@ -28,9 +28,16 @@ namespace MyAppModBus.Controllers {
     private ObservableCollection<string> _registers = new ObservableCollection<string>();
     private Ellipse _ellipseFittings;
     private ObservableCollection<Ellipse> _clnEllipseFittings = new ObservableCollection<Ellipse>();
+
+    #region LineSeriesCollection
     private ObservableCollection<ChartPoints> _volt = new ObservableCollection<ChartPoints>();
     private ObservableCollection<ChartPoints> _curr = new ObservableCollection<ChartPoints>();
     private ObservableCollection<ChartPoints> _torq = new ObservableCollection<ChartPoints>();
+    private ObservableCollection<ChartPoints> _external = new ObservableCollection<ChartPoints>();
+    private ObservableCollection<ChartPoints> _motor = new ObservableCollection<ChartPoints>();
+    private ObservableCollection<ChartPoints>[] _arrSerires = new ObservableCollection<ChartPoints>[ 5 ];
+    #endregion
+
 
     public ControllerBase() {
 
@@ -113,9 +120,9 @@ namespace MyAppModBus.Controllers {
         //</Сброс регистров>
       }
       _countTimes = 0;
-      _volt.Clear();
-      _curr.Clear();
-      _torq.Clear();
+      foreach( var item in _arrSerires ) {
+        item.Clear();
+      }
 
       _timer.Stop();
       _serial.Close();
@@ -230,14 +237,12 @@ namespace MyAppModBus.Controllers {
 
           SetColorEllipses( result[ 9 ], result[ 10 ] );
 
-          if( true ) {
-
-          }
-
-          if( _countTimes % _readWriteConvert == 0 ) {
+          if( _countTimes % _readWriteConvert * 2 == 0) {
             SetPointsSeries( result[ 0 ], _volt );
             SetPointsSeries( result[ 1 ], _curr );
             SetPointsSeries( result[ 4 ], _torq );
+            SetPointsSeries( result[ 2 ], _external );
+            SetPointsSeries( result[ 3 ], _motor );
           }
         }
         else {
@@ -257,13 +262,17 @@ namespace MyAppModBus.Controllers {
     /// </summary>
     /// <param name="_queryRegisters">Значение кнопки</param>
     /// <returns></returns>
-    internal (ObservableCollection<string>, string, string, ObservableCollection<Ellipse>, (ObservableCollection<ChartPoints>, ObservableCollection<ChartPoints>, ObservableCollection<ChartPoints>)) RegistersRequest() {
+    internal (ObservableCollection<string>, string, string, ObservableCollection<Ellipse>, ObservableCollection<ChartPoints>[]) RegistersRequest() {
       try {
         if( _serial.IsOpen ) {
           #region <Timer>
           _timer.Tick += new EventHandler( GetRegisterToDevice );
           _timer.Interval = new TimeSpan( 0, 0, 0, 0, Convert.ToInt32( _readWriteConvert ) );
-
+          _arrSerires[ 0 ] = _volt;
+          _arrSerires[ 1 ] = _curr;
+          _arrSerires[ 2 ] = _torq;
+          _arrSerires[ 3 ] = _external;
+          _arrSerires[ 4 ] = _motor;
           if( !_timer.IsEnabled ) {
             _timer.Start();
             _queryRegisters = "Stop";
@@ -280,7 +289,7 @@ namespace MyAppModBus.Controllers {
       catch( Exception err ) {
         _errMessage = err.Message.ToString();
       }
-      return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings, (_volt, _curr, _torq));
+      return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings, _arrSerires);
     }
     internal string ConvertToInt( string _readWrite ) {
 
@@ -377,38 +386,11 @@ namespace MyAppModBus.Controllers {
       return _errMessage;
     }
 
-    //private void GetSfCharts() {
-
-    //  Data = new List<DataPoints>() {
-
-    //    new DataPoints {Name = "David", Height = 180},
-    //    new DataPoints {Name = "Max", Height = 150},
-    //    new DataPoints {Name = "Ulya", Height = 178},
-    //    new DataPoints {Name = "Brad", Height = 162},
-
-    //  };
-
-    //  SfChart ch = new SfChart();
-
-    //  CategoryAxis primaryAxis = new CategoryAxis();
-
-    //  primaryAxis.Header = @"/Name/";
-
-    //  ch.PrimaryAxis = primaryAxis;
-
-    //  NumericalAxis seceondoryAxis = new NumericalAxis();
-    //  seceondoryAxis.Header = "Height(in cm)";
-    //  ch.SecondaryAxis = seceondoryAxis;
-
-    //  ColumnSeries sers = new ColumnSeries();
-
-    //  sers.ItemsSource = this.Data;
-    //  sers.XBindingPath = "Name";
-    //  sers.YBindingPath = "Height";
-
-    //  ch.Series.Add( sers );
-    //  }
-
+    /// <summary>
+    /// Добавление точки серии в коллекцию
+    /// </summary>
+    /// <param name="_valRegister">Значение регистра</param>
+    /// <param name="_lineSeries">Имя серии</param>
     private void SetPointsSeries( ushort _valRegister, ObservableCollection<ChartPoints> _lineSeries ) {
       var _time = TimeSpan.FromMilliseconds( _countTimes );
       var _value = Convert.ToDouble( _valRegister );

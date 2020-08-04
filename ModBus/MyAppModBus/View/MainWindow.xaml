@@ -255,7 +255,7 @@
                              LegendPosition="Outside"
                              IconVisibility="Visible" />
         </chart:SfChart.Legend>
-        <chart:FastLineSeries Label="Volt"
+        <chart:FastLineSeries Label="Volltage"
                               EnableAnimation="True"
                               ItemsSource="{Binding PointSeriesVolt}"
                               XBindingPath="XTime"
@@ -264,7 +264,7 @@
                               LegendIcon="SeriesType"
                               StrokeThickness="2"></chart:FastLineSeries>
         <chart:FastLineSeries EnableAnimation="True"
-                              Label="Транс"
+                              Label="Трансформатор"
                               ItemsSource="{Binding PointSeriesCurr}"
                               XBindingPath="XTime"
                               YBindingPath="YValue"
@@ -272,7 +272,7 @@
                               LegendIcon="SeriesType"
                               StrokeThickness="2"></chart:FastLineSeries>
         <chart:FastLineSeries EnableAnimation="True"
-                              Label="Транс"
+                              Label="Охлаждение"
                               ItemsSource="{Binding PointSeriesTorq}"
                               XBindingPath="XTime"
                               YBindingPath="YValue"
@@ -305,9 +305,9 @@
                              LegendPosition="Outside"
                              IconVisibility="Visible" />
         </chart:SfChart.Legend>
-        <chart:FastLineSeries Label="Extern"
+        <chart:FastLineSeries Label="External"
                               EnableAnimation="True"
-                              ItemsSource="{Binding PointSeriesVolt}"
+                              ItemsSource="{Binding PointSeriesExternal}"
                               XBindingPath="XTime"
                               YBindingPath="YValue"
                               Interior="#FFEB3B"
@@ -315,7 +315,7 @@
                               StrokeThickness="2"></chart:FastLineSeries>
         <chart:FastLineSeries EnableAnimation="True"
                               Label="Motor"
-                              ItemsSource="{Binding PointSeriesCurr}"
+                              ItemsSource="{Binding PointSeriesMotor}"
                               XBindingPath="XTime"
                               YBindingPath="YValue"
                               Interior="#FF5252"

@@ -28,6 +28,8 @@ namespace MyAppModBus.ViewModel {
     private ObservableCollection<ChartPoints> _pointsSeriesVolt;
     private ObservableCollection<ChartPoints> _pointsSeriesCurr;
     private ObservableCollection<ChartPoints> _pointsSeriesTorq;
+    private ObservableCollection<ChartPoints> _pointsSeriesExtern;
+    private ObservableCollection<ChartPoints> _pointsSeriesMotor;
 
     /// <summary>
     /// Контроллер
@@ -99,6 +101,12 @@ namespace MyAppModBus.ViewModel {
     public ObservableCollection<ChartPoints> PointSeriesTorq {
       get => _pointsSeriesTorq; set => Set( ref _pointsSeriesTorq, value );
     }
+    public ObservableCollection<ChartPoints> PointSeriesMotor{
+      get => _pointsSeriesMotor; set => Set( ref _pointsSeriesMotor, value );
+    }
+    public ObservableCollection<ChartPoints> PointSeriesExternal {
+      get => _pointsSeriesExtern; set => Set( ref _pointsSeriesExtern, value );
+    }
 
     #endregion
 
@@ -131,14 +139,16 @@ namespace MyAppModBus.ViewModel {
     private bool CanGetRegistersValuesExute( object p ) => true;
     private void OnGetRegistersValuesExecuted( object p ) {
       var regRequests = ctr.RegistersRequest();
-
+      var arrSeries = regRequests.Item5;
       Registers = regRequests.Item1;
       QueryRegistrs = regRequests.Item2;
       ErrMessage = regRequests.Item3;
       ColorEndFittings = regRequests.Item4;
-      PointSeriesVolt = regRequests.Item5.Item1;
-      PointSeriesCurr = regRequests.Item5.Item2;
-      PointSeriesTorq = regRequests.Item5.Item3;
+      PointSeriesVolt = arrSeries[0];
+      PointSeriesCurr = arrSeries[ 1 ];
+      PointSeriesTorq = arrSeries[ 2 ];
+      PointSeriesExternal = arrSeries[ 3 ];
+      PointSeriesMotor = arrSeries[ 4 ];
     }
     #endregion
 
