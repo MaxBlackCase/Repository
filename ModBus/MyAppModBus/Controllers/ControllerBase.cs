@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO.Ports;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
@@ -187,7 +188,7 @@ namespace MyAppModBus.Controllers {
     /// </summary>
     /// <param name="sender">Объект</param>
     /// <param name="e">Событие</param>
-    private void GetRegisterToDevice( object sender, EventArgs e ) {
+    private async void GetRegisterToDevice( object sender, EventArgs e ) {
       _viewRegs.Clear();
       _registers.Clear();
       _clnEllipseFittings.Clear();
@@ -203,7 +204,7 @@ namespace MyAppModBus.Controllers {
             _registers.Add( $"Регистр: {item.ID}\t|  {item.Value}" );
           }
           SetColorEllipses( result[ 9 ], result[ 10 ] );
-          if( _countTimes % _readWriteConvert * 2 == 0) {
+          if( _countTimes % _readWriteConvert == 0 ) {
             SetPointsSeries( result[ 0 ], _volt );
             SetPointsSeries( result[ 1 ], _curr );
             SetPointsSeries( result[ 4 ], _torq );
