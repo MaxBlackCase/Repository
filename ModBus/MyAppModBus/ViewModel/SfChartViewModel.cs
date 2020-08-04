@@ -1,6 +1,8 @@
 ﻿using ControlzEx.Standard;
+using InteractiveDataDisplay.WPF;
 using MyAppModBus.Commands;
 using MyAppModBus.Controllers;
+using MyAppModBus.Models;
 using MyAppModBus.ViewModel.Base;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,7 +26,7 @@ namespace MyAppModBus.ViewModel {
     private string _queryRegisters = "Start";
     private string _stateSerialPort = "Подключить";
     private ObservableCollection<Ellipse> _colorEndFittings;
-
+    private List<ChartPoints> _pointsSeries;
     private ControllerBase ctr = null;
 
     #region Свойства
@@ -80,6 +82,10 @@ namespace MyAppModBus.ViewModel {
       get => _queryRegisters; set => Set( ref _queryRegisters, value );
       }
 
+    public List<ChartPoints> PointsSeries {
+      get => _pointsSeries; set => Set(ref _pointsSeries, value);
+    }
+
     #endregion
 
     #region Команды
@@ -114,6 +120,7 @@ namespace MyAppModBus.ViewModel {
       QueryRegistrs = regRequests.Item2;
       ErrMessage = regRequests.Item3;
       ColorEndFittings = regRequests.Item4;
+      PointsSeries = regRequests.Item5;
 
       }
     #endregion

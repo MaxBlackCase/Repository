@@ -26,6 +26,7 @@ namespace MyAppModBus.Controllers {
     private ObservableCollection<string> _registers = new ObservableCollection<string>();
     private Ellipse _ellipseFittings;
     private ObservableCollection<Ellipse> _clnEllipseFittings = new ObservableCollection<Ellipse>();
+    private List<ChartPoints> _volt = new List<ChartPoints>();
 
     public ControllerBase() {
 
@@ -164,6 +165,7 @@ namespace MyAppModBus.Controllers {
     //  }
     #endregion
 
+    private int _countTimes = 0;
     /// <summary>
     /// Получение данных из регистров
     /// </summary>
@@ -173,6 +175,7 @@ namespace MyAppModBus.Controllers {
       _viewRegs.Clear();
       _registers.Clear();
       _clnEllipseFittings.Clear();
+      _countTimes += _readWriteConvert;
       ///Вывод всех регистров на экран
       try {
         if( _serial.IsOpen ) {
@@ -217,6 +220,7 @@ namespace MyAppModBus.Controllers {
           #endregion
 
           SetColorEllipses( result[ 9 ], result[ 10 ] );
+          _volt = SetPointsSeries( result[ 1 ], _volt );
         }
         else {
           _timer.Stop();
@@ -233,7 +237,7 @@ namespace MyAppModBus.Controllers {
     /// </summary>
     /// <param name="_queryRegisters">Значение кнопки</param>
     /// <returns></returns>
-    internal (ObservableCollection<string>, string, string, ObservableCollection<Ellipse>) RegistersRequest() {
+    internal (ObservableCollection<string>, string, string, ObservableCollection<Ellipse>, List<ChartPoints>) RegistersRequest() {
       try {
         if( _serial.IsOpen ) {
           #region <Timer>
@@ -256,7 +260,7 @@ namespace MyAppModBus.Controllers {
       catch( Exception err ) {
         _errMessage = err.Message.ToString();
       }
-      return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings);
+      return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings, _volt);
     }
     internal string ConvertToInt( string _readWrite ) {
 
@@ -347,10 +351,10 @@ namespace MyAppModBus.Controllers {
           _errMessage = "Запись в регистры не возможна, отсутствует подключение";
         }
       }
-      catch( Exception err) {
+      catch( Exception err ) {
         _errMessage = err.Message.ToString();
       }
-      
+
       return _errMessage;
     }
 
@@ -385,6 +389,14 @@ namespace MyAppModBus.Controllers {
 
     //  ch.Series.Add( sers );
     //  }
+
+    private List<ChartPoints> SetPointsSeries( ushort _valRegister, List<ChartPoints> _chartSer ) {
+      var _time = TimeSpan.FromMilliseconds( _countTimes );
+      var _value = Convert.ToDouble( _valRegister );
+      _chartSer.Add( new ChartPoints { XTime = _time, YValue = _value } );
+
+      return _chartSer;
+    }
 
   }
 }
