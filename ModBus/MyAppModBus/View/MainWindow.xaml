@@ -30,6 +30,20 @@
       <RowDefinition Height="auto" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
+    <Menu VerticalAlignment="Top"  Grid.Row="0">
+      <MenuItem Header="File">
+        <MenuItem Header="Copy" />
+        <MenuItem Header="Paste"/>
+        <MenuItem Header="exit"/>
+      </MenuItem>
+      <MenuItem Header="Edit"></MenuItem>
+      <MenuItem Header="View"></MenuItem>
+    </Menu>
+  <Grid Grid.Row="1">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="0.5*" />
       <ColumnDefinition Width="*" />
@@ -247,7 +261,7 @@
                               />
         </chart:SfChart.PrimaryAxis>
         <chart:SfChart.SecondaryAxis>
-          <chart:NumericalAxis Header="Value" FontSize="12" EnableScrollBar="True" LabelsPosition="Inside" />
+            <chart:NumericalAxis Header="Value" FontSize="12" EnableScrollBar="True" LabelsPosition="Outside" />
         </chart:SfChart.SecondaryAxis>
         <chart:SfChart.Legend>
           <chart:ChartLegend DockPosition="Bottom"
@@ -261,7 +275,7 @@
                                       EnableSelectionZooming="True">
           </chart:ChartZoomPanBehavior>
         </chart:SfChart.Behaviors>
-        <chart:FastLineSeries Label="Volltage"
+        <chart:FastLineSeries Label="RPM [об/мин]"
                               EnableAnimation="True"
                               ItemsSource="{Binding PointSeriesVolt}"
                               XBindingPath="XTime"
@@ -270,7 +284,7 @@
                               LegendIcon="SeriesType"
                               StrokeThickness="2"></chart:FastLineSeries>
         <chart:FastLineSeries EnableAnimation="True"
-                              Label="Трансформатор"
+                              Label="Ток [A]"
                               ItemsSource="{Binding PointSeriesCurr}"
                               XBindingPath="XTime"
                               YBindingPath="YValue"
@@ -278,7 +292,7 @@
                               LegendIcon="SeriesType"
                               StrokeThickness="2"></chart:FastLineSeries>
         <chart:FastLineSeries EnableAnimation="True"
-                              Label="Охлаждение"
+                              Label="Момент [N/m]"
                               ItemsSource="{Binding PointSeriesTorq}"
                               XBindingPath="XTime"
                               YBindingPath="YValue"
@@ -334,5 +348,6 @@
                               StrokeThickness="2"></chart:FastLineSeries>
       </chart:SfChart>
     </Grid>
+  </Grid>
   </Grid>
 </Controls:MetroWindow>

@@ -122,7 +122,9 @@ namespace MyAppModBus.Controllers {
       }
       _countTimes = 0;
       foreach( var item in _arrSerires ) {
-        item.Clear();
+        if( item != null ) {
+          item.Clear();
+        }
       }
 
       _timer.Stop();
@@ -188,7 +190,7 @@ namespace MyAppModBus.Controllers {
     /// </summary>
     /// <param name="sender">Объект</param>
     /// <param name="e">Событие</param>
-    private async void GetRegisterToDevice( object sender, EventArgs e ) {
+    private void GetRegisterToDevice( object sender, EventArgs e ) {
       _viewRegs.Clear();
       _registers.Clear();
       _clnEllipseFittings.Clear();
@@ -205,11 +207,11 @@ namespace MyAppModBus.Controllers {
           }
           SetColorEllipses( result[ 9 ], result[ 10 ] );
           if( _countTimes % _readWriteConvert == 0 ) {
-            SetPointsSeries( result[ 0 ], _volt );
-            SetPointsSeries( result[ 1 ], _curr );
-            SetPointsSeries( result[ 4 ], _torq );
-            SetPointsSeries( result[ 2 ], _external );
-            SetPointsSeries( result[ 3 ], _motor );
+            SetPointsSeries( result[ 0 ], 0, _volt );
+            SetPointsSeries( result[ 1 ], 1, _curr );
+            SetPointsSeries( result[ 4 ], 4, _torq );
+            SetPointsSeries( result[ 2 ], 2, _external );
+            SetPointsSeries( result[ 3 ], 3, _motor );
           }
         }
         else {
@@ -353,15 +355,40 @@ namespace MyAppModBus.Controllers {
       return _errMessage;
     }
 
+
     /// <summary>
     /// Добавление точки серии в коллекцию
     /// </summary>
     /// <param name="_valRegister">Значение регистра</param>
     /// <param name="_lineSeries">Имя серии</param>
-    private void SetPointsSeries( ushort _valRegister, ObservableCollection<ChartPoints> _lineSeries ) {
+    private void SetPointsSeries( ushort _valRegister,int indexRegistrs, ObservableCollection<ChartPoints> _lineSeries ) {
       var _time = TimeSpan.FromMilliseconds( _countTimes );
-      var _value = Convert.ToDouble( _valRegister );
+     double _value = 0;
+      switch( indexRegistrs ) {
+        case 0:
+        _value = ConverValuesFfromRegisters( _valRegister, 17, 1300, 0.0, 80.0 );
+        break;
+        case 1:
+        _value = ConverValuesFfromRegisters( _valRegister, 5, 46, 0.0, 52.0 );
+        break;
+        case 4:
+        _value = ConverValuesFfromRegisters( _valRegister, 45, 4046, -1000.0, 1000.0 );
+        break;
+        case 2:
+        _value = Convert.ToDouble(_valRegister);
+        break;
+        case 3:
+        _value = Convert.ToDouble( _valRegister );
+        break;
+      }
       _lineSeries.Add( new ChartPoints { XTime = _time, YValue = _value } );
+    }
+
+    private double ConverValuesFfromRegisters( ushort inVal, double inMin, double inMax, double outMin, double outMax ) {
+
+      var x = Convert.ToDouble(inVal) ;
+      var result = (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+      return  result;
     }
 
   }
