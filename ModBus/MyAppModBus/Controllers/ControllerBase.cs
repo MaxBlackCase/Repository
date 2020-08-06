@@ -4,8 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO.Ports;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
@@ -26,6 +30,16 @@ namespace MyAppModBus.Controllers {
     private ObservableCollection<string> _registers = new ObservableCollection<string>();
     private Ellipse _ellipseFittings;
     private ObservableCollection<Ellipse> _clnEllipseFittings = new ObservableCollection<Ellipse>();
+
+    #region LineSeriesCollection
+    private ObservableCollection<ChartPoints> _volt = new ObservableCollection<ChartPoints>();
+    private ObservableCollection<ChartPoints> _curr = new ObservableCollection<ChartPoints>();
+    private ObservableCollection<ChartPoints> _torq = new ObservableCollection<ChartPoints>();
+    private ObservableCollection<ChartPoints> _external = new ObservableCollection<ChartPoints>();
+    private ObservableCollection<ChartPoints> _motor = new ObservableCollection<ChartPoints>();
+    private ObservableCollection<ChartPoints>[] _arrSerires = new ObservableCollection<ChartPoints>[ 5 ];
+    #endregion
+
 
     public ControllerBase() {
 
@@ -107,6 +121,13 @@ namespace MyAppModBus.Controllers {
         }
         //</Сброс регистров>
       }
+      _countTimes = 0;
+      foreach( var item in _arrSerires ) {
+        if( item != null ) {
+          item.Clear();
+        }
+      }
+
       _timer.Stop();
       _serial.Close();
       _serial.Dispose();
@@ -164,6 +185,7 @@ namespace MyAppModBus.Controllers {
     //  }
     #endregion
 
+    private int _countTimes = 0;
     /// <summary>
     /// Получение данных из регистров
     /// </summary>
@@ -173,6 +195,7 @@ namespace MyAppModBus.Controllers {
       _viewRegs.Clear();
       _registers.Clear();
       _clnEllipseFittings.Clear();
+      _countTimes += _readWriteConvert;
       ///Вывод всех регистров на экран
       try {
         if( _serial.IsOpen ) {
@@ -183,40 +206,16 @@ namespace MyAppModBus.Controllers {
           foreach( var item in _viewRegs ) {
             _registers.Add( $"Регистр: {item.ID}\t|  {item.Value}" );
           }
-          #region Code <->
-          //Запуск функции отображения концевиков
-          //SetValSingleRegister(result[9], result[10]);
-
-          ///Занесение значений на график
-          //if (countTime % _readWrite == 0)
-          //{
-          //   #region OldGraphs
-          //   //for ( int valueFirstChart = 0; valueFirstChart < _arrDict[ 0 ].Count(); valueFirstChart++ ) {
-          //   //  _arrDict[ 0 ][ valueFirstChart ].Add( countTime / 1000, Convert.ToDouble( result[ _numberRegisters[ 0 ][ valueFirstChart ] ] ) );
-          //   //  //Очищение коллекции точек График 1
-          //   //  if (_arrDict[0][valueFirstChart].Count > 1000) { _arrDict[0][valueFirstChart].Clear(); }
-          //   //}
-          //   //for ( int valueSecondChart = 0; valueSecondChart < _arrDict[ 1 ].Count(); valueSecondChart++ ) {
-          //   //  _arrDict[ 1 ][ valueSecondChart ].Add(countTime / 1000, Convert.ToDouble( result[ _numberRegisters[ 1 ][ valueSecondChart ] ] ) );
-          //   //  //Очищение коллекции точек График 2
-          //   //  if (_arrDict[1][valueSecondChart].Count > 1000){_arrDict[1][valueSecondChart].Clear(); }
-          //   //}
-
-          //   //for ( int valueFirstChart = 0; valueFirstChart < _linesArr[ 0 ].Length; valueFirstChart++ ) {
-          //   //  _linesArr[ 0 ][ valueFirstChart ].Plot( _arrDict[ 0 ][ valueFirstChart ].Keys, _arrDict[ 0 ][ valueFirstChart ].Values );
-          //   //}
-          //   //for ( int valueSecondChart = 0; valueSecondChart < _linesArr[ 1 ].Length; valueSecondChart++ ) {
-          //   //  _linesArr[ 1 ][ valueSecondChart ].Plot( _arrDict[ 1 ][ valueSecondChart ].Keys, _arrDict[ 1 ][ valueSecondChart ].Values );
-          //   //}
-          //   #endregion
-
-          //   #region NewGraphs
-          //   #endregion
-
-          //}
-          #endregion
-
           SetColorEllipses( result[ 9 ], result[ 10 ] );
+          if( _countTimes % _readWriteConvert == 0 ) {
+
+            SetPointsSeries( result[ 0 ], 0, _volt );
+            SetPointsSeries( result[ 1 ], 1, _curr );
+            SetPointsSeries( result[ 4 ], 4, _torq );
+            SetPointsSeries( result[ 2 ], 2, _external );
+            SetPointsSeries( result[ 3 ], 3, _motor );
+
+          }
         }
         else {
           _timer.Stop();
@@ -228,18 +227,24 @@ namespace MyAppModBus.Controllers {
       }
 
     }
+
+    //private List<ObservableCollection> lstChartSeries
     /// <summary>
     /// 
     /// </summary>
     /// <param name="_queryRegisters">Значение кнопки</param>
     /// <returns></returns>
-    internal (ObservableCollection<string>, string, string, ObservableCollection<Ellipse>) RegistersRequest() {
+    internal (ObservableCollection<string>, string, string, ObservableCollection<Ellipse>, ObservableCollection<ChartPoints>[]) RegistersRequest() {
       try {
         if( _serial.IsOpen ) {
           #region <Timer>
           _timer.Tick += new EventHandler( GetRegisterToDevice );
           _timer.Interval = new TimeSpan( 0, 0, 0, 0, Convert.ToInt32( _readWriteConvert ) );
-
+          _arrSerires[ 0 ] = _volt;
+          _arrSerires[ 1 ] = _curr;
+          _arrSerires[ 2 ] = _torq;
+          _arrSerires[ 3 ] = _external;
+          _arrSerires[ 4 ] = _motor;
           if( !_timer.IsEnabled ) {
             _timer.Start();
             _queryRegisters = "Stop";
@@ -256,7 +261,7 @@ namespace MyAppModBus.Controllers {
       catch( Exception err ) {
         _errMessage = err.Message.ToString();
       }
-      return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings);
+      return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings, _arrSerires);
     }
     internal string ConvertToInt( string _readWrite ) {
 
@@ -303,7 +308,6 @@ namespace MyAppModBus.Controllers {
       }
     }
 
-
     private bool[] elemBool = new bool[ 3 ] { false, false, false };
     internal string WriteValuesToRegisters( object _indTogElem ) {
 
@@ -347,44 +351,49 @@ namespace MyAppModBus.Controllers {
           _errMessage = "Запись в регистры не возможна, отсутствует подключение";
         }
       }
-      catch( Exception err) {
+      catch( Exception err ) {
         _errMessage = err.Message.ToString();
       }
-      
+
       return _errMessage;
     }
 
-    //private void GetSfCharts() {
+    /// <summary>
+    /// Добавление точки серии в коллекцию
+    /// </summary>
+    /// <param name="_valRegister">Значение регистра</param>
+    /// <param name="_lineSeries">Имя серии</param>
+    private void SetPointsSeries( ushort _valRegister, int indexRegistrs, ObservableCollection<ChartPoints> _lineSeries ) {
+      var _time = TimeSpan.FromMilliseconds( _countTimes );
+      double _valReg = 0;
+      switch( indexRegistrs ) {
+        case 0:
+        _valReg = ConverValuesFfromRegisters( _valRegister, 17, 1300, 0.0, 80.0 );
+        break;
+        case 1:
+        _valReg = ConverValuesFfromRegisters( _valRegister, 5, 46, 0.0, 52.0 );
+        break;
+        case 4:
+        _valReg = ConverValuesFfromRegisters( _valRegister, 45, 4046, -1000.0, 1000.0 );
+        break;
+        case 2:
+        _valReg = Convert.ToDouble( _valRegister );
+        break;
+        case 3:
+        _valReg = Convert.ToDouble( _valRegister );
+        break;
+      }
 
-    //  Data = new List<DataPoints>() {
+      _lineSeries.Add( new ChartPoints { XTime = _time, YValue = _valReg } );
 
-    //    new DataPoints {Name = "David", Height = 180},
-    //    new DataPoints {Name = "Max", Height = 150},
-    //    new DataPoints {Name = "Ulya", Height = 178},
-    //    new DataPoints {Name = "Brad", Height = 162},
+    }
 
-    //  };
+    private double ConverValuesFfromRegisters( ushort inVal, double inMin, double inMax, double outMin, double outMax ) {
 
-    //  SfChart ch = new SfChart();
-
-    //  CategoryAxis primaryAxis = new CategoryAxis();
-
-    //  primaryAxis.Header = @"/Name/";
-
-    //  ch.PrimaryAxis = primaryAxis;
-
-    //  NumericalAxis seceondoryAxis = new NumericalAxis();
-    //  seceondoryAxis.Header = "Height(in cm)";
-    //  ch.SecondaryAxis = seceondoryAxis;
-
-    //  ColumnSeries sers = new ColumnSeries();
-
-    //  sers.ItemsSource = this.Data;
-    //  sers.XBindingPath = "Name";
-    //  sers.YBindingPath = "Height";
-
-    //  ch.Series.Add( sers );
-    //  }
+      var x = Convert.ToDouble( inVal );
+      var result = (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+      return result;
+    }
 
   }
 }

@@ -10,7 +10,7 @@ namespace MyAppModBus
 
     public App()
     {
-      Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mjk0NzE0QDMxMzgyZTMyMmUzMFJYaUdGYis5Zk5oSU5PRWd6S3lDSTcrYmxmN1VQb0ppMmlCYWhNMG1JWXM9");
+      Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense( "Mjk0NzE0QDMxMzgyZTMyMmUzMFJYaUdGYis5Zk5oSU5PRWd6S3lDSTcrYmxmN1VQb0ppMmlCYWhNMG1JWXM9" );
     }
 
   }

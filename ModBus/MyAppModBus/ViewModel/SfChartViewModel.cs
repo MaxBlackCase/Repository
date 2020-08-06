@@ -1,12 +1,12 @@
-﻿using ControlzEx.Standard;
-using MyAppModBus.Commands;
+﻿using MyAppModBus.Commands;
 using MyAppModBus.Controllers;
+using MyAppModBus.Models;
 using MyAppModBus.ViewModel.Base;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
+using System.Reflection.Emit;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace MyAppModBus.ViewModel {
@@ -25,13 +25,18 @@ namespace MyAppModBus.ViewModel {
     private string _stateSerialPort = "Подключить";
     private ObservableCollection<Ellipse> _colorEndFittings;
 
+    private ObservableCollection<ChartPoints> _pointsSeriesVolt;
+    private ObservableCollection<ChartPoints> _pointsSeriesCurr;
+    private ObservableCollection<ChartPoints> _pointsSeriesTorq;
+    private ObservableCollection<ChartPoints> _pointsSeriesExtern;
+    private ObservableCollection<ChartPoints> _pointsSeriesMotor;
+
+    /// <summary>
+    /// Контроллер
+    /// </summary>
     private ControllerBase ctr = null;
 
     #region Свойства
-
-    /// <summary>
-    /// Список портов
-    /// </summary>
     public List<string> PortList {
       get => _portList;
       set => Set( ref _portList, value );
@@ -53,32 +58,57 @@ namespace MyAppModBus.ViewModel {
       get => _errMessage;
       set => Set( ref _errMessage, value );
       }
+    public string StateSerialPort {
+      get => _stateSerialPort; set => Set( ref _stateSerialPort, value );
+    }
+
+    #region Свойства видимости и активности элементов
     public bool ElemEnable {
       get => _elemEnable;
       set => Set( ref _elemEnable, value );
-      }
+    }
     public bool ElemDisable {
       get => _elemDisable;
       set => Set( ref _elemDisable, value );
-      }
+    }
     public string ElemVisible {
       get => _elemVisible; set => Set( ref _elemVisible, value );
-      }
+    }
     public string ElemHidden {
       get => _elemHidden; set => Set( ref _elemHidden, value );
-      }
-    public string StateSerialPort {
-      get => _stateSerialPort; set => Set( ref _stateSerialPort, value );
-      }
+    }
+    #endregion
+
+    #region Свойства отрисовки концевиков
     public ObservableCollection<Ellipse> ColorEndFittings {
       get => _colorEndFittings; set => Set( ref _colorEndFittings, value );
-      }
+    }
     public ObservableCollection<string> Registers {
       get => _registers; set => Set( ref _registers, value );
-      }
+    }
     public string QueryRegistrs {
       get => _queryRegisters; set => Set( ref _queryRegisters, value );
-      }
+    }
+    #endregion
+
+    #region Серии линий графика
+    public ObservableCollection<ChartPoints> PointSeriesVolt {
+      get => _pointsSeriesVolt; set => Set(ref _pointsSeriesVolt, value);
+    }
+    public ObservableCollection<ChartPoints> PointSeriesCurr {
+      get => _pointsSeriesCurr; set => Set( ref _pointsSeriesCurr, value );
+    }
+    public ObservableCollection<ChartPoints> PointSeriesTorq {
+      get => _pointsSeriesTorq; set => Set( ref _pointsSeriesTorq, value );
+    }
+    public ObservableCollection<ChartPoints> PointSeriesMotor{
+      get => _pointsSeriesMotor; set => Set( ref _pointsSeriesMotor, value );
+    }
+    public ObservableCollection<ChartPoints> PointSeriesExternal {
+      get => _pointsSeriesExtern; set => Set( ref _pointsSeriesExtern, value );
+    }
+
+    #endregion
 
     #endregion
 
@@ -109,13 +139,17 @@ namespace MyAppModBus.ViewModel {
     private bool CanGetRegistersValuesExute( object p ) => true;
     private void OnGetRegistersValuesExecuted( object p ) {
       var regRequests = ctr.RegistersRequest();
-
+      var arrSeries = regRequests.Item5;
       Registers = regRequests.Item1;
       QueryRegistrs = regRequests.Item2;
       ErrMessage = regRequests.Item3;
       ColorEndFittings = regRequests.Item4;
-
-      }
+      PointSeriesVolt = arrSeries[0];
+      PointSeriesCurr = arrSeries[ 1 ];
+      PointSeriesTorq = arrSeries[ 2 ];
+      PointSeriesExternal = arrSeries[ 3 ];
+      PointSeriesMotor = arrSeries[ 4 ];
+    }
     #endregion
 
     #region Конвертировать в Целое число
@@ -146,7 +180,6 @@ namespace MyAppModBus.ViewModel {
     #endregion
 
     #endregion
-
     public SfChartViewModel() {
       #region Команды
       ConnectToDevice = new LambdaCommand( OnSelectItemCommandExecuted, CanSelectItemCommandExecute );

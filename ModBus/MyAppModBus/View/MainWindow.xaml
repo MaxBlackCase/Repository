@@ -3,9 +3,9 @@
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                      xmlns:d3="clr-namespace:InteractiveDataDisplay.WPF;assembly=InteractiveDataDisplay.WPF"
                       xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
                       xmlns:vm="clr-namespace:MyAppModBus.ViewModel"
+                      xmlns:chart="http://schemas.syncfusion.com/wpf"
                       mc:Ignorable="d"
                       Title="ModBus(RTU)"
                       MinHeight="720"
@@ -21,9 +21,6 @@
                       SaveWindowPosition="True"
                       FontFamily="SegoeUI"
                       Foreground="#fff">
-  <!--<Window.Resources>
-    <lc:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter" />
-  </Window.Resources>-->
   <Window.DataContext>
     <vm:SfChartViewModel />
   </Window.DataContext>
@@ -32,284 +29,327 @@
       <RowDefinition Height="auto" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="0.5*" />
-      <ColumnDefinition Width="*" />
-    </Grid.ColumnDefinitions>
-    <Grid Grid.Row="0">
-    </Grid>
-    <Grid Grid.Row="1"
-          Grid.Column="0"
-          Margin="10">
+    <Menu VerticalAlignment="Top"
+          Grid.Row="0">
+      <MenuItem Header="File">
+        <MenuItem Header="Copy" />
+        <MenuItem Header="Paste" />
+        <MenuItem Header="exit" />
+      </MenuItem>
+      <MenuItem Header="Edit"></MenuItem>
+      <MenuItem Header="View"></MenuItem>
+    </Menu>
+    <Grid Grid.Row="1">
       <Grid.RowDefinitions>
         <RowDefinition Height="auto" />
         <RowDefinition Height="*" />
-        <RowDefinition Height="auto" />
-        <RowDefinition Height="auto" />
-        <RowDefinition Height="auto" />
       </Grid.RowDefinitions>
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="170*" />
-        <ColumnDefinition Width="27*" />
-        <ColumnDefinition Width="58*" />
+        <ColumnDefinition Width="0.5*" />
+        <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
-      <ComboBox Grid.Row="0"
-                Padding="10 0"
-                Height="30"
-                VerticalContentAlignment="Center"
-                Grid.Column="0"
-                IsEnabled="{Binding ElemEnable}"
-                ItemsSource="{Binding PortList}"
-                SelectedItem="{Binding SelectedItem}"
-                x:Name="comboBoxMainPorts"
-                Background="White"
-                Foreground="#FF212121" />
-      <Button Grid.Row="0"
-              Grid.Column="1"
-              Margin="5 0 0 0"
-              Name="connectComPort"
-              Content="{Binding StateSerialPort}"
-              VerticalContentAlignment="Center"
-              Command="{Binding ConnectToDevice}"
-              Background="#FF3F3F46"
-              Foreground="White"
-              BorderBrush="{x:Null}"
-              FontFamily="Arial Rounded MT Bold"
-              FontWeight="Bold"
-              Grid.ColumnSpan="2" />
-
-      <Grid Grid.Row="4"
-            Grid.Column="0"
-            Grid.ColumnSpan="3">
-        <Grid.RowDefinitions>
-          <RowDefinition />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="1*" />
-          <ColumnDefinition Width="1*" />
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Row="0"
-              Grid.Column="0">
-          <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-          </Grid.RowDefinitions>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto" />
-          </Grid.ColumnDefinitions>
-          <StackPanel Orientation="Horizontal"
-                      VerticalAlignment="Top"
-                      Grid.Row="0"
-                      Grid.Column="0">
-            <ItemsControl ItemsSource="{Binding ColorEndFittings}">
-              <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                  <StackPanel Orientation="Horizontal" />
-                </ItemsPanelTemplate>
-              </ItemsControl.ItemsPanel>
-            </ItemsControl>
-          </StackPanel>
-          <StackPanel VerticalAlignment="Bottom"
-                      Grid.Row="1"
-                      Grid.Column="0">
-            
-            <Button Name="StartRegsRequest"
-                    Content="{Binding QueryRegistrs}"
-                    MinWidth="100"
-                    IsEnabled="{Binding ElemDisable}"
-                    Command="{Binding GetRegistersValues}"
-                    MinHeight="60"
-                    Margin="0 5"
-                    HorizontalAlignment="Left" />
-          </StackPanel>
-
-          <StackPanel Grid.Row="0"
-                      Grid.Column="0"
-                      Orientation="Horizontal"
-                      VerticalAlignment="Bottom"
-                      HorizontalAlignment="Left"
-                      x:Name="LimSwPanel" />
-        </Grid>
-        <StackPanel Grid.Row="0"
-                    Grid.Column="1"
-                    Width="auto"
-                    Margin="0 10"
-                    Orientation="Vertical"
-                    VerticalAlignment="Top"
-                    x:Name="CheckBoxWriteRegisters"
-                    HorizontalAlignment="Right">
-          <Controls:ToggleSwitch Name="checkBoxWrite_1"
-                                 Header="Volltage"
-                                 OffContent="Выкл"
-                                 OnContent="Вкл"
-                                 IsEnabled="{Binding ElemDisable}"
-                                 Command="{Binding WriteToRegisters}"
-                                 CommandParameter="1" />
-
-          <Controls:ToggleSwitch Name="checkBoxWrite_2"
-                                 Header="Трансформатор"
-                                 OffContent="Выкл"
-                                 OnContent="Вкл"
-                                 IsEnabled="{Binding ElemDisable}"
-                                 Command="{Binding WriteToRegisters}"
-                                 CommandParameter="2" />
-          <Controls:ToggleSwitch Name="checkBoxWrite_3"
-                                 Header="Охлаждение"
-                                 OffContent="Выкл"
-                                 OnContent="Вкл"
-                                 IsEnabled="{Binding ElemDisable}"
-                                 Command="{Binding WriteToRegisters}"
-                                 CommandParameter="3" />
-        </StackPanel>
+      <Grid Grid.Row="0">
       </Grid>
-
-      <StackPanel Grid.Row="3"
-                  Grid.Column="0"
-                  Grid.ColumnSpan="3">
-        <Grid Margin="0 10">
-          <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-          </Grid.RowDefinitions>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*" />
-            <ColumnDefinition />
-          </Grid.ColumnDefinitions>
-          <Border BorderBrush="Black"
-                  CornerRadius="15">
-            <TextBox Name="decTextBox"
-                     IsEnabled="{Binding ElemEnable}"
-                     MaxLength="3"
-                     Grid.Row="0"
-                     Grid.Column="0"
-                     Grid.ColumnSpan="1"
-                     HorizontalContentAlignment="Right"
-                     Text="{Binding ReadWrite}"
-                     PreviewTextInput="CheckReadWriteOnRegular"
-                     Controls:TextBoxHelper.ClearTextButton="True"
-                     Controls:TextBoxHelper.Watermark="введите значение в ms" />
-          </Border>
-
-          <Button Grid.Row="0"
-                  Grid.Column="3"
-                  Content="Задать"
-                  Name="decButtonTimeout"
-                  Grid.ColumnSpan="2"
-                  Margin="10 0 0 0"
-                  Foreground="White"
-                  Background="#FF3F3F46"
-                  IsEnabled="{Binding ElemEnable}"
-                  Command="{Binding ConverToInt}"
-                  BorderBrush="{x:Null}" />
-        </Grid>
-      </StackPanel>
       <Grid Grid.Row="1"
             Grid.Column="0"
-            Grid.ColumnSpan="3">
+            Margin="10">
         <Grid.RowDefinitions>
           <RowDefinition Height="auto" />
           <RowDefinition Height="*" />
+          <RowDefinition Height="auto" />
+          <RowDefinition Height="auto" />
+          <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0"
-                   Margin="0 5"
-                   Padding="5"
-                   Background="#212121"
-                   Foreground="#fff"
-                   Name="textViewer"
-                   Height="auto"
-                   Text="{Binding ErrMessage}"
-                   TextWrapping="Wrap" />
-        <ScrollViewer Grid.Row="1"
-                      CanContentScroll="True">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="170*" />
+          <ColumnDefinition Width="27*" />
+          <ColumnDefinition Width="58*" />
+        </Grid.ColumnDefinitions>
+        <ComboBox Grid.Row="0"
+                  Padding="10 0"
+                  Height="30"
+                  VerticalContentAlignment="Center"
+                  Grid.Column="0"
+                  IsEnabled="{Binding ElemEnable}"
+                  ItemsSource="{Binding PortList}"
+                  SelectedItem="{Binding SelectedItem}"
+                  x:Name="comboBoxMainPorts"
+                  Background="White"
+                  Foreground="#FF212121" />
+        <Button Grid.Row="0"
+                Grid.Column="1"
+                Margin="5 0 0 0"
+                Name="connectComPort"
+                Content="{Binding StateSerialPort}"
+                VerticalContentAlignment="Center"
+                Command="{Binding ConnectToDevice}"
+                Background="#FF3F3F46"
+                Foreground="White"
+                BorderBrush="{x:Null}"
+                FontFamily="Arial Rounded MT Bold"
+                FontWeight="Bold"
+                Grid.ColumnSpan="2" />
 
-          <ListBox Width="auto"
-                   Height="auto"
-                   ItemsSource="{Binding Registers}" />
-        </ScrollViewer>
+        <Grid Grid.Row="4"
+              Grid.Column="0"
+              Grid.ColumnSpan="3">
+          <Grid.RowDefinitions>
+            <RowDefinition />
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
+          </Grid.ColumnDefinitions>
+          <Grid Grid.Row="0"
+                Grid.Column="0">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="*" />
+              <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal"
+                        VerticalAlignment="Top"
+                        Grid.Row="0"
+                        Grid.Column="0">
+              <ItemsControl ItemsSource="{Binding ColorEndFittings}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+            </StackPanel>
+            <StackPanel VerticalAlignment="Bottom"
+                        Grid.Row="1"
+                        Grid.Column="0">
+
+              <Button Name="StartRegsRequest"
+                      Content="{Binding QueryRegistrs}"
+                      MinWidth="100"
+                      IsEnabled="{Binding ElemDisable}"
+                      Command="{Binding GetRegistersValues}"
+                      MinHeight="60"
+                      Margin="0 5"
+                      HorizontalAlignment="Left" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="0"
+                        Grid.Column="0"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Left"
+                        x:Name="LimSwPanel" />
+          </Grid>
+          <StackPanel Grid.Row="0"
+                      Grid.Column="1"
+                      Width="auto"
+                      Margin="0 10"
+                      Orientation="Vertical"
+                      VerticalAlignment="Top"
+                      x:Name="CheckBoxWriteRegisters"
+                      HorizontalAlignment="Right">
+            <Controls:ToggleSwitch Name="checkBoxWrite_1"
+                                   Header="Volltage"
+                                   OffContent="Выкл"
+                                   OnContent="Вкл"
+                                   IsEnabled="{Binding ElemDisable}"
+                                   Command="{Binding WriteToRegisters}"
+                                   CommandParameter="1" />
+
+            <Controls:ToggleSwitch Name="checkBoxWrite_2"
+                                   Header="Трансформатор"
+                                   OffContent="Выкл"
+                                   OnContent="Вкл"
+                                   IsEnabled="{Binding ElemDisable}"
+                                   Command="{Binding WriteToRegisters}"
+                                   CommandParameter="2" />
+            <Controls:ToggleSwitch Name="checkBoxWrite_3"
+                                   Header="Охлаждение"
+                                   OffContent="Выкл"
+                                   OnContent="Вкл"
+                                   IsEnabled="{Binding ElemDisable}"
+                                   Command="{Binding WriteToRegisters}"
+                                   CommandParameter="3" />
+          </StackPanel>
+        </Grid>
+
+        <StackPanel Grid.Row="3"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3">
+          <Grid Margin="0 10">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="2*" />
+              <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Border BorderBrush="Black"
+                    CornerRadius="15">
+              <TextBox Name="decTextBox"
+                       IsEnabled="{Binding ElemEnable}"
+                       MaxLength="3"
+                       Grid.Row="0"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="1"
+                       HorizontalContentAlignment="Right"
+                       Text="{Binding ReadWrite}"
+                       PreviewTextInput="CheckReadWriteOnRegular"
+                       Controls:TextBoxHelper.ClearTextButton="True"
+                       Controls:TextBoxHelper.Watermark="введите значение в ms" />
+            </Border>
+
+            <Button Grid.Row="0"
+                    Grid.Column="3"
+                    Content="Задать"
+                    Name="decButtonTimeout"
+                    Grid.ColumnSpan="2"
+                    Margin="10 0 0 0"
+                    Foreground="White"
+                    Background="#FF3F3F46"
+                    IsEnabled="{Binding ElemEnable}"
+                    Command="{Binding ConverToInt}"
+                    BorderBrush="{x:Null}" />
+          </Grid>
+        </StackPanel>
+        <Grid Grid.Row="1"
+              Grid.Column="0"
+              Grid.ColumnSpan="3">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+          <TextBlock Grid.Row="0"
+                     Margin="0 5"
+                     Padding="5"
+                     Background="#212121"
+                     Foreground="#fff"
+                     Name="textViewer"
+                     Height="auto"
+                     Text="{Binding ErrMessage}"
+                     TextWrapping="Wrap" />
+          <ScrollViewer Grid.Row="1"
+                        CanContentScroll="True">
+
+            <ListBox Width="auto"
+                     Height="auto"
+                     ItemsSource="{Binding Registers}" />
+          </ScrollViewer>
+        </Grid>
       </Grid>
-    </Grid>
-    <Grid Grid.Row="1"
-          Grid.Column="1"
-          Margin="10">
-      <Grid.RowDefinitions>
-        <RowDefinition Height="1*" />
-        <RowDefinition Height="1*" />
-      </Grid.RowDefinitions>
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-      </Grid.ColumnDefinitions>
-
-      <!--<d3:Chart x:Name="PlotUp"
-                Grid.Column="0"
-                Grid.Row="0"
-                BottomTitle="Argument"
-                LeftTitle="Function"
-                Background="#212121"
-                Foreground="#fff">
-        <d3:Chart.Title>
-          <TextBlock Text="First Chart"
-                     FontSize="20" />
-        </d3:Chart.Title>
-        <Grid x:Name="lines_one" />
-        <d3:Chart.LegendContent>
-          <d3:LegendItemsPanel>
-            <d3:LegendItemsPanel.Resources>
-              <DataTemplate x:Key="InteractiveDataDisplay.WPF.LineGraph">
-                <StackPanel Orientation="Horizontal">
-                  <CheckBox IsChecked="{Binding Path=Visibility, Converter={StaticResource VisibilityToCheckedConverter}, Mode=TwoWay}" />
-                  <Line Width="15"
-                        Height="15"
-                        X1="0"
-                        Y1="0"
-                        X2="15"
-                        Y2="15"
-                        Stroke="{Binding Path=Stroke}"
-                        StrokeThickness="1.8" />
-                  <TextBlock Margin="5,0,0,0"
-                             Text="{Binding Path=Description}" />
-                </StackPanel>
-              </DataTemplate>
-            </d3:LegendItemsPanel.Resources>
-          </d3:LegendItemsPanel>
-        </d3:Chart.LegendContent>
-      </d3:Chart>-->
-
-      <!--<chart:SfChart x:Name="SfChart" />-->
-      <TextBlock Grid.Row="0"
-                 Grid.Column="0" />
-
-      <d3:Chart Grid.Row="1"
-                BottomTitle="Argument"
-                LeftTitle="Function"
-                Name="MyLines_two"
-                Background="#212121"
-                Foreground="#fff">
-        <d3:Chart.Title>
-          <TextBlock Text="Second Chart"
-                     FontSize="20" />
-        </d3:Chart.Title>
-        <Grid x:Name="lines_two" />
-        <d3:Chart.LegendContent>
-          <d3:LegendItemsPanel>
-            <d3:LegendItemsPanel.Resources>
-              <DataTemplate x:Key="InteractiveDataDisplay.WPF.LineGraph">
-                <StackPanel Orientation="Horizontal">
-                  <!--<CheckBox IsChecked="{Binding Path=Visibility, Converter={StaticResource VisibilityToCheckedConverter}, Mode=TwoWay}" />-->
-                  <Line Width="15"
-                        Height="15"
-                        X1="0"
-                        Y1="0"
-                        X2="15"
-                        Y2="15"
-                        Stroke="{Binding Path=Stroke}"
-                        StrokeThickness="1.8" />
-                  <TextBlock Margin="5,0,0,0"
-                             Text="{Binding Path=Description}" />
-                </StackPanel>
-              </DataTemplate>
-            </d3:LegendItemsPanel.Resources>
-          </d3:LegendItemsPanel>
-        </d3:Chart.LegendContent>
-      </d3:Chart>
+      <Grid Grid.Row="0"
+            Grid.RowSpan="2"
+            Grid.Column="1">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="1*" />
+          <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <chart:SfChart Header="Chart One"
+                       Palette="Metro"
+                       AreaBorderBrush="Gray"
+                       AreaBorderThickness="2"
+                       BorderBrush="LightGray"
+                       Grid.Row="0">
+          <chart:SfChart.PrimaryAxis>
+            <chart:TimeSpanAxis Header="Time"
+                                FontSize="12"
+                                LabelFormat="mmss"
+                                LabelsPosition="Inside"
+                                EnableScrollBar="True" />
+          </chart:SfChart.PrimaryAxis>
+          <chart:SfChart.SecondaryAxis>
+            <chart:NumericalAxis Header="Value"
+                                 FontSize="12"
+                                 EnableScrollBar="True"
+                                 LabelsPosition="Outside" />
+          </chart:SfChart.SecondaryAxis>
+          <chart:SfChart.Legend>
+            <chart:ChartLegend DockPosition="Bottom"
+                               CheckBoxVisibility="Visible"
+                               Orientation="Horizontal"
+                               LegendPosition="Outside"
+                               IconVisibility="Visible" />
+          </chart:SfChart.Legend>
+          <chart:SfChart.Behaviors>
+            <chart:ChartZoomPanBehavior ZoomRelativeToCursor="True"
+                                        EnableSelectionZooming="True">
+            </chart:ChartZoomPanBehavior>
+          </chart:SfChart.Behaviors>
+          <chart:FastLineSeries Label="Напряжение [В]"
+                                EnableAnimation="True"
+                                ItemsSource="{Binding PointSeriesVolt}"
+                                XBindingPath="XTime"
+                                YBindingPath="YValue"
+                                Interior="#FFEB3B"
+                                LegendIcon="SeriesType"
+                                StrokeThickness="2"></chart:FastLineSeries>
+          <chart:FastLineSeries EnableAnimation="True"
+                                Label="Ток [A]"
+                                ItemsSource="{Binding PointSeriesCurr}"
+                                XBindingPath="XTime"
+                                YBindingPath="YValue"
+                                Interior="#FF5252"
+                                LegendIcon="SeriesType"
+                                StrokeThickness="2"></chart:FastLineSeries>
+          <chart:FastLineSeries EnableAnimation="True"
+                                Label="Момент [Н/м]"
+                                ItemsSource="{Binding PointSeriesTorq}"
+                                XBindingPath="XTime"
+                                YBindingPath="YValue"
+                                Interior="#448AFF"
+                                LegendIcon="SeriesType"
+                                StrokeThickness="2"></chart:FastLineSeries>
+        </chart:SfChart>
+        <chart:SfChart Header="Chart Two"
+                       Palette="Metro"
+                       AreaBorderBrush="Gray"
+                       AreaBorderThickness="2"
+                       Grid.Row="1">
+          <chart:SfChart.PrimaryAxis>
+            <chart:TimeSpanAxis Header="Time"
+                                FontSize="12"
+                                LabelFormat="mmss"
+                                LabelsPosition="Inside"
+                                EnableScrollBar="True" />
+          </chart:SfChart.PrimaryAxis>
+          <chart:SfChart.SecondaryAxis>
+            <chart:NumericalAxis Header="Value"
+                                 FontSize="12"
+                                 EnableScrollBar="True"
+                                 LabelsPosition="Inside" />
+          </chart:SfChart.SecondaryAxis>
+          <chart:SfChart.Legend>
+            <chart:ChartLegend DockPosition="Bottom"
+                               CheckBoxVisibility="Visible"
+                               Orientation="Horizontal"
+                               LegendPosition="Outside"
+                               IconVisibility="Visible" />
+          </chart:SfChart.Legend>
+          <chart:SfChart.Behaviors>
+            <chart:ChartZoomPanBehavior ZoomRelativeToCursor="True"
+                                        EnableSelectionZooming="True">
+            </chart:ChartZoomPanBehavior>
+          </chart:SfChart.Behaviors>
+          <chart:FastLineSeries Label="Обороты [об х мин]"
+                                EnableAnimation="True"
+                                ItemsSource="{Binding PointSeriesExternal}"
+                                XBindingPath="XTime"
+                                YBindingPath="YValue"
+                                Interior="#FFEB3B"
+                                LegendIcon="SeriesType"
+                                StrokeThickness="2"></chart:FastLineSeries>
+          <chart:FastLineSeries EnableAnimation="True"
+                                Label="test"
+                                ItemsSource="{Binding PointSeriesMotor}"
+                                XBindingPath="XTime"
+                                YBindingPath="YValue"
+                                Interior="#FF5252"
+                                LegendIcon="SeriesType"
+                                StrokeThickness="2"></chart:FastLineSeries>
+        </chart:SfChart>
+      </Grid>
     </Grid>
   </Grid>
 </Controls:MetroWindow>
