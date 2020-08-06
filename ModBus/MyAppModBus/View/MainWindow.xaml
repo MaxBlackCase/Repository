@@ -36,8 +36,8 @@
         <MenuItem Header="Paste" />
         <MenuItem Header="exit" />
       </MenuItem>
-      <MenuItem Header="Edit"></MenuItem>
-      <MenuItem Header="View"></MenuItem>
+      <MenuItem Header="DB Lines"
+                Command="{Binding SetDbLines}"></MenuItem>
     </Menu>
     <Grid Grid.Row="1">
       <Grid.RowDefinitions>
@@ -241,10 +241,10 @@
       </Grid>
       <Grid Grid.Row="0"
             Grid.RowSpan="2"
-            Grid.Column="1">
+            Grid.Column="1"
+            Margin="15">
         <Grid.RowDefinitions>
-          <RowDefinition Height="1*" />
-          <RowDefinition Height="1*" />
+          <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <chart:SfChart Header="Chart One"
                        Palette="Metro"
@@ -256,14 +256,20 @@
             <chart:TimeSpanAxis Header="Time"
                                 FontSize="12"
                                 LabelFormat="mmss"
-                                LabelsPosition="Inside"
-                                EnableScrollBar="True" />
+                                LabelsPosition="Outside"
+                                EnableScrollBarResizing="True"
+                                EnableScrollBar="True"
+                                MaximumLabels="3" />
           </chart:SfChart.PrimaryAxis>
           <chart:SfChart.SecondaryAxis>
             <chart:NumericalAxis Header="Value"
                                  FontSize="12"
+                                 RangePadding="Additional"
+                                 LabelsPosition="Outside"
+                                 TickLineSize="4"
                                  EnableScrollBar="True"
-                                 LabelsPosition="Outside" />
+                                 TickLinesPosition="Outside"
+                                 MaximumLabels="3" />
           </chart:SfChart.SecondaryAxis>
           <chart:SfChart.Legend>
             <chart:ChartLegend DockPosition="Bottom"
@@ -301,43 +307,12 @@
                                 Interior="#448AFF"
                                 LegendIcon="SeriesType"
                                 StrokeThickness="2"></chart:FastLineSeries>
-        </chart:SfChart>
-        <chart:SfChart Header="Chart Two"
-                       Palette="Metro"
-                       AreaBorderBrush="Gray"
-                       AreaBorderThickness="2"
-                       Grid.Row="1">
-          <chart:SfChart.PrimaryAxis>
-            <chart:TimeSpanAxis Header="Time"
-                                FontSize="12"
-                                LabelFormat="mmss"
-                                LabelsPosition="Inside"
-                                EnableScrollBar="True" />
-          </chart:SfChart.PrimaryAxis>
-          <chart:SfChart.SecondaryAxis>
-            <chart:NumericalAxis Header="Value"
-                                 FontSize="12"
-                                 EnableScrollBar="True"
-                                 LabelsPosition="Inside" />
-          </chart:SfChart.SecondaryAxis>
-          <chart:SfChart.Legend>
-            <chart:ChartLegend DockPosition="Bottom"
-                               CheckBoxVisibility="Visible"
-                               Orientation="Horizontal"
-                               LegendPosition="Outside"
-                               IconVisibility="Visible" />
-          </chart:SfChart.Legend>
-          <chart:SfChart.Behaviors>
-            <chart:ChartZoomPanBehavior ZoomRelativeToCursor="True"
-                                        EnableSelectionZooming="True">
-            </chart:ChartZoomPanBehavior>
-          </chart:SfChart.Behaviors>
           <chart:FastLineSeries Label="Обороты [об х мин]"
                                 EnableAnimation="True"
                                 ItemsSource="{Binding PointSeriesExternal}"
                                 XBindingPath="XTime"
                                 YBindingPath="YValue"
-                                Interior="#FFEB3B"
+                                Interior="#00BCD4"
                                 LegendIcon="SeriesType"
                                 StrokeThickness="2"></chart:FastLineSeries>
           <chart:FastLineSeries EnableAnimation="True"
@@ -345,7 +320,7 @@
                                 ItemsSource="{Binding PointSeriesMotor}"
                                 XBindingPath="XTime"
                                 YBindingPath="YValue"
-                                Interior="#FF5252"
+                                Interior="#4CAF50"
                                 LegendIcon="SeriesType"
                                 StrokeThickness="2"></chart:FastLineSeries>
         </chart:SfChart>

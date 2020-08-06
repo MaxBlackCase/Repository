@@ -1,9 +1,13 @@
-﻿using MyAppModBus.Commands;
+﻿using Microsoft.Toolkit.Win32.UI.Controls.Interop.WinRT;
+using MyAppModBus.Commands;
 using MyAppModBus.Controllers;
 using MyAppModBus.Models;
+using MyAppModBus.View.Pages;
 using MyAppModBus.ViewModel.Base;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Shapes;
 
@@ -177,6 +181,15 @@ namespace MyAppModBus.ViewModel {
       }
     #endregion
 
+    #region Открытие окна с данными о точках на графике
+    public ICommand SetDbLines { get; set; }
+    private bool CanSetDbLinesExecute( object p ) => true;
+    private void OnSetDbLinesExecuted(object p ) {
+      var winDbLines = new DbLines();
+      winDbLines.Show();
+    }
+    #endregion
+
     #endregion
     public SfChartViewModel() {
       #region Команды
@@ -184,6 +197,7 @@ namespace MyAppModBus.ViewModel {
       GetRegistersValues = new LambdaCommand( OnGetRegistersValuesExecuted, CanGetRegistersValuesExute );
       ConverToInt = new LambdaCommand( OnConverToIntExecuted, CanConverToIntExecute );
       WriteToRegisters = new LambdaCommand( OnWriteToRegistersExuted, CanWriteToRegistersExute );
+      SetDbLines = new LambdaCommand( OnSetDbLinesExecuted, CanSetDbLinesExecute );
       #endregion
 
       ctr = new ControllerBase();
