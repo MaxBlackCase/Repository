@@ -2,10 +2,8 @@
 using MyAppModBus.Controllers;
 using MyAppModBus.Models;
 using MyAppModBus.ViewModel.Base;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Reflection.Emit;
 using System.Windows.Input;
 using System.Windows.Shapes;
 
