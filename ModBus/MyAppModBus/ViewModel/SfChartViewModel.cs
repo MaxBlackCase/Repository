@@ -22,7 +22,7 @@ namespace MyAppModBus.ViewModel {
     private ObservableCollection<string> _registers;
     private string _queryRegisters = "Start";
     private string _stateSerialPort = "Подключить";
-    private string _cleanSeries = "Пусто";
+    private string _cleanSeries = "очистить";
     private ObservableCollection<Ellipse> _colorEndFittings;
 
     private ObservableCollection<ChartPoints> _pointsSeriesVolt;

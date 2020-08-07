@@ -244,7 +244,7 @@ namespace MyAppModBus.Controllers {
 
           foreach( var series in _arrSerires ) {
             if( series == null )
-              _cleanSeries = "Очищено";
+              _cleanSeries = "Пусто";
             else
               _cleanSeries = "Очистить";
           }
@@ -402,7 +402,9 @@ namespace MyAppModBus.Controllers {
     internal void CleanSeriesWithChart() {
 
       foreach( var item in _arrSerires ) {
-          item.Clear();
+        if( item != null ) {
+            item.Clear();
+        }
       }
     }
 
