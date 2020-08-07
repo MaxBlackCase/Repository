@@ -122,15 +122,6 @@
                         <StackPanel VerticalAlignment="Bottom"
                                     Grid.Row="1"
                                     Grid.Column="0">
-                            <Button x:Name="CleanSeries"
-                                    Content="{Binding CleanSeries}"
-                                    IsEnabled="{Binding ElemDisable}"
-                                    Command="{Binding CleaningChart}"
-                                    Height="auto"
-                                    MinWidth="100"
-                                    MaxWidth="100"
-                                    Margin="0 5"
-                                    />
                             <Button Name="StartRegsRequest"
                                     Content="{Binding QueryRegistrs}"
                                     MinWidth="100"
@@ -246,6 +237,7 @@
                   Margin="15">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
                 <chart:SfChart Header="Chart One"
                                Palette="Metro"
@@ -324,6 +316,16 @@
                                           LegendIcon="SeriesType"
                                           StrokeThickness="2"></chart:FastLineSeries>
                 </chart:SfChart>
+                <StackPanel HorizontalAlignment="Right"
+                            Grid.Row="1">
+                    <Button Content="{Binding CleanSeries}"
+                            IsEnabled="{Binding ElemDisable}"
+                            Command="{Binding CleaningChart}"
+                            Height="auto"
+                            MinWidth="100"
+                            MaxWidth="100"
+                            Margin="0 5" />
+                </StackPanel>
             </Grid>
         </Grid>
     </Grid>

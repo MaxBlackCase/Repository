@@ -14,8 +14,8 @@ using System.Windows.Threading;
 namespace MyAppModBus.Controllers {
   internal class ControllerBase {
 
-    private DispatcherTimer _timer = new DispatcherTimer();
-    private SerialPort _serial = new SerialPort();
+    private readonly DispatcherTimer _timer = new DispatcherTimer();
+    private readonly SerialPort _serial = new SerialPort();
     private ModbusSerialMaster _master;
     const byte slaveID = 1;
     private string _stateSerialPort = null;
@@ -269,20 +269,23 @@ namespace MyAppModBus.Controllers {
     }
     internal string ConvertToInt( string _readWrite ) {
 
-      if( _readWrite != null ) {
-        _readWriteConvert = Convert.ToInt32( _readWrite );
-        if( _readWriteConvert < 20 ) {
-          _readWriteConvert = 20;
-          _errMessage = string.Format( "Интервал не может быть меньше {0} ms, поэтому задан интервал по умолчанию {0} ms.", _readWriteConvert );
+      if( _readWrite != "" )
+        if( _readWrite != null ) {
+          _readWriteConvert = Convert.ToInt32( _readWrite );
+          if( _readWriteConvert < 20 ) {
+            _readWriteConvert = 20;
+            _errMessage = string.Format( "Интервал не может быть меньше {0} ms, поэтому задан интервал по умолчанию {0} ms.", _readWriteConvert );
+          }
+          else if( _readWriteConvert > 100 ) {
+            _readWriteConvert = 100;
+            _errMessage = string.Format( "Значение не может превышать значение в {0} ms, поэтому задано значение по умолчанию {0} ms.", _readWriteConvert );
+          }
+          else {
+            _errMessage = string.Format( "Значение интервала опроса устроства: {0} ms", _readWriteConvert );
+          }
         }
-        else if( _readWriteConvert > 100 ) {
-          _readWriteConvert = 100;
-          _errMessage = string.Format( "Значение не может превышать значение в {0} ms, поэтому задано значение по умолчанию {0} ms.", _readWriteConvert );
-        }
-        else {
-          _errMessage = string.Format( "Значение интервала опроса устроства: {0} ms", _readWriteConvert );
-        }
-      }
+        else
+          _errMessage = "Введите значение";
       return _errMessage;
     }
     private void SetColorEllipses( ushort valOne, ushort valTwo ) {
@@ -403,7 +406,7 @@ namespace MyAppModBus.Controllers {
 
       foreach( var item in _arrSerires ) {
         if( item != null ) {
-            item.Clear();
+          item.Clear();
         }
       }
     }

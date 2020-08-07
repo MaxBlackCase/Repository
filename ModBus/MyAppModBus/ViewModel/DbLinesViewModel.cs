@@ -6,14 +6,14 @@ using System.Collections.Generic;
 namespace MyAppModBus.ViewModel {
   internal class DbLinesViewModel : ViewModelBase {
 
-    private List<LineModel> _dbLines;
+    private List<int> _dbLines;
     private int _IdLine;
     private TimeSpan _timeLine;
     private double _valueLine;
 
     #region Свойства
 
-    public List<LineModel> DbLines { get => _dbLines; set => Set( ref _dbLines, value ); }
+    public List<int> DbLines { get => _dbLines; set => Set( ref _dbLines, value ); }
 
     public int IdLine { get => _IdLine; set => Set( ref _IdLine, value ); }
     public TimeSpan TimeLine { get => _timeLine; set => Set( ref _timeLine, value ); }
@@ -22,13 +22,12 @@ namespace MyAppModBus.ViewModel {
 
     public DbLinesViewModel() {
 
-      DbLines = new List<LineModel>() {
-                new LineModel{ Id = 1, Time = TimeSpan.FromMinutes(84848), LineValue = 152 }
-            };
+      DbLines = new List<int>();
+      var rand = new Random();
 
-      IdLine = 1;
-      TimeLine = TimeSpan.FromMinutes( 84848 );
-      ValueLine = 154;
+      for( int i = 0; i < 10; i++ ) {
+        DbLines.Add( rand.Next( 0, 452 ) );
+      }
 
     }
 

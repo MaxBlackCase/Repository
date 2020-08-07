@@ -5,6 +5,7 @@ using MyAppModBus.View.Pages;
 using MyAppModBus.ViewModel.Base;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Shapes;
 
@@ -197,7 +198,7 @@ namespace MyAppModBus.ViewModel {
     private bool CanCleaningChartExecute( object p ) => true;
 
     private void OnCleaningChartExecuted( object p ) {
-     ctr.CleanSeriesWithChart();
+        ctr.CleanSeriesWithChart();
     }
 
     #endregion
