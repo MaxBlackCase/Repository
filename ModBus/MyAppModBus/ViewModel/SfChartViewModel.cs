@@ -1,13 +1,10 @@
-﻿using Microsoft.Toolkit.Win32.UI.Controls.Interop.WinRT;
-using MyAppModBus.Commands;
+﻿using MyAppModBus.Commands;
 using MyAppModBus.Controllers;
 using MyAppModBus.Models;
 using MyAppModBus.View.Pages;
 using MyAppModBus.ViewModel.Base;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Shapes;
 
@@ -25,6 +22,7 @@ namespace MyAppModBus.ViewModel {
     private ObservableCollection<string> _registers;
     private string _queryRegisters = "Start";
     private string _stateSerialPort = "Подключить";
+    private string _cleanSeries = "Пусто";
     private ObservableCollection<Ellipse> _colorEndFittings;
 
     private ObservableCollection<ChartPoints> _pointsSeriesVolt;
@@ -63,6 +61,8 @@ namespace MyAppModBus.ViewModel {
     public string StateSerialPort {
       get => _stateSerialPort; set => Set( ref _stateSerialPort, value );
     }
+
+    public string CleanSeries { get => _cleanSeries; set => Set(ref _cleanSeries, value); }
 
     #region Свойства видимости и активности элементов
     public bool ElemEnable {
@@ -151,6 +151,7 @@ namespace MyAppModBus.ViewModel {
       PointSeriesTorq = arrSeries[ 2 ];
       PointSeriesExternal = arrSeries[ 3 ];
       PointSeriesMotor = arrSeries[ 4 ];
+      CleanSeries = regRequests.Item6;
     }
     #endregion
 
@@ -190,6 +191,17 @@ namespace MyAppModBus.ViewModel {
     }
     #endregion
 
+    #region Очистка графика
+
+    public ICommand CleaningChart { get; set; }
+    private bool CanCleaningChartExecute( object p ) => true;
+
+    private void OnCleaningChartExecuted( object p ) {
+     ctr.CleanSeriesWithChart();
+    }
+
+    #endregion
+
     #endregion
     public SfChartViewModel() {
       #region Команды
@@ -198,6 +210,7 @@ namespace MyAppModBus.ViewModel {
       ConverToInt = new LambdaCommand( OnConverToIntExecuted, CanConverToIntExecute );
       WriteToRegisters = new LambdaCommand( OnWriteToRegistersExuted, CanWriteToRegistersExute );
       SetDbLines = new LambdaCommand( OnSetDbLinesExecuted, CanSetDbLinesExecute );
+      CleaningChart = new LambdaCommand( OnCleaningChartExecuted, CanCleaningChartExecute );
       #endregion
 
       ctr = new ControllerBase();

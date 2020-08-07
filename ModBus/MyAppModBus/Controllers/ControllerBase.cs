@@ -1,15 +1,13 @@
 ﻿using Modbus.Device;
 using MyAppModBus.Models;
+using Syncfusion.UI.Xaml.Charts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO.Ports;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Media;
-using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
@@ -30,6 +28,8 @@ namespace MyAppModBus.Controllers {
     private ObservableCollection<string> _registers = new ObservableCollection<string>();
     private Ellipse _ellipseFittings;
     private ObservableCollection<Ellipse> _clnEllipseFittings = new ObservableCollection<Ellipse>();
+    private string _cleanSeries;
+
 
     #region LineSeriesCollection
     private ObservableCollection<ChartPoints> _volt = new ObservableCollection<ChartPoints>();
@@ -122,12 +122,8 @@ namespace MyAppModBus.Controllers {
         //</Сброс регистров>
       }
       _countTimes = 0;
-      foreach( var item in _arrSerires ) {
-        if( item != null ) {
-          item.Clear();
-        }
-      }
 
+      CleanSeriesWithChart();
       _timer.Stop();
       _serial.Close();
       _serial.Dispose();
@@ -234,7 +230,7 @@ namespace MyAppModBus.Controllers {
     /// </summary>
     /// <param name="_queryRegisters">Значение кнопки</param>
     /// <returns></returns>
-    internal (ObservableCollection<string>, string, string, ObservableCollection<Ellipse>, ObservableCollection<ChartPoints>[]) RegistersRequest() {
+    internal (ObservableCollection<string>, string, string, ObservableCollection<Ellipse>, ObservableCollection<ChartPoints>[], string) RegistersRequest() {
       try {
         if( _serial.IsOpen ) {
           #region <Timer>
@@ -245,6 +241,14 @@ namespace MyAppModBus.Controllers {
           _arrSerires[ 2 ] = _torq;
           _arrSerires[ 3 ] = _external;
           _arrSerires[ 4 ] = _motor;
+
+          foreach( var series in _arrSerires ) {
+            if( series == null )
+              _cleanSeries = "Очищено";
+            else
+              _cleanSeries = "Очистить";
+          }
+
           if( !_timer.IsEnabled ) {
             _timer.Start();
             _queryRegisters = "Stop";
@@ -261,7 +265,7 @@ namespace MyAppModBus.Controllers {
       catch( Exception err ) {
         _errMessage = err.Message.ToString();
       }
-      return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings, _arrSerires);
+      return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings, _arrSerires, _cleanSeries);
     }
     internal string ConvertToInt( string _readWrite ) {
 
@@ -393,6 +397,13 @@ namespace MyAppModBus.Controllers {
       var x = Convert.ToDouble( inVal );
       var result = (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
       return result;
+    }
+
+    internal void CleanSeriesWithChart() {
+
+      foreach( var item in _arrSerires ) {
+          item.Clear();
+      }
     }
 
   }
