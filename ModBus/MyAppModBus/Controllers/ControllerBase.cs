@@ -30,7 +30,6 @@ namespace MyAppModBus.Controllers {
     private ObservableCollection<Ellipse> _clnEllipseFittings = new ObservableCollection<Ellipse>();
     private string _cleanSeries;
 
-
     #region LineSeriesCollection
     private ObservableCollection<ChartPoints> _volt = new ObservableCollection<ChartPoints>();
     private ObservableCollection<ChartPoints> _curr = new ObservableCollection<ChartPoints>();
@@ -241,7 +240,6 @@ namespace MyAppModBus.Controllers {
           _arrSerires[ 2 ] = _torq;
           _arrSerires[ 3 ] = _external;
           _arrSerires[ 4 ] = _motor;
-
           foreach( var series in _arrSerires ) {
             if( series == null )
               _cleanSeries = "Пусто";

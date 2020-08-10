@@ -290,16 +290,16 @@
                     <chart:SfChart.Behaviors>
                         <chart:ChartZoomPanBehavior ZoomRelativeToCursor="True"
                                                     EnableSelectionZooming="True"></chart:ChartZoomPanBehavior>
-                        <chart:ChartTrackBallBehavior LineStyle="{StaticResource seriesLineStyle}" />
+                        <chart:ChartTrackBallBehavior UseSeriesPalette="True"  LineStyle="{StaticResource seriesLineStyle}" />
                     </chart:SfChart.Behaviors>
                     <chart:FastLineSeries Label="Напряжение [В]"
                                           EnableAnimation="True"
                                           ItemsSource="{Binding PointSeriesVolt}"
                                           XBindingPath="XTime"
                                           YBindingPath="YValue"
-                                          Interior="#FFEB3B"
+                                          Interior="#FF9800"
                                           LegendIcon="SeriesType"
-                                          ShowTooltip="True"
+                                          ShowTrackballInfo="True"
                                           StrokeThickness="2">
                     </chart:FastLineSeries>
                     <chart:FastLineSeries EnableAnimation="True"
@@ -308,7 +308,6 @@
                                           XBindingPath="XTime"
                                           YBindingPath="YValue"
                                           Interior="#FF5252"
-                                          ShowTooltip="True"
                                           LegendIcon="SeriesType"
                                           StrokeThickness="2"></chart:FastLineSeries>
                     <chart:FastLineSeries EnableAnimation="True"
@@ -317,7 +316,6 @@
                                           XBindingPath="XTime"
                                           YBindingPath="YValue"
                                           Interior="#448AFF"
-                                          ShowTooltip="True"
                                           LegendIcon="SeriesType"
                                           StrokeThickness="2"></chart:FastLineSeries>
                     <chart:FastLineSeries Label="Обороты [об х мин]"
@@ -326,7 +324,6 @@
                                           XBindingPath="XTime"
                                           YBindingPath="YValue"
                                           Interior="#00BCD4"
-                                          ShowTooltip="True"
                                           LegendIcon="SeriesType"
                                           StrokeThickness="2"></chart:FastLineSeries>
                     <chart:FastLineSeries EnableAnimation="True"
@@ -335,7 +332,6 @@
                                           XBindingPath="XTime"
                                           YBindingPath="YValue"
                                           Interior="#4CAF50"
-                                          ShowTooltip="True"
                                           LegendIcon="SeriesType"
                                           StrokeThickness="2"></chart:FastLineSeries>
                 </chart:SfChart>
