@@ -24,17 +24,6 @@
     <Controls:MetroWindow.DataContext>
         <vm:SfChartViewModel />
     </Controls:MetroWindow.DataContext>
-    <Controls:MetroWindow.Resources>
-        <ControlTemplate TargetType="ToolTip" x:Key="seriesTooltip">
-            <Border CornerRadius="5"
-                    BorderBrush="#212121"
-                    BorderThickness="1" Background="#212121" Height="20" Width="60">
-                <ContentControl Margin="5"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center" />
-            </Border>
-        </ControlTemplate>
-    </Controls:MetroWindow.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -255,6 +244,21 @@
                                AreaBorderThickness="2"
                                BorderBrush="LightGray"
                                Grid.Row="0">
+                    <chart:SfChart.Resources>
+                        <Style TargetType="Line"
+                               x:Key="seriesLineStyle">
+
+                            <Setter Property="StrokeDashArray"
+                                    Value="6" />
+
+                            <Setter Property="Stroke"
+                                    Value="Red" />
+
+                            <Setter Property="StrokeThickness"
+                                    Value="1" />
+
+                        </Style>
+                    </chart:SfChart.Resources>
                     <chart:SfChart.PrimaryAxis>
                         <chart:TimeSpanAxis Header="Time"
                                             FontSize="12"
@@ -286,6 +290,7 @@
                     <chart:SfChart.Behaviors>
                         <chart:ChartZoomPanBehavior ZoomRelativeToCursor="True"
                                                     EnableSelectionZooming="True"></chart:ChartZoomPanBehavior>
+                        <chart:ChartTrackBallBehavior LineStyle="{StaticResource seriesLineStyle}" />
                     </chart:SfChart.Behaviors>
                     <chart:FastLineSeries Label="Напряжение [В]"
                                           EnableAnimation="True"
