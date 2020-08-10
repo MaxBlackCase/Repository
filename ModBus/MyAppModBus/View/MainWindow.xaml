@@ -21,9 +21,20 @@
                       SaveWindowPosition="True"
                       FontFamily="SegoeUI"
                       Foreground="#fff">
-    <Window.DataContext>
+    <Controls:MetroWindow.DataContext>
         <vm:SfChartViewModel />
-    </Window.DataContext>
+    </Controls:MetroWindow.DataContext>
+    <Controls:MetroWindow.Resources>
+        <ControlTemplate TargetType="ToolTip" x:Key="seriesTooltip">
+            <Border CornerRadius="5"
+                    BorderBrush="#212121"
+                    BorderThickness="1" Background="#212121" Height="20" Width="60">
+                <ContentControl Margin="5"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+            </Border>
+        </ControlTemplate>
+    </Controls:MetroWindow.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -240,7 +251,6 @@
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
                 <chart:SfChart Header="Chart One"
-                               Palette="Metro"
                                AreaBorderBrush="Gray"
                                AreaBorderThickness="2"
                                BorderBrush="LightGray"
@@ -262,7 +272,9 @@
                                              TickLineSize="4"
                                              EnableScrollBar="True"
                                              TickLinesPosition="Outside"
-                                             MaximumLabels="3" />
+                                             MaximumLabels="3"
+                                             ShowTrackBallInfo="True">
+                        </chart:NumericalAxis>
                     </chart:SfChart.SecondaryAxis>
                     <chart:SfChart.Legend>
                         <chart:ChartLegend DockPosition="Bottom"
@@ -282,13 +294,16 @@
                                           YBindingPath="YValue"
                                           Interior="#FFEB3B"
                                           LegendIcon="SeriesType"
-                                          StrokeThickness="2"></chart:FastLineSeries>
+                                          ShowTooltip="True"
+                                          StrokeThickness="2">
+                    </chart:FastLineSeries>
                     <chart:FastLineSeries EnableAnimation="True"
                                           Label="Ток [A]"
                                           ItemsSource="{Binding PointSeriesCurr}"
                                           XBindingPath="XTime"
                                           YBindingPath="YValue"
                                           Interior="#FF5252"
+                                          ShowTooltip="True"
                                           LegendIcon="SeriesType"
                                           StrokeThickness="2"></chart:FastLineSeries>
                     <chart:FastLineSeries EnableAnimation="True"
@@ -297,6 +312,7 @@
                                           XBindingPath="XTime"
                                           YBindingPath="YValue"
                                           Interior="#448AFF"
+                                          ShowTooltip="True"
                                           LegendIcon="SeriesType"
                                           StrokeThickness="2"></chart:FastLineSeries>
                     <chart:FastLineSeries Label="Обороты [об х мин]"
@@ -305,6 +321,7 @@
                                           XBindingPath="XTime"
                                           YBindingPath="YValue"
                                           Interior="#00BCD4"
+                                          ShowTooltip="True"
                                           LegendIcon="SeriesType"
                                           StrokeThickness="2"></chart:FastLineSeries>
                     <chart:FastLineSeries EnableAnimation="True"
@@ -313,6 +330,7 @@
                                           XBindingPath="XTime"
                                           YBindingPath="YValue"
                                           Interior="#4CAF50"
+                                          ShowTooltip="True"
                                           LegendIcon="SeriesType"
                                           StrokeThickness="2"></chart:FastLineSeries>
                 </chart:SfChart>
