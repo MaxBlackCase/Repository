@@ -397,7 +397,7 @@ namespace MyAppModBus.Controllers {
 
       var x = Convert.ToDouble( inVal );
       var result = (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
-      return result;
+      return Math.Round( result , 2);
     }
 
     internal void CleanSeriesWithChart() {
