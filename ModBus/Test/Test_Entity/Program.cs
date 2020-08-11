@@ -18,7 +18,7 @@ namespace Test_Entity {
         new LineGroup{NameLine = "External" },
         new LineGroup{NameLine = "Motor" }
         };
-        
+
 
         lpg.ForEach( s => context.LinesGroup.AddOrUpdate( p => p.NameLine, s ) );
         context.SaveChanges();
@@ -44,15 +44,28 @@ namespace Test_Entity {
           } );
 
         foreach( var grpItem in result ) {
-          Console.WriteLine( $"Line Name: {grpItem.LineName}\n" );
+          Console.WriteLine( $"\n-----Line Name: {grpItem.LineName}-----\n" );
           foreach( var lineItem in grpItem.LineData ) {
             Console.WriteLine( $"\tTime: {lineItem.Time} Value: {lineItem.Values}" );
           }
         }
+        
       }
 
-      Console.Read();
-    }
+      var keyPress = Console.ReadKey().Key;
 
+      if( keyPress == ConsoleKey.F ) {
+        DeletedFromTable();
+      }
+
+      Console.ReadLine();
+    }
+    public static void DeletedFromTable() {
+
+
+
+      Console.WriteLine( "\n\n------Deleted------" );
+
+    }
   }
 }
