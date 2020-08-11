@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity.Migrations;
 using System.Linq;
+using System.Security.Principal;
 using Test_Entity.Models;
 
 namespace Test_Entity {
@@ -26,9 +27,10 @@ namespace Test_Entity {
         var lp = new List<LinePoint>();
         var rand = new Random();
 
-        for( int i = 0; i < rand.Next( 25, 100 ); i++ ) {
-          lp.Add( new LinePoint { LineGroupId = rand.Next( 1, 6 ), Time = TimeSpan.FromSeconds( rand.Next( 500, 9000 ) ), Values = rand.Next( 25, 6230 ) } );
+        for( int i = 0; i < rand.Next( 1, 50 ); i++ ) {
+          lp.Add( new LinePoint { Id = i, LineGroupId = rand.Next( 1, 6 ), Time = TimeSpan.FromMilliseconds(1500.00), Values = rand.Next( 25, 6230 ) } );
         }
+        
         context.LinePoints.AddRange( lp );
         context.SaveChanges();
 
@@ -49,7 +51,6 @@ namespace Test_Entity {
             Console.WriteLine( $"\tTime: {lineItem.Time} Value: {lineItem.Values}" );
           }
         }
-        
       }
 
       var keyPress = Console.ReadKey().Key;
@@ -57,15 +58,19 @@ namespace Test_Entity {
       if( keyPress == ConsoleKey.F ) {
         DeletedFromTable();
       }
-
-      Console.ReadLine();
     }
     public static void DeletedFromTable() {
+      using( var context = new SampleContext() ) {
 
+        foreach( var delItem in context.LinePoints ) {
+          context.LinePoints.Remove( delItem );
+        }
+        context.LinePoints.DefaultIfEmpty();
+        context.SaveChanges();
 
-
-      Console.WriteLine( "\n\n------Deleted------" );
-
+        Console.WriteLine( "\n\n------Deleted------" );
+        Console.Clear();
+      }
     }
   }
 }

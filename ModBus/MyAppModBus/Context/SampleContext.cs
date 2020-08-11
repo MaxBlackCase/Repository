@@ -1,10 +1,11 @@
 ﻿using System.Data.Entity;
-using Test_Entity.Models;
+using System.Data.Entity.ModelConfiguration.Conventions;
+using MyAppModBus.Models.DbModel;
 
-namespace Test_Entity {
+namespace MyAppModBus.Context {
   internal class SampleContext : DbContext {
 
-    public SampleContext() :base( "DbConnectionString" ) { }
+    internal SampleContext() :base( "DbConnectionString" ) {}
     public DbSet<LineGroup> LinesGroup { get; set; }
     public DbSet<LinePoint> LinePoints { get; set; }
 

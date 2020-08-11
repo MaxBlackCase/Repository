@@ -5,7 +5,6 @@ using MyAppModBus.View.Pages;
 using MyAppModBus.ViewModel.Base;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Shapes;
 
@@ -41,29 +40,29 @@ namespace MyAppModBus.ViewModel {
     public List<string> PortList {
       get => _portList;
       set => Set( ref _portList, value );
-      }
+    }
     public string SelectedItem {
 
       get => _selectedItem;
       set => Set( ref _selectedItem, value );
 
-      }
+    }
     public string ReadWrite {
       get => _readWrite; set => Set( ref _readWrite, value );
-      }
+    }
     public int ReadWriteTimeOut {
       get => _readWriteTimeOut;
       set => Set( ref _readWriteTimeOut, value );
-      }
+    }
     public string ErrMessage {
       get => _errMessage;
       set => Set( ref _errMessage, value );
-      }
+    }
     public string StateSerialPort {
       get => _stateSerialPort; set => Set( ref _stateSerialPort, value );
     }
 
-    public string CleanSeries { get => _cleanSeries; set => Set(ref _cleanSeries, value); }
+    public string CleanSeries { get => _cleanSeries; set => Set( ref _cleanSeries, value ); }
 
     #region Свойства видимости и активности элементов
     public bool ElemEnable {
@@ -96,7 +95,7 @@ namespace MyAppModBus.ViewModel {
 
     #region Серии линий графика
     public ObservableCollection<ChartPoints> PointSeriesVolt {
-      get => _pointsSeriesVolt; set => Set(ref _pointsSeriesVolt, value);
+      get => _pointsSeriesVolt; set => Set( ref _pointsSeriesVolt, value );
     }
     public ObservableCollection<ChartPoints> PointSeriesCurr {
       get => _pointsSeriesCurr; set => Set( ref _pointsSeriesCurr, value );
@@ -104,7 +103,7 @@ namespace MyAppModBus.ViewModel {
     public ObservableCollection<ChartPoints> PointSeriesTorq {
       get => _pointsSeriesTorq; set => Set( ref _pointsSeriesTorq, value );
     }
-    public ObservableCollection<ChartPoints> PointSeriesMotor{
+    public ObservableCollection<ChartPoints> PointSeriesMotor {
       get => _pointsSeriesMotor; set => Set( ref _pointsSeriesMotor, value );
     }
     public ObservableCollection<ChartPoints> PointSeriesExternal {
@@ -120,7 +119,7 @@ namespace MyAppModBus.ViewModel {
     #region Команда поключения/отключения к/от COM порта и отображение UI элементов
     public ICommand ConnectToDevice {
       get;
-      }
+    }
     private bool CanSelectItemCommandExecute( object p ) => true;
     private void OnSelectItemCommandExecuted( object p ) {
 
@@ -132,13 +131,13 @@ namespace MyAppModBus.ViewModel {
       ElemEnable = ctr.SetElementEnable( _elemEnable );
       ElemDisable = ctr.SetElementDisable( _elemEnable );
 
-      }
+    }
     #endregion
 
     #region Запрос регистров
     public ICommand GetRegistersValues {
       get;
-      }
+    }
     private bool CanGetRegistersValuesExute( object p ) => true;
     private void OnGetRegistersValuesExecuted( object p ) {
       var regRequests = ctr.RegistersRequest();
@@ -147,7 +146,7 @@ namespace MyAppModBus.ViewModel {
       QueryRegistrs = regRequests.Item2;
       ErrMessage = regRequests.Item3;
       ColorEndFittings = regRequests.Item4;
-      PointSeriesVolt = arrSeries[0];
+      PointSeriesVolt = arrSeries[ 0 ];
       PointSeriesCurr = arrSeries[ 1 ];
       PointSeriesTorq = arrSeries[ 2 ];
       PointSeriesExternal = arrSeries[ 3 ];
@@ -160,11 +159,11 @@ namespace MyAppModBus.ViewModel {
 
     public ICommand ConverToInt {
       get;
-      }
+    }
     private bool CanConverToIntExecute( object p ) => true;
     private void OnConverToIntExecuted( object p ) {
       ErrMessage = ctr.ConvertToInt( _readWrite );
-      }
+    }
 
     #endregion
 
@@ -172,21 +171,21 @@ namespace MyAppModBus.ViewModel {
 
     public ICommand WriteToRegisters {
       get;
-      }
+    }
 
     private bool CanWriteToRegistersExute( object p ) => true;
     private void OnWriteToRegistersExuted( object p ) {
 
-       var wrtRegs = ctr.WriteValuesToRegisters(p);
+      var wrtRegs = ctr.WriteValuesToRegisters( p );
       ErrMessage = wrtRegs;
 
-      }
+    }
     #endregion
 
     #region Открытие окна с данными о точках на графике
     public ICommand SetDbLines { get; set; }
     private bool CanSetDbLinesExecute( object p ) => true;
-    private void OnSetDbLinesExecuted(object p ) {
+    private void OnSetDbLinesExecuted( object p ) {
       var winDbLines = new DbLines();
       winDbLines.Show();
     }
@@ -198,7 +197,8 @@ namespace MyAppModBus.ViewModel {
     private bool CanCleaningChartExecute( object p ) => true;
 
     private void OnCleaningChartExecuted( object p ) {
-        ctr.CleanSeriesWithChart();
+      ctr.CleanSeriesWithChart();
+      ctr.DeletedFromTable();
     }
 
     #endregion
@@ -216,6 +216,6 @@ namespace MyAppModBus.ViewModel {
 
       ctr = new ControllerBase();
       ctr.AddItemToComboBox( ref _portList );
-      }
     }
   }
+}

@@ -1,10 +1,15 @@
 ﻿using Modbus.Device;
+using MyAppModBus.Context;
 using MyAppModBus.Models;
+using MyAppModBus.Models.DbModel;
 using Syncfusion.UI.Xaml.Charts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.Entity;
+using System.Data.Entity.Migrations;
 using System.IO.Ports;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -29,6 +34,8 @@ namespace MyAppModBus.Controllers {
     private Ellipse _ellipseFittings;
     private ObservableCollection<Ellipse> _clnEllipseFittings = new ObservableCollection<Ellipse>();
     private string _cleanSeries;
+    private List<LineGroup> linePointGroup;
+    private List<LinePoint> linePoints = new List<LinePoint>();
 
     #region LineSeriesCollection
     private ObservableCollection<ChartPoints> _volt = new ObservableCollection<ChartPoints>();
@@ -42,8 +49,15 @@ namespace MyAppModBus.Controllers {
 
     public ControllerBase() {
 
+      linePointGroup = new List<LineGroup>() {
+        new LineGroup { NameLine = "Volltage" },
+        new LineGroup { NameLine = "Current" },
+        new LineGroup { NameLine = "Torque" },
+        new LineGroup { NameLine = "External" },
+        new LineGroup { NameLine = "Motor" }
+        };
+      SetDbSeriesLine();
     }
-
     /// <summary>
     /// Инициализация массива портов
     /// </summary>
@@ -68,7 +82,6 @@ namespace MyAppModBus.Controllers {
         }
       }
     }
-
     /// <summary>
     /// Соединение с устройством
     /// </summary>
@@ -104,7 +117,6 @@ namespace MyAppModBus.Controllers {
       }
       return (_errMessage, _stateSerialPort, _queryRegisters);
     }
-
     /// <summary>
     /// Отключение от устройства
     /// </summary>
@@ -121,7 +133,6 @@ namespace MyAppModBus.Controllers {
         //</Сброс регистров>
       }
       _countTimes = 0;
-
       CleanSeriesWithChart();
       _timer.Stop();
       _serial.Close();
@@ -131,7 +142,6 @@ namespace MyAppModBus.Controllers {
       _stateSerialPort = "Подключить";
       _queryRegisters = "Start";
     }
-
     #region Elements IsEnable, IsVisibility
     /// <summary>
     /// Переключатель активности для елементов до подключения к устройству
@@ -179,8 +189,7 @@ namespace MyAppModBus.Controllers {
     //  return _elemHid;
     //  }
     #endregion
-
-    private int _countTimes = 0;
+    private double _countTimes = 0;
     /// <summary>
     /// Получение данных из регистров
     /// </summary>
@@ -204,11 +213,11 @@ namespace MyAppModBus.Controllers {
           SetColorEllipses( result[ 9 ], result[ 10 ] );
           if( _countTimes % _readWriteConvert == 0 ) {
 
-            SetPointsSeries( result[ 0 ], 0, _volt );
-            SetPointsSeries( result[ 1 ], 1, _curr );
-            SetPointsSeries( result[ 4 ], 4, _torq );
-            SetPointsSeries( result[ 2 ], 2, _external );
-            SetPointsSeries( result[ 3 ], 3, _motor );
+            SetPointsSeries( result[ 0 ], 0, _volt, _countTimes );
+            SetPointsSeries( result[ 1 ], 1, _curr, _countTimes );
+            SetPointsSeries( result[ 4 ], 4, _torq, _countTimes );
+            SetPointsSeries( result[ 2 ], 2, _external, _countTimes );
+            SetPointsSeries( result[ 3 ], 3, _motor, _countTimes );
 
           }
         }
@@ -222,8 +231,6 @@ namespace MyAppModBus.Controllers {
       }
 
     }
-
-    //private List<ObservableCollection> lstChartSeries
     /// <summary>
     /// 
     /// </summary>
@@ -251,6 +258,7 @@ namespace MyAppModBus.Controllers {
             _timer.Start();
             _queryRegisters = "Stop";
             _errMessage = "Запущено...";
+            SetDbLinePoints();
           }
           else {
             _timer.Stop();
@@ -368,36 +376,39 @@ namespace MyAppModBus.Controllers {
     /// </summary>
     /// <param name="_valRegister">Значение регистра</param>
     /// <param name="_lineSeries">Имя серии</param>
-    private void SetPointsSeries( ushort _valRegister, int indexRegistrs, ObservableCollection<ChartPoints> _lineSeries ) {
+    private void SetPointsSeries( ushort _valRegister, int indexRegistrs, ObservableCollection<ChartPoints> _lineSeries, double time ) {
       var _time = TimeSpan.FromMilliseconds( _countTimes );
       double _valReg = 0;
       switch( indexRegistrs ) {
         case 0:
         _valReg = ConverValuesFfromRegisters( _valRegister, 17, 1300, 0.0, 80.0 );
+        linePoints.Add( new LinePoint { LineGroupId = 1, Time = TimeSpan.FromSeconds( time ), Values = _valReg } );
         break;
         case 1:
         _valReg = ConverValuesFfromRegisters( _valRegister, 5, 46, 0.0, 52.0 );
+        linePoints.Add( new LinePoint { LineGroupId = 2, Time = TimeSpan.FromSeconds( time ), Values = _valReg } );
         break;
         case 4:
         _valReg = ConverValuesFfromRegisters( _valRegister, 45, 4046, -1000.0, 1000.0 );
+        linePoints.Add( new LinePoint { LineGroupId = 3, Time = TimeSpan.FromSeconds( time ), Values = _valReg } );
         break;
         case 2:
         _valReg = Convert.ToDouble( _valRegister );
+        linePoints.Add( new LinePoint { LineGroupId = 4, Time = TimeSpan.FromSeconds( time ), Values = _valReg } );
         break;
         case 3:
         _valReg = Convert.ToDouble( _valRegister );
+        linePoints.Add( new LinePoint { LineGroupId = 5, Time = TimeSpan.FromSeconds( time ), Values = _valReg } );
         break;
       }
-
       _lineSeries.Add( new ChartPoints { XTime = _time, YValue = _valReg } );
-
     }
 
     private double ConverValuesFfromRegisters( ushort inVal, double inMin, double inMax, double outMin, double outMax ) {
 
       var x = Convert.ToDouble( inVal );
       var result = (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
-      return Math.Round( result , 2);
+      return Math.Round( result, 2 );
     }
 
     internal void CleanSeriesWithChart() {
@@ -409,6 +420,64 @@ namespace MyAppModBus.Controllers {
       }
     }
 
+    private async void SetDbSeriesLine() {
+
+      await Task.Run( () => {
+        using( var context = new SampleContext() ) {
+          linePointGroup.ForEach( s => context.LinesGroup.AddOrUpdate( p => p.NameLine, s ) );
+          context.SaveChanges();
+          #region <Comment>
+
+          //  var result = context.LinesGroup.GroupJoin(
+          //    context.LinePoints,
+          //    lpgItem => lpgItem.Id,
+          //    lpItem => lpItem.LineGroupId,
+          //    ( group, line ) => new {
+          //      LineName = group.NameLine,
+          //      LineData = line.Select( res => new { res.Time, res.Values } )
+          //    } );
+
+          //  foreach( var grpItem in result ) {
+          //    Console.WriteLine( $"\n-----Line Name: {grpItem.LineName}-----\n" );
+          //    foreach( var lineItem in grpItem.LineData ) {
+          //      Console.WriteLine( $"\tTime: {lineItem.Time} Value: {lineItem.Values}" );
+          //    }
+          //  }
+          //}
+
+          //var keyPress = Console.ReadKey().Key;
+
+          //if( keyPress == ConsoleKey.F ) {
+          //  DeletedFromTable();
+          #endregion
+        }
+
+      } );
+
+    }
+    private async void SetDbLinePoints() {
+
+      await Task.Run( () => {
+        using( var context = new SampleContext() ) {
+          if( linePoints != null ) {
+            context.LinePoints.AddRange( linePoints );
+            context.SaveChanges();
+
+          }
+        }
+      } );
+
+    }
+    public async void DeletedFromTable() {
+      using( var context = new SampleContext() ) {
+        foreach( var delItem in context.LinePoints ) {
+          context.LinePoints.Remove( delItem );
+        }
+        await Task.Run( () => {
+          context.SaveChanges();
+        } );
+      }
+    }
   }
 }
 
