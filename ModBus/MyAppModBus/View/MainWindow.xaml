@@ -179,7 +179,7 @@
                                 CornerRadius="15">
                             <TextBox Name="decTextBox"
                                      IsEnabled="{Binding ElemEnable}"
-                                     MaxLength="3"
+                                     MaxLength="4"
                                      Grid.Row="0"
                                      Grid.Column="0"
                                      Grid.ColumnSpan="1"
@@ -236,8 +236,8 @@
                 </Grid.RowDefinitions>
                 <chart:SfChart Header="Chart One"
                                AreaBorderBrush="Gray"
-                               AreaBorderThickness="2"
-                               BorderBrush="LightGray"
+                               AreaBorderThickness="0.5"
+                               IsEnabled="{Binding ElemDisable}"
                                Grid.Row="0">
                     <chart:SfChart.Resources>
                         <Style TargetType="Line"
@@ -282,16 +282,15 @@
                                             MinorTickLineStyle="{StaticResource tickStyle}"
                                             TickLinesPosition="Inside"
                                             SmallTickLinesPosition="Inside"
-                                            EnableScrollBarResizing="True"
                                             EnableScrollBar="True"
-                                            MaximumLabels="3" />
+                                            MaximumLabels="3">
+                        </chart:TimeSpanAxis>
                     </chart:SfChart.PrimaryAxis>
                     <chart:SfChart.SecondaryAxis>
                         <chart:NumericalAxis Header="Value"
                                              FontSize="12"
                                              RangePadding="Additional"
                                              LabelsPosition="Outside"
-                                             EnableScrollBar="True"
                                              TickLineSize="8"
                                              SmallTickLineSize="4"
                                              SmallTicksPerInterval="1"
@@ -299,6 +298,7 @@
                                              MinorGridLineStyle="{StaticResource gridAxisStyle}"
                                              MajorTickLineStyle="{StaticResource tickStyle}"
                                              MinorTickLineStyle="{StaticResource tickStyle}"
+                                             EnableScrollBar="True"
                                              TickLinesPosition="Inside"
                                              SmallTickLinesPosition="Inside"
                                              MaximumLabels="3"
@@ -363,7 +363,8 @@
                 <StackPanel HorizontalAlignment="Right"
                             Grid.Row="1">
                     <Button Content="{Binding CleanSeries}"
-                            IsEnabled="{Binding ElemDisable}"
+                            IsEnabled="{Binding ClearBtn}"
+                            Visibility="{Binding ElemVisible}"
                             Command="{Binding CleaningChart}"
                             Height="auto"
                             MinWidth="100"

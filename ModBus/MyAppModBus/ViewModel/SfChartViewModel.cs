@@ -6,6 +6,8 @@ using MyAppModBus.ViewModel.Base;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Shapes;
 
@@ -17,14 +19,14 @@ namespace MyAppModBus.ViewModel {
     private string _selectedItem;
     private bool _elemEnable = true;
     private bool _elemDisable = false;
-    private string _elemVisible = "Visible";
-    private string _elemHidden = "Hidden";
+    private string _elemVisible = Visibility.Hidden.ToString();
     private string _readWrite;
     private ObservableCollection<string> _registers;
     private string _queryRegisters = "Start";
     private string _stateSerialPort = "Подключить";
     private string _cleanSeries = "очистить";
     private ObservableCollection<Ellipse> _colorEndFittings;
+    private bool _clearBtn;
 
     #region Коллекции объектов точек серий 
 
@@ -65,10 +67,11 @@ namespace MyAppModBus.ViewModel {
     public string StateSerialPort {
       get => _stateSerialPort; set => Set( ref _stateSerialPort, value );
     }
-
     public string CleanSeries { get => _cleanSeries; set => Set( ref _cleanSeries, value ); }
+    public bool ClearBtn { get => _clearBtn; set => Set(ref _clearBtn, value); }
 
     #region Свойства видимости и активности элементов
+
     public bool ElemEnable {
       get => _elemEnable;
       set => Set( ref _elemEnable, value );
@@ -77,12 +80,8 @@ namespace MyAppModBus.ViewModel {
       get => _elemDisable;
       set => Set( ref _elemDisable, value );
     }
-    public string ElemVisible {
-      get => _elemVisible; set => Set( ref _elemVisible, value );
-    }
-    public string ElemHidden {
-      get => _elemHidden; set => Set( ref _elemHidden, value );
-    }
+    public string ElemVisible { get => _elemVisible; set => Set( ref _elemVisible, value ); }
+
     #endregion
 
     #region Свойства отрисовки концевиков
@@ -134,7 +133,8 @@ namespace MyAppModBus.ViewModel {
       QueryRegistrs = conToDeviceItem.Item3;
       ElemEnable = ctr.SetElementEnable( _elemEnable );
       ElemDisable = ctr.SetElementDisable( _elemEnable );
-
+      ClearBtn = conToDeviceItem.Item4;
+      ElemVisible = conToDeviceItem.Item5;
     }
     #endregion
 
@@ -156,6 +156,7 @@ namespace MyAppModBus.ViewModel {
       PointSeriesExternal = arrSeries[ 3 ];
       PointSeriesMotor = arrSeries[ 4 ];
       CleanSeries = regRequests.Item6;
+      ClearBtn = regRequests.Item7;
     }
     #endregion
 

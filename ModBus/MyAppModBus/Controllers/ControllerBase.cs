@@ -7,7 +7,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity.Migrations;
 using System.IO.Ports;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Web.WebSockets;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -25,7 +28,11 @@ namespace MyAppModBus.Controllers {
     const ushort startAddress = 0;
     const ushort numburOfPoints = 18;
     private int _readWriteConvert = 50;
+    private int _baseMinValReadWrite = 10;
+    private int _baseMaxValReadWrite = 1000;
+    private double _countTimes;
     private string _queryRegisters;
+    private string _elemVisible;
     private ObservableCollection<ViewRegisterModel> _viewRegs = new ObservableCollection<ViewRegisterModel>();
     private ObservableCollection<string> _registers = new ObservableCollection<string>();
     private Ellipse _ellipseFittings;
@@ -85,7 +92,7 @@ namespace MyAppModBus.Controllers {
     /// <param name="_portName">Имя Порта</param>
     /// <param name="_errMessage">Сообщение</param>
     /// <returns></returns>
-    internal (string, string, string) ConnectToDevice( string _portName ) {
+    internal (string, string, string, bool, string) ConnectToDevice( string _portName ) {
       try {
         if( !_serial.IsOpen ) {
           #region <Настройки RTU подключения>
@@ -102,8 +109,12 @@ namespace MyAppModBus.Controllers {
           _errMessage = string.Format( "{0} порт подключен", _portName );
           _stateSerialPort = "Отключить";
           _queryRegisters = "Start";
+          _clearBtn = true;
+          _countTimes = _readWriteConvert;
+          _elemVisible = SetElementVisible( true );
         }
         else {
+          _elemVisible = SetElementVisible( false );
           DisconnectToDevice();
           _errMessage = string.Format( "{0} порт Отключен", _portName );
         }
@@ -112,7 +123,7 @@ namespace MyAppModBus.Controllers {
         _errMessage = err.Message.ToString();
         _stateSerialPort = "Подключить";
       }
-      return (_errMessage, _stateSerialPort, _queryRegisters);
+      return (_errMessage, _stateSerialPort, _queryRegisters, _clearBtn, _elemVisible);
     }
     /// <summary>
     /// Отключение от устройства
@@ -120,24 +131,30 @@ namespace MyAppModBus.Controllers {
     /// <param name="_portName">Имя порта</param>
     /// <param name="_errMessage">Сообщение</param>
     /// <returns></returns>
-    internal void DisconnectToDevice() {
-      if( _serial.IsOpen && _timer.IsEnabled ) {
-        // <Сброс регистров>
-        var cleanRegs = new ushort[ 3 ] { 6, 7, 8 };
-        for( int i = 0; i < cleanRegs.Length; i++ ) {
-          _master.WriteSingleRegister( slaveID, cleanRegs[ i ], 0 );
-        }
-        //</Сброс регистров>
-      }
-      _countTimes = 0;
-      CleanSeriesWithChart();
-      _timer.Stop();
-      _serial.Close();
-      _serial.Dispose();
-      _master.Dispose();
+    internal async void DisconnectToDevice() {
       _errMessage = "Остановлено";
       _stateSerialPort = "Подключить";
       _queryRegisters = "Start";
+      _clearBtn = false;
+      if( _serial.IsOpen && _timer.IsEnabled ) {
+        await Task.Run( () => {
+          // <Сброс регистров>
+          var cleanRegs = new ushort[ 3 ] { 6, 7, 8 };
+          for( int i = 0; i < cleanRegs.Length; i++ ) {
+            _master.WriteSingleRegister( slaveID, cleanRegs[ i ], 0 );
+          }
+          //</Сброс регистров>
+          _countTimes = 0;
+        } );
+      }
+      await Task.Run( () => {
+        _timer.Stop();
+        _serial.Close();
+        _serial.Dispose();
+        _master.Dispose();
+      } );
+
+      CleanSeriesWithChart();
     }
     #region Elements IsEnable, IsVisibility
     /// <summary>
@@ -168,14 +185,15 @@ namespace MyAppModBus.Controllers {
     /// </summary>
     /// <param name="_elemEnable">Значение переключателя</param>
     /// <returns></returns>
-    internal string SetElementVisible( string _elemVis ) {
-      if( _elemVis == Visibility.Visible.ToString() && _serial.IsOpen ) {
-        _elemVis = Visibility.Hidden.ToString();
+    internal string SetElementVisible( bool _boolState ) {
+      string visible = null;
+      if( _boolState && _serial.IsOpen ) {
+        visible = Visibility.Visible.ToString();
       }
       else {
-        _elemVis = Visibility.Visible.ToString();
+        visible = Visibility.Hidden.ToString();
       }
-      return _elemVis;
+      return visible;
     }
     //internal string SetElementHidden( string _elemHid ) {
     //  if (_elemHid == Visibility.Hidden.ToString() && _serial.IsOpen) {
@@ -186,7 +204,6 @@ namespace MyAppModBus.Controllers {
     //  return _elemHid;
     //  }
     #endregion
-    private double _countTimes = 0;
     private TimeSpan _time;
     /// <summary>
     /// Получение данных из регистров
@@ -197,8 +214,6 @@ namespace MyAppModBus.Controllers {
       _viewRegs.Clear();
       _registers.Clear();
       _clnEllipseFittings.Clear();
-      _countTimes += _readWriteConvert;
-      _time = TimeSpan.FromMilliseconds( _countTimes );
       ///Вывод всех регистров на экран
       try {
         if( _serial.IsOpen ) {
@@ -211,6 +226,8 @@ namespace MyAppModBus.Controllers {
           }
           SetColorEllipses( result[ 9 ], result[ 10 ] );
           if( _countTimes % _readWriteConvert == 0 ) {
+            _countTimes += _readWriteConvert;
+            _time = TimeSpan.FromMilliseconds( _countTimes );
             SetPointsSeries( result[ 0 ], 0, _volt, _time );
             SetPointsSeries( result[ 1 ], 1, _curr, _time );
             SetPointsSeries( result[ 4 ], 4, _torq, _time );
@@ -233,17 +250,17 @@ namespace MyAppModBus.Controllers {
     /// </summary>
     /// <param name="_queryRegisters">Значение кнопки</param>
     /// <returns></returns>
-    internal (ObservableCollection<string>, string, string, ObservableCollection<Ellipse>, ObservableCollection<ChartPoints>[], string) RegistersRequest() {
+    private bool _clearBtn;
+    internal (ObservableCollection<string>, string, string, ObservableCollection<Ellipse>, ObservableCollection<ChartPoints>[], string, bool) RegistersRequest() {
       try {
         if( _serial.IsOpen ) {
           #region <Timer>
           _timer.Tick += new EventHandler( GetRegisterToDevice );
           _timer.Interval = new TimeSpan( 0, 0, 0, 0, Convert.ToInt32( _readWriteConvert ) );
-          _arrSerires[ 0 ] = _volt;
-          _arrSerires[ 1 ] = _curr;
-          _arrSerires[ 2 ] = _torq;
-          _arrSerires[ 3 ] = _external;
-          _arrSerires[ 4 ] = _motor;
+          var listArrSeries = new ObservableCollection<ChartPoints>[] { _volt, _curr, _torq, _external, _motor };
+          for( int i = 0; i < _arrSerires.Length; i++ ) {
+            _arrSerires[ i ] = listArrSeries[ i ];
+          }
           foreach( var series in _arrSerires ) {
             if( series == null )
               _cleanSeries = "Пусто";
@@ -255,12 +272,14 @@ namespace MyAppModBus.Controllers {
             _timer.Start();
             _queryRegisters = "Stop";
             _errMessage = "Запущено...";
-            SetDbLinePoints();
+            _clearBtn = false;
           }
           else {
             _timer.Stop();
             _queryRegisters = "Start";
             _errMessage = "Остановлено...";
+            _clearBtn = true;
+            SetDbLinePoints();
           }
           #endregion
         }
@@ -268,19 +287,19 @@ namespace MyAppModBus.Controllers {
       catch( Exception err ) {
         _errMessage = err.Message.ToString();
       }
-      return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings, _arrSerires, _cleanSeries);
+      return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings, _arrSerires, _cleanSeries, _clearBtn);
     }
     internal string ConvertToInt( string _readWrite ) {
 
       if( _readWrite != "" )
         if( _readWrite != null ) {
           _readWriteConvert = Convert.ToInt32( _readWrite );
-          if( _readWriteConvert < 20 ) {
-            _readWriteConvert = 20;
+          if( _readWriteConvert < _baseMinValReadWrite ) {
+            _readWriteConvert = _baseMinValReadWrite;
             _errMessage = string.Format( "Интервал не может быть меньше {0} ms, поэтому задан интервал по умолчанию {0} ms.", _readWriteConvert );
           }
-          else if( _readWriteConvert > 100 ) {
-            _readWriteConvert = 100;
+          else if( _readWriteConvert > _baseMaxValReadWrite ) {
+            _readWriteConvert = _baseMaxValReadWrite;
             _errMessage = string.Format( "Значение не может превышать значение в {0} ms, поэтому задано значение по умолчанию {0} ms.", _readWriteConvert );
           }
           else {
@@ -415,12 +434,12 @@ namespace MyAppModBus.Controllers {
           item.Clear();
         }
       }
-    }
 
+    }
     private async void SetDbSeriesLine() {
 
-      await Task.Run( () => {
-        using( var context = new SampleContext() ) {
+      using( var context = new SampleContext() ) {
+        await Task.Run( () => {
           linePointGroup.ForEach( s => context.LinesGroup.AddOrUpdate( p => p.NameLine, s ) );
           context.SaveChanges();
           #region <Comment>
@@ -447,33 +466,32 @@ namespace MyAppModBus.Controllers {
           //if( keyPress == ConsoleKey.F ) {
           //  DeletedFromTable();
           #endregion
-        }
-
-      } );
+        } );
+      }
 
     }
     private async void SetDbLinePoints() {
-      await Task.Run( () => {
-        try {
-          using( var context = new SampleContext() ) {
-              context.LinePoints.AddRange( linePoints );
-              context.SaveChanges();
-          }
+      try {
+        using( var context = new SampleContext() ) {
+          await Task.Run( () => {
+            context.LinePoints.AddRange( linePoints );
+            context.SaveChanges();
+          } );
         }
-        catch( Exception err ) {
-          _errMessage = err.Message.ToString();
-        }
-
-      } );
-
+      }
+      catch( Exception err ) {
+        _errMessage = err.Message.ToString();
+      }
     }
     internal async void DeletedFromTable() {
       try {
+        _countTimes = 0;
+        linePoints.Clear();
         using( var context = new SampleContext() ) {
-          foreach( var delItem in context.LinePoints ) {
-            context.LinePoints.Remove( delItem );
-          }
           await Task.Run( () => {
+            foreach( var delItem in context.LinePoints ) {
+              context.LinePoints.Remove( delItem );
+            }
             context.SaveChanges();
           } );
         }
