@@ -253,12 +253,35 @@
                                     Value="1" />
 
                         </Style>
+                        <Style TargetType="Line"
+                               x:Key="gridAxisStyle">
+                            <Setter Property="StrokeThickness"
+                                    Value="0.5" />
+                            <Setter Property="Stroke"
+                                    Value="Gray" />
+                        </Style>
+                        <Style TargetType="Line"
+                               x:Key="tickStyle">
+                            <Setter Property="StrokeThickness"
+                                    Value="1" />
+                            <Setter Property="Stroke"
+                                    Value="white" />
+                        </Style>
                     </chart:SfChart.Resources>
                     <chart:SfChart.PrimaryAxis>
                         <chart:TimeSpanAxis Header="Time"
                                             FontSize="12"
-                                            LabelFormat="mmss"
+                                            LabelFormat="mm\:ss"
                                             LabelsPosition="Outside"
+                                            TickLineSize="8"
+                                            SmallTickLineSize="4"
+                                            SmallTicksPerInterval="1"
+                                            MajorGridLineStyle="{StaticResource gridAxisStyle}"
+                                            MinorGridLineStyle="{StaticResource gridAxisStyle}"
+                                            MajorTickLineStyle="{StaticResource tickStyle}"
+                                            MinorTickLineStyle="{StaticResource tickStyle}"
+                                            TickLinesPosition="Inside"
+                                            SmallTickLinesPosition="Inside"
                                             EnableScrollBarResizing="True"
                                             EnableScrollBar="True"
                                             MaximumLabels="3" />
@@ -268,9 +291,16 @@
                                              FontSize="12"
                                              RangePadding="Additional"
                                              LabelsPosition="Outside"
-                                             TickLineSize="4"
                                              EnableScrollBar="True"
-                                             TickLinesPosition="Outside"
+                                             TickLineSize="8"
+                                             SmallTickLineSize="4"
+                                             SmallTicksPerInterval="1"
+                                             MajorGridLineStyle="{StaticResource gridAxisStyle}"
+                                             MinorGridLineStyle="{StaticResource gridAxisStyle}"
+                                             MajorTickLineStyle="{StaticResource tickStyle}"
+                                             MinorTickLineStyle="{StaticResource tickStyle}"
+                                             TickLinesPosition="Inside"
+                                             SmallTickLinesPosition="Inside"
                                              MaximumLabels="3"
                                              ShowTrackBallInfo="True">
                         </chart:NumericalAxis>

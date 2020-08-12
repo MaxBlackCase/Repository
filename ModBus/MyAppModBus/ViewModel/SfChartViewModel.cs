@@ -3,6 +3,7 @@ using MyAppModBus.Controllers;
 using MyAppModBus.Models;
 using MyAppModBus.View.Pages;
 using MyAppModBus.ViewModel.Base;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
@@ -25,11 +26,14 @@ namespace MyAppModBus.ViewModel {
     private string _cleanSeries = "очистить";
     private ObservableCollection<Ellipse> _colorEndFittings;
 
+    #region Коллекции объектов точек серий 
+
     private ObservableCollection<ChartPoints> _pointsSeriesVolt;
     private ObservableCollection<ChartPoints> _pointsSeriesCurr;
     private ObservableCollection<ChartPoints> _pointsSeriesTorq;
     private ObservableCollection<ChartPoints> _pointsSeriesExtern;
     private ObservableCollection<ChartPoints> _pointsSeriesMotor;
+    #endregion
 
     /// <summary>
     /// Контроллер
@@ -217,5 +221,6 @@ namespace MyAppModBus.ViewModel {
       ctr = new ControllerBase();
       ctr.AddItemToComboBox( ref _portList );
     }
+
   }
 }

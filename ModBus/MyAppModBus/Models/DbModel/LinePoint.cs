@@ -6,7 +6,7 @@ namespace MyAppModBus.Models.DbModel {
     public int Id { get; set; }
     public TimeSpan Time { get; set; }
     public double Values { get; set; }
-    public int? LineGroupId { get; set; }
+    public int LineGroupId { get; set; }
 
   }
 }

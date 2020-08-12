@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Security.Principal;
@@ -28,9 +29,9 @@ namespace Test_Entity {
         var rand = new Random();
 
         for( int i = 0; i < rand.Next( 1, 50 ); i++ ) {
-          lp.Add( new LinePoint { Id = i, LineGroupId = rand.Next( 1, 6 ), Time = TimeSpan.FromMilliseconds(1500.00), Values = rand.Next( 25, 6230 ) } );
+          lp.Add( new LinePoint { Id = i, LineGroupId = rand.Next( 1, 6 ), Time = TimeSpan.FromMilliseconds( 1500.00 ), Values = rand.Next( 25, 6230 ) } );
         }
-        
+
         context.LinePoints.AddRange( lp );
         context.SaveChanges();
 
@@ -72,5 +73,9 @@ namespace Test_Entity {
         Console.Clear();
       }
     }
+
+    protected static void SaveChart() {
+    }
+
   }
 }

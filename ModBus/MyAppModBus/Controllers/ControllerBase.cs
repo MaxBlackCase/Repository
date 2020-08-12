@@ -2,14 +2,11 @@
 using MyAppModBus.Context;
 using MyAppModBus.Models;
 using MyAppModBus.Models.DbModel;
-using Syncfusion.UI.Xaml.Charts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.IO.Ports;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -46,7 +43,6 @@ namespace MyAppModBus.Controllers {
     private ObservableCollection<ChartPoints>[] _arrSerires = new ObservableCollection<ChartPoints>[ 5 ];
     #endregion
 
-
     public ControllerBase() {
 
       linePointGroup = new List<LineGroup>() {
@@ -57,6 +53,7 @@ namespace MyAppModBus.Controllers {
         new LineGroup { NameLine = "Motor" }
         };
       SetDbSeriesLine();
+      DeletedFromTable();
     }
     /// <summary>
     /// Инициализация массива портов
@@ -190,6 +187,7 @@ namespace MyAppModBus.Controllers {
     //  }
     #endregion
     private double _countTimes = 0;
+    private TimeSpan _time;
     /// <summary>
     /// Получение данных из регистров
     /// </summary>
@@ -200,6 +198,7 @@ namespace MyAppModBus.Controllers {
       _registers.Clear();
       _clnEllipseFittings.Clear();
       _countTimes += _readWriteConvert;
+      _time = TimeSpan.FromMilliseconds( _countTimes );
       ///Вывод всех регистров на экран
       try {
         if( _serial.IsOpen ) {
@@ -212,13 +211,11 @@ namespace MyAppModBus.Controllers {
           }
           SetColorEllipses( result[ 9 ], result[ 10 ] );
           if( _countTimes % _readWriteConvert == 0 ) {
-
-            SetPointsSeries( result[ 0 ], 0, _volt, _countTimes );
-            SetPointsSeries( result[ 1 ], 1, _curr, _countTimes );
-            SetPointsSeries( result[ 4 ], 4, _torq, _countTimes );
-            SetPointsSeries( result[ 2 ], 2, _external, _countTimes );
-            SetPointsSeries( result[ 3 ], 3, _motor, _countTimes );
-
+            SetPointsSeries( result[ 0 ], 0, _volt, _time );
+            SetPointsSeries( result[ 1 ], 1, _curr, _time );
+            SetPointsSeries( result[ 4 ], 4, _torq, _time );
+            SetPointsSeries( result[ 2 ], 2, _external, _time );
+            SetPointsSeries( result[ 3 ], 3, _motor, _time );
           }
         }
         else {
@@ -376,32 +373,32 @@ namespace MyAppModBus.Controllers {
     /// </summary>
     /// <param name="_valRegister">Значение регистра</param>
     /// <param name="_lineSeries">Имя серии</param>
-    private void SetPointsSeries( ushort _valRegister, int indexRegistrs, ObservableCollection<ChartPoints> _lineSeries, double time ) {
+    private void SetPointsSeries( ushort _valRegister, int indexRegistrs, ObservableCollection<ChartPoints> _lineSeries, TimeSpan _dt ) {
       var _time = TimeSpan.FromMilliseconds( _countTimes );
       double _valReg = 0;
       switch( indexRegistrs ) {
         case 0:
         _valReg = ConverValuesFfromRegisters( _valRegister, 17, 1300, 0.0, 80.0 );
-        linePoints.Add( new LinePoint { LineGroupId = 1, Time = TimeSpan.FromSeconds( time ), Values = _valReg } );
+        linePoints.Add( new LinePoint { LineGroupId = 1, Time = _dt, Values = _valReg } );
         break;
         case 1:
         _valReg = ConverValuesFfromRegisters( _valRegister, 5, 46, 0.0, 52.0 );
-        linePoints.Add( new LinePoint { LineGroupId = 2, Time = TimeSpan.FromSeconds( time ), Values = _valReg } );
+        linePoints.Add( new LinePoint { LineGroupId = 2, Time = _dt, Values = _valReg } );
         break;
         case 4:
         _valReg = ConverValuesFfromRegisters( _valRegister, 45, 4046, -1000.0, 1000.0 );
-        linePoints.Add( new LinePoint { LineGroupId = 3, Time = TimeSpan.FromSeconds( time ), Values = _valReg } );
+        linePoints.Add( new LinePoint { LineGroupId = 3, Time = _dt, Values = _valReg } );
         break;
         case 2:
         _valReg = Convert.ToDouble( _valRegister );
-        linePoints.Add( new LinePoint { LineGroupId = 4, Time = TimeSpan.FromSeconds( time ), Values = _valReg } );
+        linePoints.Add( new LinePoint { LineGroupId = 4, Time = _dt, Values = _valReg } );
         break;
         case 3:
         _valReg = Convert.ToDouble( _valRegister );
-        linePoints.Add( new LinePoint { LineGroupId = 5, Time = TimeSpan.FromSeconds( time ), Values = _valReg } );
+        linePoints.Add( new LinePoint { LineGroupId = 5, Time = _dt, Values = _valReg } );
         break;
       }
-      _lineSeries.Add( new ChartPoints { XTime = _time, YValue = _valReg } );
+      _lineSeries.Add( new ChartPoints { XTime = _dt, YValue = _valReg } );
     }
 
     private double ConverValuesFfromRegisters( ushort inVal, double inMin, double inMax, double outMin, double outMax ) {
@@ -456,28 +453,37 @@ namespace MyAppModBus.Controllers {
 
     }
     private async void SetDbLinePoints() {
-
       await Task.Run( () => {
-        using( var context = new SampleContext() ) {
-          if( linePoints != null ) {
-            context.LinePoints.AddRange( linePoints );
-            context.SaveChanges();
-
+        try {
+          using( var context = new SampleContext() ) {
+              context.LinePoints.AddRange( linePoints );
+              context.SaveChanges();
           }
         }
+        catch( Exception err ) {
+          _errMessage = err.Message.ToString();
+        }
+
       } );
 
     }
-    public async void DeletedFromTable() {
-      using( var context = new SampleContext() ) {
-        foreach( var delItem in context.LinePoints ) {
-          context.LinePoints.Remove( delItem );
+    internal async void DeletedFromTable() {
+      try {
+        using( var context = new SampleContext() ) {
+          foreach( var delItem in context.LinePoints ) {
+            context.LinePoints.Remove( delItem );
+          }
+          await Task.Run( () => {
+            context.SaveChanges();
+          } );
         }
-        await Task.Run( () => {
-          context.SaveChanges();
-        } );
+      }
+      catch( Exception err ) {
+        _errMessage = err.Message.ToString();
       }
     }
+
+
   }
 }
 
