@@ -204,7 +204,6 @@ namespace MyAppModBus.Controllers {
     //  return _elemHid;
     //  }
     #endregion
-    private TimeSpan _time;
     /// <summary>
     /// Получение данных из регистров
     /// </summary>
@@ -225,15 +224,12 @@ namespace MyAppModBus.Controllers {
             _registers.Add( $"Регистр: {item.ID}\t|  {item.Value}" );
           }
           SetColorEllipses( result[ 9 ], result[ 10 ] );
-          if( _countTimes % _readWriteConvert == 0 ) {
-            _countTimes += _readWriteConvert;
-            _time = TimeSpan.FromMilliseconds( _countTimes );
-            SetPointsSeries( result[ 0 ], 0, _volt, _time );
-            SetPointsSeries( result[ 1 ], 1, _curr, _time );
-            SetPointsSeries( result[ 4 ], 4, _torq, _time );
-            SetPointsSeries( result[ 2 ], 2, _external, _time );
-            SetPointsSeries( result[ 3 ], 3, _motor, _time );
-          }
+          SetPointsSeries( result[ 0 ], 0, _volt, _countTimes );
+          SetPointsSeries( result[ 1 ], 1, _curr, _countTimes );
+          SetPointsSeries( result[ 4 ], 4, _torq, _countTimes );
+          SetPointsSeries( result[ 2 ], 2, _external, _countTimes );
+          SetPointsSeries( result[ 3 ], 3, _motor, _countTimes );
+          _countTimes += _readWriteConvert;
         }
         else {
           _timer.Stop();
@@ -290,7 +286,7 @@ namespace MyAppModBus.Controllers {
       return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings, _arrSerires, _cleanSeries, _clearBtn);
     }
     internal string ConvertToInt( string _readWrite ) {
-
+      _countTimes = 0;
       if( _readWrite != "" )
         if( _readWrite != null ) {
           _readWriteConvert = Convert.ToInt32( _readWrite );
@@ -392,32 +388,32 @@ namespace MyAppModBus.Controllers {
     /// </summary>
     /// <param name="_valRegister">Значение регистра</param>
     /// <param name="_lineSeries">Имя серии</param>
-    private void SetPointsSeries( ushort _valRegister, int indexRegistrs, ObservableCollection<ChartPoints> _lineSeries, TimeSpan _dt ) {
+    private void SetPointsSeries( ushort _valRegister, int indexRegistrs, ObservableCollection<ChartPoints> _lineSeries, double _countTimes ) {
       var _time = TimeSpan.FromMilliseconds( _countTimes );
       double _valReg = 0;
       switch( indexRegistrs ) {
         case 0:
         _valReg = ConverValuesFfromRegisters( _valRegister, 17, 1300, 0.0, 80.0 );
-        linePoints.Add( new LinePoint { LineGroupId = 1, Time = _dt, Values = _valReg } );
+        linePoints.Add( new LinePoint { LineGroupId = 1, Time = _time, Values = _valReg } );
         break;
         case 1:
         _valReg = ConverValuesFfromRegisters( _valRegister, 5, 46, 0.0, 52.0 );
-        linePoints.Add( new LinePoint { LineGroupId = 2, Time = _dt, Values = _valReg } );
+        linePoints.Add( new LinePoint { LineGroupId = 2, Time = _time, Values = _valReg } );
         break;
         case 4:
         _valReg = ConverValuesFfromRegisters( _valRegister, 45, 4046, -1000.0, 1000.0 );
-        linePoints.Add( new LinePoint { LineGroupId = 3, Time = _dt, Values = _valReg } );
+        linePoints.Add( new LinePoint { LineGroupId = 3, Time = _time, Values = _valReg } );
         break;
         case 2:
         _valReg = Convert.ToDouble( _valRegister );
-        linePoints.Add( new LinePoint { LineGroupId = 4, Time = _dt, Values = _valReg } );
+        linePoints.Add( new LinePoint { LineGroupId = 4, Time = _time, Values = _valReg } );
         break;
         case 3:
         _valReg = Convert.ToDouble( _valRegister );
-        linePoints.Add( new LinePoint { LineGroupId = 5, Time = _dt, Values = _valReg } );
+        linePoints.Add( new LinePoint { LineGroupId = 5, Time = _time, Values = _valReg } );
         break;
       }
-      _lineSeries.Add( new ChartPoints { XTime = _dt, YValue = _valReg } );
+      _lineSeries.Add( new ChartPoints { XTime = _time, YValue = _valReg } );
     }
 
     private double ConverValuesFfromRegisters( ushort inVal, double inMin, double inMax, double outMin, double outMax ) {
