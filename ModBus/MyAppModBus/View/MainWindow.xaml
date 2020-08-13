@@ -187,6 +187,7 @@
                                      Text="{Binding ReadWrite}"
                                      PreviewTextInput="CheckReadWriteOnRegular"
                                      Controls:TextBoxHelper.ClearTextButton="True"
+                                     Controls:TextBoxHelper.WatermarkAlignment="Left"
                                      Controls:TextBoxHelper.Watermark="введите значение в ms" />
                         </Border>
                         <Button Grid.Row="0"
@@ -271,7 +272,7 @@
                     <chart:SfChart.PrimaryAxis>
                         <chart:TimeSpanAxis Header="Time"
                                             FontSize="12"
-                                            LabelFormat="mm\:ss"
+                                            LabelFormat="mm\:ss\:fff"
                                             LabelsPosition="Outside"
                                             TickLineSize="8"
                                             SmallTickLineSize="4"

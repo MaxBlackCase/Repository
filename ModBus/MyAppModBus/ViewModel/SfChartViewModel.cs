@@ -20,7 +20,7 @@ namespace MyAppModBus.ViewModel {
     private bool _elemEnable = true;
     private bool _elemDisable = false;
     private string _elemVisible = Visibility.Hidden.ToString();
-    private string _readWrite;
+    private string _readWrite = "";
     private ObservableCollection<string> _registers;
     private string _queryRegisters = "Start";
     private string _stateSerialPort = "Подключить";
@@ -68,7 +68,7 @@ namespace MyAppModBus.ViewModel {
       get => _stateSerialPort; set => Set( ref _stateSerialPort, value );
     }
     public string CleanSeries { get => _cleanSeries; set => Set( ref _cleanSeries, value ); }
-    public bool ClearBtn { get => _clearBtn; set => Set(ref _clearBtn, value); }
+    public bool ClearBtn { get => _clearBtn; set => Set( ref _clearBtn, value ); }
 
     #region Свойства видимости и активности элементов
 
@@ -126,15 +126,20 @@ namespace MyAppModBus.ViewModel {
     private bool CanSelectItemCommandExecute( object p ) => true;
     private void OnSelectItemCommandExecuted( object p ) {
 
-      var conToDeviceItem = ctr.ConnectToDevice( _selectedItem );
+      if( _readWrite != "" ) {
 
-      ErrMessage = conToDeviceItem.Item1;
-      StateSerialPort = conToDeviceItem.Item2;
-      QueryRegistrs = conToDeviceItem.Item3;
-      ElemEnable = ctr.SetElementEnable( _elemEnable );
-      ElemDisable = ctr.SetElementDisable( _elemEnable );
-      ClearBtn = conToDeviceItem.Item4;
-      ElemVisible = conToDeviceItem.Item5;
+        var conToDeviceItem = ctr.ConnectToDevice( _selectedItem );
+        ErrMessage = conToDeviceItem.Item1;
+        StateSerialPort = conToDeviceItem.Item2;
+        QueryRegistrs = conToDeviceItem.Item3;
+        ElemEnable = ctr.SetElementEnable( _elemEnable );
+        ElemDisable = ctr.SetElementDisable( _elemEnable );
+        ClearBtn = conToDeviceItem.Item4;
+        ElemVisible = conToDeviceItem.Item5;
+      }
+      else {
+        ErrMessage = "Задайте значение опроса устройства!";
+      }
     }
     #endregion
 
@@ -167,7 +172,8 @@ namespace MyAppModBus.ViewModel {
     }
     private bool CanConverToIntExecute( object p ) => true;
     private void OnConverToIntExecuted( object p ) {
-      ErrMessage = ctr.ConvertToInt( _readWrite );
+      var cnvToInt = ctr.ConvertToInt( _readWrite );
+      ErrMessage = cnvToInt.Item1;
     }
 
     #endregion
@@ -209,6 +215,7 @@ namespace MyAppModBus.ViewModel {
     #endregion
 
     #endregion
+
     public SfChartViewModel() {
       #region Команды
       ConnectToDevice = new LambdaCommand( OnSelectItemCommandExecuted, CanSelectItemCommandExecute );

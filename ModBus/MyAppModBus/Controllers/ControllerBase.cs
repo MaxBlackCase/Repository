@@ -7,10 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity.Migrations;
 using System.IO.Ports;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using System.Web.WebSockets;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -27,12 +24,13 @@ namespace MyAppModBus.Controllers {
     private string _errMessage;
     const ushort startAddress = 0;
     const ushort numburOfPoints = 18;
-    private int _readWriteConvert = 50;
+    private int _readWriteConvert = 0;
     private int _baseMinValReadWrite = 10;
     private int _baseMaxValReadWrite = 1000;
-    private double _countTimes;
+    private int _countTimes;
     private string _queryRegisters;
     private string _elemVisible;
+    private TimeSpan _dTime = new TimeSpan();
     private ObservableCollection<ViewRegisterModel> _viewRegs = new ObservableCollection<ViewRegisterModel>();
     private ObservableCollection<string> _registers = new ObservableCollection<string>();
     private Ellipse _ellipseFittings;
@@ -49,7 +47,6 @@ namespace MyAppModBus.Controllers {
     private ObservableCollection<ChartPoints> _motor = new ObservableCollection<ChartPoints>();
     private ObservableCollection<ChartPoints>[] _arrSerires = new ObservableCollection<ChartPoints>[ 5 ];
     #endregion
-
     public ControllerBase() {
 
       linePointGroup = new List<LineGroup>() {
@@ -110,8 +107,8 @@ namespace MyAppModBus.Controllers {
           _stateSerialPort = "Отключить";
           _queryRegisters = "Start";
           _clearBtn = true;
-          _countTimes = _readWriteConvert;
           _elemVisible = SetElementVisible( true );
+
         }
         else {
           _elemVisible = SetElementVisible( false );
@@ -136,6 +133,7 @@ namespace MyAppModBus.Controllers {
       _stateSerialPort = "Подключить";
       _queryRegisters = "Start";
       _clearBtn = false;
+      _countTimes = 0;
       if( _serial.IsOpen && _timer.IsEnabled ) {
         await Task.Run( () => {
           // <Сброс регистров>
@@ -143,8 +141,6 @@ namespace MyAppModBus.Controllers {
           for( int i = 0; i < cleanRegs.Length; i++ ) {
             _master.WriteSingleRegister( slaveID, cleanRegs[ i ], 0 );
           }
-          //</Сброс регистров>
-          _countTimes = 0;
         } );
       }
       await Task.Run( () => {
@@ -153,7 +149,6 @@ namespace MyAppModBus.Controllers {
         _serial.Dispose();
         _master.Dispose();
       } );
-
       CleanSeriesWithChart();
     }
     #region Elements IsEnable, IsVisibility
@@ -213,6 +208,9 @@ namespace MyAppModBus.Controllers {
       _viewRegs.Clear();
       _registers.Clear();
       _clnEllipseFittings.Clear();
+      _countTimes += _readWriteConvert;
+      _dTime = TimeSpan.FromMilliseconds( _countTimes );
+
       ///Вывод всех регистров на экран
       try {
         if( _serial.IsOpen ) {
@@ -224,12 +222,12 @@ namespace MyAppModBus.Controllers {
             _registers.Add( $"Регистр: {item.ID}\t|  {item.Value}" );
           }
           SetColorEllipses( result[ 9 ], result[ 10 ] );
-          SetPointsSeries( result[ 0 ], 0, _volt, _countTimes );
-          SetPointsSeries( result[ 1 ], 1, _curr, _countTimes );
-          SetPointsSeries( result[ 4 ], 4, _torq, _countTimes );
-          SetPointsSeries( result[ 2 ], 2, _external, _countTimes );
-          SetPointsSeries( result[ 3 ], 3, _motor, _countTimes );
-          _countTimes += _readWriteConvert;
+          SetPointsSeries( result[ 0 ], 0, _volt, _dTime );
+          SetPointsSeries( result[ 1 ], 1, _curr, _dTime );
+          SetPointsSeries( result[ 4 ], 4, _torq, _dTime );
+          SetPointsSeries( result[ 2 ], 2, _external, _dTime );
+          SetPointsSeries( result[ 3 ], 3, _motor, _dTime );
+
         }
         else {
           _timer.Stop();
@@ -239,7 +237,6 @@ namespace MyAppModBus.Controllers {
         _registers.Add( err.Message.ToString() );
         _timer.Stop();
       }
-
     }
     /// <summary>
     /// 
@@ -285,26 +282,25 @@ namespace MyAppModBus.Controllers {
       }
       return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings, _arrSerires, _cleanSeries, _clearBtn);
     }
-    internal string ConvertToInt( string _readWrite ) {
-      _countTimes = 0;
-      if( _readWrite != "" )
-        if( _readWrite != null ) {
-          _readWriteConvert = Convert.ToInt32( _readWrite );
-          if( _readWriteConvert < _baseMinValReadWrite ) {
-            _readWriteConvert = _baseMinValReadWrite;
-            _errMessage = string.Format( "Интервал не может быть меньше {0} ms, поэтому задан интервал по умолчанию {0} ms.", _readWriteConvert );
-          }
-          else if( _readWriteConvert > _baseMaxValReadWrite ) {
-            _readWriteConvert = _baseMaxValReadWrite;
-            _errMessage = string.Format( "Значение не может превышать значение в {0} ms, поэтому задано значение по умолчанию {0} ms.", _readWriteConvert );
-          }
-          else {
-            _errMessage = string.Format( "Значение интервала опроса устроства: {0} ms", _readWriteConvert );
-          }
+    internal (string, int) ConvertToInt( string _readWrite ) {
+      if( _readWrite != "" ) {
+        _readWriteConvert = (int)Convert.ToDouble( _readWrite );
+        if( _readWriteConvert < _baseMinValReadWrite ) {
+          _readWriteConvert = _baseMinValReadWrite;
+          _errMessage = string.Format( "Интервал не может быть меньше {0} ms, поэтому задан интервал по умолчанию {0} ms.", _readWriteConvert );
         }
-        else
-          _errMessage = "Введите значение";
-      return _errMessage;
+        else if( _readWriteConvert > _baseMaxValReadWrite ) {
+          _readWriteConvert = _baseMaxValReadWrite;
+          _errMessage = string.Format( "Значение не может превышать значение в {0} ms, поэтому задано значение по умолчанию {0} ms.", _readWriteConvert );
+        }
+        else {
+          _errMessage = string.Format( "Значение интервала опроса устроства: {0} ms", _readWriteConvert );
+        }
+      }
+      else {
+        _errMessage = string.Format( "Задайте значение опроса устройства!" );
+      }
+      return (_errMessage, _readWriteConvert);
     }
     private void SetColorEllipses( ushort valOne, ushort valTwo ) {
       var regFit = new ushort[ 2 ];
@@ -332,7 +328,6 @@ namespace MyAppModBus.Controllers {
         _clnEllipseFittings.Add( _ellipseFittings );
       }
     }
-
     private bool[] elemBool = new bool[ 3 ] { false, false, false };
     internal string WriteValuesToRegisters( object _indTogElem ) {
 
@@ -388,41 +383,37 @@ namespace MyAppModBus.Controllers {
     /// </summary>
     /// <param name="_valRegister">Значение регистра</param>
     /// <param name="_lineSeries">Имя серии</param>
-    private void SetPointsSeries( ushort _valRegister, int indexRegistrs, ObservableCollection<ChartPoints> _lineSeries, double _countTimes ) {
-      var _time = TimeSpan.FromMilliseconds( _countTimes );
+    private void SetPointsSeries( ushort _valRegister, int indexRegistrs, ObservableCollection<ChartPoints> _lineSeries, TimeSpan _dTime ) {
       double _valReg = 0;
       switch( indexRegistrs ) {
         case 0:
         _valReg = ConverValuesFfromRegisters( _valRegister, 17, 1300, 0.0, 80.0 );
-        linePoints.Add( new LinePoint { LineGroupId = 1, Time = _time, Values = _valReg } );
+        linePoints.Add( new LinePoint { LineGroupId = 1, Time = _dTime, Values = _valReg } );
         break;
         case 1:
         _valReg = ConverValuesFfromRegisters( _valRegister, 5, 46, 0.0, 52.0 );
-        linePoints.Add( new LinePoint { LineGroupId = 2, Time = _time, Values = _valReg } );
+        linePoints.Add( new LinePoint { LineGroupId = 2, Time = _dTime, Values = _valReg } );
         break;
         case 4:
         _valReg = ConverValuesFfromRegisters( _valRegister, 45, 4046, -1000.0, 1000.0 );
-        linePoints.Add( new LinePoint { LineGroupId = 3, Time = _time, Values = _valReg } );
+        linePoints.Add( new LinePoint { LineGroupId = 3, Time = _dTime, Values = _valReg } );
         break;
         case 2:
         _valReg = Convert.ToDouble( _valRegister );
-        linePoints.Add( new LinePoint { LineGroupId = 4, Time = _time, Values = _valReg } );
+        linePoints.Add( new LinePoint { LineGroupId = 4, Time = _dTime, Values = _valReg } );
         break;
         case 3:
         _valReg = Convert.ToDouble( _valRegister );
-        linePoints.Add( new LinePoint { LineGroupId = 5, Time = _time, Values = _valReg } );
+        linePoints.Add( new LinePoint { LineGroupId = 5, Time = _dTime, Values = _valReg } );
         break;
       }
-      _lineSeries.Add( new ChartPoints { XTime = _time, YValue = _valReg } );
+      _lineSeries.Add( new ChartPoints { XTime = _dTime, YValue = _valReg } );
     }
-
     private double ConverValuesFfromRegisters( ushort inVal, double inMin, double inMax, double outMin, double outMax ) {
-
       var x = Convert.ToDouble( inVal );
       var result = (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
       return Math.Round( result, 2 );
     }
-
     internal void CleanSeriesWithChart() {
 
       foreach( var item in _arrSerires ) {
@@ -481,7 +472,6 @@ namespace MyAppModBus.Controllers {
     }
     internal async void DeletedFromTable() {
       try {
-        _countTimes = 0;
         linePoints.Clear();
         using( var context = new SampleContext() ) {
           await Task.Run( () => {
@@ -496,7 +486,6 @@ namespace MyAppModBus.Controllers {
         _errMessage = err.Message.ToString();
       }
     }
-
 
   }
 }

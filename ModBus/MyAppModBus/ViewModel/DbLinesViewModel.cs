@@ -1,19 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using MyAppModBus.Models.DbModel;
 using MyAppModBus.ViewModel.Base;
 
 namespace MyAppModBus.ViewModel {
   internal class DbLinesViewModel : ViewModelBase {
 
-    private List<(TimeSpan, int)> _lst = new List<(TimeSpan, int)>();
+    private Random rand = new Random();
 
-    public List<(TimeSpan, int)> List { get => _lst; set => Set(ref _lst, value); }
+    private ObservableCollection<LinePoint> _orders;
+    public ObservableCollection<LinePoint> Orders { get => _orders; set => Set( ref _orders, value ); }
+
     public DbLinesViewModel() {
-      var rand = new Random();
-      for( int i = 0; i < 400; i++ ) {
-        _lst.Add((TimeSpan.FromSeconds(rand.Next(1000, 10000)), rand.Next(-1000, 9561)) );
-      }
+      _orders = new ObservableCollection<LinePoint>();
+      this.GenerateOrders();
+    }
 
+    private async void GenerateOrders() {
+      await Task.Run( () => {
+        for( int i = 0; i < 20; i++ ) {
+          _orders.Add( new LinePoint { 
+            Id = i, 
+            LineGroupId = rand.Next(1, 6), 
+            Time = TimeSpan.FromSeconds(rand.Next(20, 60)),
+            Values = rand.Next(1564, 87984)
+          } );
+        }
+      } );
     }
   }
 }

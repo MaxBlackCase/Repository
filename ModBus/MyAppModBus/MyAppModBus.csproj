@@ -213,7 +213,13 @@
       <Version>2.1.1</Version>
     </PackageReference>
     <PackageReference Include="Syncfusion.SfChart.WPF">
-      <Version>18.2.0.46</Version>
+      <Version>18.2.0.48</Version>
+    </PackageReference>
+    <PackageReference Include="Syncfusion.SfGrid.WPF">
+      <Version>18.2.0.48</Version>
+    </PackageReference>
+    <PackageReference Include="Syncfusion.Shared.WPF">
+      <Version>18.2.0.48</Version>
     </PackageReference>
     <PackageReference Include="TestDataGenerator">
       <Version>0.0.8</Version>
