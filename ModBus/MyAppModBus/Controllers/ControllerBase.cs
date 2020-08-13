@@ -1,4 +1,5 @@
-﻿using Modbus.Device;
+﻿using MahApps.Metro.Controls;
+using Modbus.Device;
 using MyAppModBus.Context;
 using MyAppModBus.Models;
 using MyAppModBus.Models.DbModel;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity.Migrations;
 using System.IO.Ports;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -24,13 +26,13 @@ namespace MyAppModBus.Controllers {
     private string _errMessage;
     const ushort startAddress = 0;
     const ushort numburOfPoints = 18;
-    private int _readWriteConvert = 0;
+    private int _readWriteConvert;
     private int _baseMinValReadWrite = 10;
     private int _baseMaxValReadWrite = 1000;
-    private int _countTimes;
+    private int _countTimes = 0;
+    private TimeSpan _dTime = new TimeSpan(0,0,0,0,0);
     private string _queryRegisters;
     private string _elemVisible;
-    private TimeSpan _dTime = new TimeSpan();
     private ObservableCollection<ViewRegisterModel> _viewRegs = new ObservableCollection<ViewRegisterModel>();
     private ObservableCollection<string> _registers = new ObservableCollection<string>();
     private Ellipse _ellipseFittings;
@@ -133,7 +135,6 @@ namespace MyAppModBus.Controllers {
       _stateSerialPort = "Подключить";
       _queryRegisters = "Start";
       _clearBtn = false;
-      _countTimes = 0;
       if( _serial.IsOpen && _timer.IsEnabled ) {
         await Task.Run( () => {
           // <Сброс регистров>
@@ -208,9 +209,6 @@ namespace MyAppModBus.Controllers {
       _viewRegs.Clear();
       _registers.Clear();
       _clnEllipseFittings.Clear();
-      _countTimes += _readWriteConvert;
-      _dTime = TimeSpan.FromMilliseconds( _countTimes );
-
       ///Вывод всех регистров на экран
       try {
         if( _serial.IsOpen ) {
@@ -221,12 +219,16 @@ namespace MyAppModBus.Controllers {
           foreach( var item in _viewRegs ) {
             _registers.Add( $"Регистр: {item.ID}\t|  {item.Value}" );
           }
+
+          _countTimes += _readWriteConvert;
+          _dTime = TimeSpan.FromMilliseconds(_countTimes);
+
           SetColorEllipses( result[ 9 ], result[ 10 ] );
-          SetPointsSeries( result[ 0 ], 0, _volt, _dTime );
-          SetPointsSeries( result[ 1 ], 1, _curr, _dTime );
-          SetPointsSeries( result[ 4 ], 4, _torq, _dTime );
-          SetPointsSeries( result[ 2 ], 2, _external, _dTime );
-          SetPointsSeries( result[ 3 ], 3, _motor, _dTime );
+          SetPointsSeries( result[ 0 ], 0, _volt );
+          SetPointsSeries( result[ 1 ], 1, _curr );
+          SetPointsSeries( result[ 4 ], 4, _torq );
+          SetPointsSeries( result[ 2 ], 2, _external );
+          SetPointsSeries( result[ 3 ], 3, _motor );
 
         }
         else {
@@ -260,7 +262,6 @@ namespace MyAppModBus.Controllers {
             else
               _cleanSeries = "Очистить";
           }
-
           if( !_timer.IsEnabled ) {
             _timer.Start();
             _queryRegisters = "Stop";
@@ -383,7 +384,7 @@ namespace MyAppModBus.Controllers {
     /// </summary>
     /// <param name="_valRegister">Значение регистра</param>
     /// <param name="_lineSeries">Имя серии</param>
-    private void SetPointsSeries( ushort _valRegister, int indexRegistrs, ObservableCollection<ChartPoints> _lineSeries, TimeSpan _dTime ) {
+    private void SetPointsSeries( ushort _valRegister, int indexRegistrs, ObservableCollection<ChartPoints> _lineSeries  ) {
       double _valReg = 0;
       switch( indexRegistrs ) {
         case 0:
@@ -421,7 +422,7 @@ namespace MyAppModBus.Controllers {
           item.Clear();
         }
       }
-
+      _countTimes = 0;
     }
     private async void SetDbSeriesLine() {
 
