@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -11,6 +12,7 @@ namespace RealTime {
     private static Random rand = new Random();
     private static TimeSpan _time = new TimeSpan();
     private static string _nameSeries = "Series Title";
+    private static Excel.Application exApp = new Excel.Application();
 
     public static string NameSeries { get => _nameSeries; set => _nameSeries = value; }
     public static string NameExcelFile { get => _nameExcelFile; set => _nameExcelFile = value; }
@@ -23,15 +25,15 @@ namespace RealTime {
       }
       Console.WriteLine( "\n-------Нажмите Enter-------" );
       Console.ReadKey();
+      KillToExcelProcess();
     }
 
     private async static void SaveSeriesData() {
 
-      Excel.Application exApp = new Excel.Application();
       exApp.Workbooks.Add();
       Excel.Worksheet wsh = (Excel.Worksheet)exApp.ActiveSheet;
 
-      var arrNums = new int[ 60 ];
+      var arrNums = new int[ 500 ];
 
       for( int i = 1; i < 3; i++ ) {
         if( (i) % 2 != 0 ) {
@@ -40,7 +42,6 @@ namespace RealTime {
         else {
           wsh.Cells[ 1, i ] = NameSeries;
         }
-
       }
 
       int countTime = 0;
@@ -57,15 +58,25 @@ namespace RealTime {
           }
           countTime++;
         }
+
+        Excel.ChartObjects _chartObjectsSeries = (Excel.ChartObjects)wsh.ChartObjects();
+
+        Excel.ChartObject _chartObjectSeries = _chartObjectsSeries.Add( 150, 25, 1024, 450 );
+
+        _chartObjectSeries.Chart.ChartWizard( wsh.Range[ "A1", $"B{arrNums.Length - 1}" ], Excel.XlChartType.xlLineMarkers, "Title" );
+
+        _chartObjectSeries.Chart.ChartStyle = 204;
+
       } );
-
-
-      Excel.ChartObjects _chartObjectsSeries = (Excel.ChartObjects)wsh.ChartObjects();
-
-      Excel.ChartObject _chartObjectSeries = _chartObjectsSeries.Add( 150, 25, 1024, 450 );
-
-      _chartObjectSeries.Chart.ChartWizard( wsh.Range[ "A1", $"B{arrNums.Length - 1}" ], Excel.XlChartType.xlLineMarkers, "Title" );
       exApp.Visible = true;
+    }
+
+    private static void KillToExcelProcess() {
+      Process[] List;
+      List = Process.GetProcessesByName( "EXCEL" );
+      foreach( Process proc in List ) {
+        proc.Kill();
+      }
     }
   }
 }
