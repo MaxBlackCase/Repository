@@ -1,5 +1,4 @@
-﻿using MahApps.Metro.Controls;
-using Modbus.Device;
+﻿using Modbus.Device;
 using MyAppModBus.Context;
 using MyAppModBus.Models;
 using MyAppModBus.Models.DbModel;
@@ -8,7 +7,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity.Migrations;
 using System.IO.Ports;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -486,6 +484,10 @@ namespace MyAppModBus.Controllers {
       catch( Exception err ) {
         _errMessage = err.Message.ToString();
       }
+    }
+
+    internal void ExportDataToExcel() {
+      
     }
 
   }

@@ -212,6 +212,9 @@
     <PackageReference Include="MahApps.Metro">
       <Version>2.1.1</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.Office.Interop.Excel">
+      <Version>15.0.4795.1000</Version>
+    </PackageReference>
     <PackageReference Include="Syncfusion.SfChart.WPF">
       <Version>18.2.0.48</Version>
     </PackageReference>
