@@ -8,9 +8,9 @@
                  xmlns:msk="http://schemas.xceed.com/wpf/xaml/toolkit"
                  mc:Ignorable="d"
                  Title="Export Chart"
-                 Height="160"
+                 Height="200"
                  Width="250"
-                 MinHeight="160"
+                 MinHeight="200"
                  MinWidth="250"
                  MaxHeight="250"
                  MaxWidth="250"
@@ -21,15 +21,49 @@
     <mah:MetroWindow.DataContext>
         <vm:ExportChartViewModel />
     </mah:MetroWindow.DataContext>
+    <mah:MetroWindow.Resources>
+        <Style TargetType="CheckBox" x:Key="chckBoxExport">
+            <Setter Property="Margin"
+                    Value="10 5 " />
+        </Style>
+    </mah:MetroWindow.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Vertical"
                     Background="#212121">
-            <ComboBox ItemsSource="{Binding NameSeries}"
+            <!--<ComboBox ItemsSource="{Binding NameSeries}"
                       SelectedIndex="{Binding SelectItem}" 
-                      Margin="10 5" />
+                      Margin="10 5" />-->
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <CheckBox Grid.Row="0"
+                          Grid.Column="0"
+                          Content="Напряжение" Style="{StaticResource chckBoxExport}"/>
+                <CheckBox Grid.Row="0"
+                          Grid.Column="1"
+                          Content="Ток"
+                          Style="{StaticResource chckBoxExport}" />
+                <CheckBox Grid.Row="1"
+                          Grid.Column="0"
+                          Content="Момент" Style="{StaticResource chckBoxExport}"/>
+                <CheckBox Grid.Row="1"
+                          Grid.Column="1"
+                          Content="Обороты" Style="{StaticResource chckBoxExport}" />
+                <CheckBox Grid.Row="2"
+                          Grid.Column="0"
+                          Content="Empty" Style="{StaticResource chckBoxExport}"/>
+            </Grid>
+
             <Grid Margin="10 0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
@@ -38,7 +72,9 @@
                 <StackPanel Orientation="Vertical"
                             HorizontalAlignment="Left">
                     <TextBlock Text="Min"
-                               Grid.Column="0" HorizontalAlignment="Right" Margin="0 0 0 2"/>
+                               Grid.Column="0"
+                               HorizontalAlignment="Right"
+                               Margin="0 0 0 2" />
                     <msk:TimeSpanUpDown Width="auto"
                                         Padding="5 0"
                                         Foreground="#fff"
@@ -53,7 +89,8 @@
                             HorizontalAlignment="Right"
                             Grid.Column="1"
                             Margin="0 0 0 2">
-                    <TextBlock Text="Max" HorizontalAlignment="Right"/>
+                    <TextBlock Text="Max"
+                               HorizontalAlignment="Right" />
                     <msk:TimeSpanUpDown Width="auto"
                                         Padding="5 0"
                                         Foreground="#fff"
@@ -72,6 +109,6 @@
                  Content="Export"
                  VerticalAlignment="Bottom"
                  Margin="0 10"
-                 Command="{Binding Path=ExportToXLS}"/>
+                 Command="{Binding Path=ExportToXLS}" />
     </Grid>
 </mah:MetroWindow>
