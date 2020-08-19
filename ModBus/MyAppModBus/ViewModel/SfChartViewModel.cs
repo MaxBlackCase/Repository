@@ -1,13 +1,11 @@
 ﻿using MyAppModBus.Commands;
 using MyAppModBus.Controllers;
 using MyAppModBus.Models;
-using MyAppModBus.View.Pages;
+using MyAppModBus.View;
 using MyAppModBus.ViewModel.Base;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Shapes;
 
@@ -28,6 +26,13 @@ namespace MyAppModBus.ViewModel {
     private ObservableCollection<Ellipse> _colorEndFittings;
     private bool _clearBtn;
 
+    #region ForExcel
+    private  string _nameSeries = "Series Title";
+    private  string _nameExcelFile;
+    private  int _minValueTime = 1000;
+    private  int _maxValueTime = 8000;
+    #endregion
+
     #region Коллекции объектов точек серий 
 
     private ObservableCollection<ChartPoints> _pointsSeriesVolt;
@@ -43,6 +48,14 @@ namespace MyAppModBus.ViewModel {
     private ControllerBase ctr = null;
 
     #region Свойства
+
+    #region ForExcel
+    public string NameSeries { get => _nameSeries; set => _nameSeries = value; }
+    public string NameExcelFile { get => _nameExcelFile; set => _nameExcelFile = value; }
+
+    public int MinValueTime { get => _minValueTime; set => _minValueTime = value; }
+    public int MaxValueTime { get => _maxValueTime; set => _maxValueTime = value; }
+    #endregion
     public List<string> PortList {
       get => _portList;
       set => Set( ref _portList, value );
@@ -194,11 +207,11 @@ namespace MyAppModBus.ViewModel {
     #endregion
 
     #region Открытие окна с данными о точках на графике
-    public ICommand SetDbLines { get; set; }
+    public ICommand ExportChart { get; set; }
     private bool CanSetDbLinesExecute( object p ) => true;
     private void OnSetDbLinesExecuted( object p ) {
-      var winDbLines = new DbLines();
-      winDbLines.Show();
+      var expChart = new ExportChart();
+      expChart.Show();
     }
     #endregion
 
@@ -222,7 +235,7 @@ namespace MyAppModBus.ViewModel {
       GetRegistersValues = new LambdaCommand( OnGetRegistersValuesExecuted, CanGetRegistersValuesExute );
       ConverToInt = new LambdaCommand( OnConverToIntExecuted, CanConverToIntExecute );
       WriteToRegisters = new LambdaCommand( OnWriteToRegistersExuted, CanWriteToRegistersExute );
-      SetDbLines = new LambdaCommand( OnSetDbLinesExecuted, CanSetDbLinesExecute );
+      ExportChart = new LambdaCommand( OnSetDbLinesExecuted, CanSetDbLinesExecute );
       CleaningChart = new LambdaCommand( OnCleaningChartExecuted, CanCleaningChartExecute );
       #endregion
 

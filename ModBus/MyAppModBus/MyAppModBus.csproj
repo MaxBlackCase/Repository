@@ -156,11 +156,12 @@
     <Compile Include="Models\DbModel\LinePoint.cs" />
     <Compile Include="Models\ViewRegisterModel.cs" />
     <Compile Include="ViewModel\Base\ViewModelBase.cs" />
-    <Compile Include="ViewModel\DbLinesViewModel.cs" />
+    <Compile Include="ViewModel\ExportChartViewModel.cs" />
     <Compile Include="ViewModel\SfChartViewModel.cs" />
-    <Compile Include="View\DbLines.xaml.cs">
-      <DependentUpon>DbLines.xaml</DependentUpon>
-    </Compile>
+    <Page Include="View\ExportChart.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -169,14 +170,13 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="View\ExportChart.xaml.cs">
+      <DependentUpon>ExportChart.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="View\DbLines.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -208,6 +208,9 @@
   <ItemGroup>
     <PackageReference Include="EntityFramework">
       <Version>6.4.4</Version>
+    </PackageReference>
+    <PackageReference Include="Extended.Wpf.Toolkit">
+      <Version>4.0.1</Version>
     </PackageReference>
     <PackageReference Include="MahApps.Metro">
       <Version>2.1.1</Version>

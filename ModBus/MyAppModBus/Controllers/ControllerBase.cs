@@ -6,12 +6,15 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity.Migrations;
+using System.Diagnostics;
+using System.IO;
 using System.IO.Ports;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MyAppModBus.Controllers {
   internal class ControllerBase {
@@ -38,6 +41,17 @@ namespace MyAppModBus.Controllers {
     private string _cleanSeries;
     private List<LineGroup> linePointGroup;
     private List<LinePoint> linePoints = new List<LinePoint>();
+    private Random rand = new Random();
+    private TimeSpan _time;
+    
+    private Excel.Application exApp = new Excel.Application();
+    private string _exlPath = null;
+
+
+    private List<string> _timeList = new List<string>();
+    private List<int> _valueList = new List<int>();
+
+    public int CountTime { get => _countTimes; set => _countTimes = value; }
 
     #region LineSeriesCollection
     private ObservableCollection<ChartPoints> _volt = new ObservableCollection<ChartPoints>();
@@ -486,8 +500,85 @@ namespace MyAppModBus.Controllers {
       }
     }
 
-    internal void ExportDataToExcel() {
-      
+    internal async void ExportDataToExcel(TimeSpan _minValueTime, TimeSpan _maxValueTime, int _nameSeries ) {
+      exApp.Workbooks.Add();
+      Excel.Worksheet wsh = (Excel.Worksheet)exApp.ActiveSheet;
+
+      var arrNums = new int[ 100 ];
+
+      for( int i = 1; i < 3; i++ ) {
+        if( (i) % 2 != 0 ) {
+          wsh.Cells[ 1, i ] = "Time";
+        }
+        else {
+          wsh.Cells[ 1, i ] = "Series Value";
+        }
+      }
+
+      var _dataSeries = new ObservableCollection<ChartPoints>();
+      //var indSeries = _nameSeries.IndexOf();
+
+      switch( _nameSeries) {
+        case 0:
+        _dataSeries = _volt;
+        break;
+        case 1:
+        _dataSeries = _curr;
+        break;
+        case 2:
+        _dataSeries = _torq;
+        break;
+        case 3:
+        _dataSeries = _external;
+        break;
+        case 4:
+        _dataSeries = _motor;
+        break;
+        default:
+        _errMessage = "Ненайдена серия";
+        break;
+      }
+
+      await Task.Run( () => {
+        for( int i = 0; i < arrNums.Length; i++ ) {
+          _time = new TimeSpan();
+          _time = TimeSpan.FromMilliseconds( _countTimes );
+          if( _time >= _minValueTime && _time <= _maxValueTime ) {
+            _valueList.Add( rand.Next( 458, 6848 ) );
+            _timeList.Add( _time.ToString() );
+          }
+        }
+
+        for( int i = 0; i < _valueList.Count; i++ ) {
+          for( int j = 1; j < 3; j++ ) {
+            if( j % 2 == 0 ) {
+              wsh.Cells[ i + 2, j ] = _valueList[ i ];
+            }
+            else {
+              wsh.Cells[ i + 2, j ] = _timeList[ i ];
+            }
+          }
+        }
+
+        //_exlPath = Environment.CurrentDirectory.ToString() + @"\ExcelFiles\" + _nameSeries.Replace( " ", "" ) + @"_" + Path.GetRandomFileName().ToString() + @".xls"
+        Excel.ChartObjects _chartObjectsSeries = (Excel.ChartObjects)wsh.ChartObjects();
+
+        Excel.ChartObject _chartObjectSeries = _chartObjectsSeries.Add( 150, 25, 1024, 450 );
+
+        _chartObjectSeries.Chart.ChartWizard( wsh.Range[ "A1", $"B{_valueList.Count + 1}" ], Excel.XlChartType.xlLineMarkers );
+
+        _chartObjectSeries.Chart.ChartStyle = 273;
+
+
+        Directory.CreateDirectory( Environment.CurrentDirectory + @"\ExcelFiles" );
+
+
+        exApp.ActiveWorkbook.SaveAs( _exlPath, Excel.XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing, false, false );
+
+        exApp.ActiveWorkbook.Close();
+        exApp.Quit();
+        Process.Start( _exlPath );
+      } );
     }
 
   }

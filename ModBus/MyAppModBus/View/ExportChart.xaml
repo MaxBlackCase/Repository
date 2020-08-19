@@ -1,0 +1,77 @@
+﻿<mah:MetroWindow x:Class="MyAppModBus.View.ExportChart"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns:vm="clr-namespace:MyAppModBus.ViewModel"
+                 xmlns:msk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                 mc:Ignorable="d"
+                 Title="Export Chart"
+                 Height="160"
+                 Width="250"
+                 MinHeight="160"
+                 MinWidth="250"
+                 MaxHeight="250"
+                 MaxWidth="250"
+                 ResizeMode="NoResize"
+                 SaveWindowPosition="True"
+                 WindowStartupLocation="CenterScreen"
+                 Foreground="#fff">
+    <mah:MetroWindow.DataContext>
+        <vm:ExportChartViewModel />
+    </mah:MetroWindow.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Vertical"
+                    Background="#212121">
+            <ComboBox ItemsSource="{Binding NameSeries}"
+                      SelectedIndex="{Binding SelectItem}" 
+                      Margin="10 5" />
+            <Grid Margin="10 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Vertical"
+                            HorizontalAlignment="Left">
+                    <TextBlock Text="Min"
+                               Grid.Column="0" HorizontalAlignment="Right" Margin="0 0 0 2"/>
+                    <msk:TimeSpanUpDown Width="auto"
+                                        Padding="5 0"
+                                        Foreground="#fff"
+                                        Watermark="00:00:00"
+                                        Minimum="00:00:00:000"
+                                        Value="{Binding MinValueTime}"
+                                        TextAlignment="Right"
+                                        HorizontalAlignment="Right"
+                                        Margin="5 0 0 0" />
+                </StackPanel>
+                <StackPanel Orientation="Vertical"
+                            HorizontalAlignment="Right"
+                            Grid.Column="1"
+                            Margin="0 0 0 2">
+                    <TextBlock Text="Max" HorizontalAlignment="Right"/>
+                    <msk:TimeSpanUpDown Width="auto"
+                                        Padding="5 0"
+                                        Foreground="#fff"
+                                        ClipValueToMinMax="True"
+                                        AllowDrop="True"
+                                        Watermark="00:00:00:000"
+                                        Value="{Binding MaxValueTime}"
+                                        TextAlignment="Right"
+                                        Minimum="00:00:00"
+                                        HorizontalAlignment="Right"
+                                        Margin="5 0 0 0" />
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+        <Button  Width="100"
+                 Content="Export"
+                 VerticalAlignment="Bottom"
+                 Margin="0 10"
+                 Command="{Binding Path=ExportToXLS}"/>
+    </Grid>
+</mah:MetroWindow>

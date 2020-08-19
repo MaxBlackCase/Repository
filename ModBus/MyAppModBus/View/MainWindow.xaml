@@ -8,6 +8,8 @@
                       xmlns:chart="http://schemas.syncfusion.com/wpf"
                       mc:Ignorable="d"
                       Title="ModBus(RTU)"
+                      Height="720"
+                      Width="1080"
                       MinHeight="720"
                       MaxHeight="1080"
                       MinWidth="1280"
@@ -31,8 +33,9 @@
         </Grid.RowDefinitions>
         <Menu VerticalAlignment="Top"
               Grid.Row="0">
-            <MenuItem Header="DB Lines"
-                      Command="{Binding SetDbLines}"></MenuItem>
+            <MenuItem Header="File" IsEnabled="{Binding ElemDisable}">
+                <MenuItem Header="Expot Chart" Command="{Binding Path=ExportChart}" />
+            </MenuItem>
         </Menu>
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
