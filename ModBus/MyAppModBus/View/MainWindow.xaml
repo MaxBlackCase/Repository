@@ -33,7 +33,7 @@
         </Grid.RowDefinitions>
         <Menu VerticalAlignment="Top"
               Grid.Row="0">
-            <MenuItem Header="File" IsEnabled="{Binding ElemDisable}">
+            <MenuItem Header="File" IsEnabled="{Binding }">
                 <MenuItem Header="Expot Chart" Command="{Binding Path=ExportChart}" />
             </MenuItem>
         </Menu>

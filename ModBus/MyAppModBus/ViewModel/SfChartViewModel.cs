@@ -27,10 +27,10 @@ namespace MyAppModBus.ViewModel {
     private bool _clearBtn;
 
     #region ForExcel
-    private  string _nameSeries = "Series Title";
-    private  string _nameExcelFile;
-    private  int _minValueTime = 1000;
-    private  int _maxValueTime = 8000;
+    private string _nameSeries = "Series Title";
+    private string _nameExcelFile;
+    private int _minValueTime = 1000;
+    private int _maxValueTime = 8000;
     #endregion
 
     #region Коллекции объектов точек серий 
@@ -222,11 +222,9 @@ namespace MyAppModBus.ViewModel {
 
     private void OnCleaningChartExecuted( object p ) {
       ctr.CleanSeriesWithChart();
-      ctr.DeletedFromTable();
     }
 
     #endregion
-
     #endregion
 
     public SfChartViewModel() {
