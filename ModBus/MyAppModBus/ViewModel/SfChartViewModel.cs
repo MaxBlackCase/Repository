@@ -16,7 +16,8 @@ using System.Windows.Shapes;
 namespace MyAppModBus.ViewModel {
   internal class SfChartViewModel : ViewModelBase {
     private ControllerBase ctr = null;
-    private static ExportChart expToExlWin = null;
+    private ExportChart expToExlWin = null;
+
     private List<string> _portList;
     private int _readWriteTimeOut;
     private string _errMessage = "Подключитесь к COM порту...";
@@ -254,7 +255,6 @@ namespace MyAppModBus.ViewModel {
     public ICommand ExportToExlWindow { get; set; }
     private bool CanSetDbLinesExecute( object p ) => true;
     private void OnSetDbLinesExecuted( object p ) {
-      expToExlWin = new ExportChart();
       expToExlWin.ShowDialog();
     }
     #endregion
@@ -275,10 +275,9 @@ namespace MyAppModBus.ViewModel {
     private bool CanExportToXLSExecute( object p ) => true;
     private void OnExportToXLSExecuted( object p ) {
       var arrBoolVal = new bool[] { _chVolt, _chCurr, _chTorq, _chExt, _chMot };
-      ctr.ExportDataToExcelAsync( MinValueTimeExl, MaxValueTimeExl, arrBoolVal, _nameSeriesExl, _allSeries, _allTime);
+      ctr.ExportDataToExcelAsync( MinValueTimeExl, MaxValueTimeExl, arrBoolVal, _nameSeriesExl );
     }
     #endregion
-
     #endregion
 
     public SfChartViewModel() {
@@ -293,7 +292,7 @@ namespace MyAppModBus.ViewModel {
       #endregion
 
       ctr = new ControllerBase();
-
+      expToExlWin = new ExportChart();
       ctr.AddItemToComboBox( ref _portList );
 
       MinValueTimeExl = TimeSpan.FromMilliseconds( 0 );
