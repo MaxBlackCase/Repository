@@ -107,7 +107,6 @@ namespace MyAppModBus.ViewModel {
     public List<string> NameSeriesExl { get => _nameSeriesExl; set => Set( ref _nameSeriesExl, value ); }
     public int SelectItem { get => _selectitem; set => Set( ref _selectitem, value ); }
 
-
     #region Свойства CheckBoxes
     public bool CheckBoxVolt { get => _chVolt; set => SetRightFlag( ref _chVolt, value ); }
     public bool CheckBoxCurr { get => _chCurr; set => SetRightFlag( ref _chCurr, value ); }
@@ -170,6 +169,7 @@ namespace MyAppModBus.ViewModel {
     public ObservableCollection<ChartPoints> PointSeriesExternal {
       get => _pointsSeriesExtern; set => Set( ref _pointsSeriesExtern, value );
     }
+
     #endregion
 
     #endregion
@@ -275,7 +275,7 @@ namespace MyAppModBus.ViewModel {
     private bool CanExportToXLSExecute( object p ) => true;
     private void OnExportToXLSExecuted( object p ) {
       var arrBoolVal = new bool[] { _chVolt, _chCurr, _chTorq, _chExt, _chMot };
-      ctr.ExportDataToExcelAsync( MinValueTimeExl, MaxValueTimeExl, arrBoolVal, _nameSeriesExl);
+      ctr.ExportDataToExcelAsync( MinValueTimeExl, MaxValueTimeExl, arrBoolVal, _nameSeriesExl, _allSeries, _allTime);
     }
     #endregion
 

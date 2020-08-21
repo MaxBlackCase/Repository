@@ -264,7 +264,7 @@ namespace MyAppModBus.Controllers {
     /// <param name="_queryRegisters">Значение кнопки</param>
     /// <returns></returns>
     private bool _clearBtn;
-    internal (ObservableCollection<string>, string, string, ObservableCollection<Ellipse>, ObservableCollection<ChartPoints>[], string, bool) RegistersRequest() {
+    internal (ObservableCollection<string>, string, string, ObservableCollection<Ellipse>, ObservableCollection<ChartPoints>[], string, bool, List<double>) RegistersRequest() {
       try {
         if( _serial.IsOpen ) {
           #region <Timer>
@@ -298,7 +298,7 @@ namespace MyAppModBus.Controllers {
       catch( Exception err ) {
         _errMessage = err.Message.ToString();
       }
-      return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings, _arrSerires, _cleanSeries, _clearBtn);
+      return (_registers, _queryRegisters, _errMessage, _clnEllipseFittings, _arrSerires, _cleanSeries, _clearBtn, _countTimeList);
     }
     internal (string, int) ConvertToInt( string _readWrite ) {
       if( _readWrite != "" ) {
@@ -531,14 +531,6 @@ namespace MyAppModBus.Controllers {
 
 
         wsh.Cells[ 1, 1 ] = "Time";
-
-        var arrVoltListExl = _voltListExl.ToArray();
-        var arrCurrListExl = _currListExl.ToArray();
-        var arrTorqListExl = _torqListExl.ToArray();
-        var arrExtListExl = _extListExl.ToArray();
-        var arrMotListExl = _motListExl.ToArray();
-        var allArrExl = new[] { arrVoltListExl, arrCurrListExl, arrTorqListExl, arrExtListExl, arrMotListExl };
-
 
         //Задаем интервал времени
         foreach( var setTimeItem in _countTimeList ) {
