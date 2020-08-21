@@ -1,16 +1,22 @@
-﻿using MyAppModBus.Commands;
+﻿using MahApps.Metro.Controls.Dialogs;
+using MaterialDesignThemes.Wpf;
+using MyAppModBus.Commands;
 using MyAppModBus.Controllers;
 using MyAppModBus.Models;
 using MyAppModBus.View;
 using MyAppModBus.ViewModel.Base;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Shapes;
 
 namespace MyAppModBus.ViewModel {
   internal class SfChartViewModel : ViewModelBase {
+    private ControllerBase ctr = null;
+    private static ExportChart expToExlWin = null;
     private List<string> _portList;
     private int _readWriteTimeOut;
     private string _errMessage = "Подключитесь к COM порту...";
@@ -25,6 +31,25 @@ namespace MyAppModBus.ViewModel {
     private string _cleanSeries = "очистить";
     private ObservableCollection<Ellipse> _colorEndFittings;
     private bool _clearBtn;
+
+    #region Variables
+    private TimeSpan _minValueTimeExl = new TimeSpan();
+    private TimeSpan _maxValueTimeExl = new TimeSpan();
+    private List<string> _nameSeriesExl = new List<string>();
+    private int _selectitem;
+
+
+
+    //Переменные Чекбоксов
+    #region Чекбоксы
+    private bool _chVolt = false;
+    private bool _chCurr = false;
+    private bool _chTorq = false;
+    private bool _chExt = false;
+    private bool _chMot = false;
+    private bool? _chAll = null;
+    #endregion
+    #endregion
 
     #region ForExcel
     private string _nameSeries = "Series Title";
@@ -41,11 +66,6 @@ namespace MyAppModBus.ViewModel {
     private ObservableCollection<ChartPoints> _pointsSeriesExtern;
     private ObservableCollection<ChartPoints> _pointsSeriesMotor;
     #endregion
-
-    /// <summary>
-    /// Контроллер
-    /// </summary>
-    private ControllerBase ctr = null;
 
     #region Свойства
 
@@ -82,6 +102,31 @@ namespace MyAppModBus.ViewModel {
     }
     public string CleanSeries { get => _cleanSeries; set => Set( ref _cleanSeries, value ); }
     public bool ClearBtn { get => _clearBtn; set => Set( ref _clearBtn, value ); }
+    public TimeSpan MinValueTimeExl { get => _minValueTimeExl; set => Set( ref _minValueTimeExl, value ); }
+    public TimeSpan MaxValueTimeExl { get => _maxValueTimeExl; set => Set( ref _maxValueTimeExl, value ); }
+    public List<string> NameSeriesExl { get => _nameSeriesExl; set => Set( ref _nameSeriesExl, value ); }
+    public int SelectItem { get => _selectitem; set => Set( ref _selectitem, value ); }
+
+
+    #region Свойства CheckBoxes
+    public bool CheckBoxVolt { get => _chVolt; set => SetRightFlag( ref _chVolt, value ); }
+    public bool CheckBoxCurr { get => _chCurr; set => SetRightFlag( ref _chCurr, value ); }
+    public bool CheckBoxTorq { get => _chTorq; set => SetRightFlag( ref _chTorq, value ); }
+    public bool CheckBoxExt { get => _chExt; set => SetRightFlag( ref _chExt, value ); }
+    public bool CheckBoxMot { get => _chMot; set => SetRightFlag( ref _chMot, value ); }
+    public bool? CheckBoxAll {
+      get => _chAll;
+      set
+      {
+        if( _chAll != value ) {
+          Set( ref _chAll, value );
+          if( _chAll.HasValue ) {
+            CheckBoxVolt = CheckBoxCurr = CheckBoxTorq = CheckBoxExt = CheckBoxMot = (bool)_chAll;
+          }
+        }
+      }
+    }
+    #endregion
 
     #region Свойства видимости и активности элементов
 
@@ -125,7 +170,6 @@ namespace MyAppModBus.ViewModel {
     public ObservableCollection<ChartPoints> PointSeriesExternal {
       get => _pointsSeriesExtern; set => Set( ref _pointsSeriesExtern, value );
     }
-
     #endregion
 
     #endregion
@@ -206,12 +250,12 @@ namespace MyAppModBus.ViewModel {
     }
     #endregion
 
-    #region Открытие окна с данными о точках на графике
-    public ICommand ExportChart { get; set; }
+    #region Открытие окна эксорта в ексель
+    public ICommand ExportToExlWindow { get; set; }
     private bool CanSetDbLinesExecute( object p ) => true;
     private void OnSetDbLinesExecuted( object p ) {
-      var expChart = new ExportChart();
-      expChart.Show();
+      expToExlWin = new ExportChart();
+      expToExlWin.ShowDialog();
     }
     #endregion
 
@@ -225,6 +269,16 @@ namespace MyAppModBus.ViewModel {
     }
 
     #endregion
+
+    #region Экспорт серии в ексель
+    public ICommand ExportDataToXLS { get; set; }
+    private bool CanExportToXLSExecute( object p ) => true;
+    private void OnExportToXLSExecuted( object p ) {
+      var arrBoolVal = new bool[] { _chVolt, _chCurr, _chTorq, _chExt, _chMot };
+      ctr.ExportDataToExcelAsync( MinValueTimeExl, MaxValueTimeExl, arrBoolVal, _nameSeriesExl);
+    }
+    #endregion
+
     #endregion
 
     public SfChartViewModel() {
@@ -233,12 +287,45 @@ namespace MyAppModBus.ViewModel {
       GetRegistersValues = new LambdaCommand( OnGetRegistersValuesExecuted, CanGetRegistersValuesExute );
       ConverToInt = new LambdaCommand( OnConverToIntExecuted, CanConverToIntExecute );
       WriteToRegisters = new LambdaCommand( OnWriteToRegistersExuted, CanWriteToRegistersExute );
-      ExportChart = new LambdaCommand( OnSetDbLinesExecuted, CanSetDbLinesExecute );
       CleaningChart = new LambdaCommand( OnCleaningChartExecuted, CanCleaningChartExecute );
+      ExportToExlWindow = new LambdaCommand( OnSetDbLinesExecuted, CanSetDbLinesExecute );
+      ExportDataToXLS = new LambdaCommand( OnExportToXLSExecuted, CanExportToXLSExecute );
       #endregion
 
       ctr = new ControllerBase();
+
       ctr.AddItemToComboBox( ref _portList );
+
+      MinValueTimeExl = TimeSpan.FromMilliseconds( 0 );
+      MaxValueTimeExl = TimeSpan.FromMilliseconds( 0 );
+
+      var name = new string[] { "Напряжение", "Ток", "Момент", "Обороты", "Empty" };
+      _nameSeriesExl.AddRange( name );
+
+    }
+
+    private bool SetRightFlag( ref bool field, bool value, [CallerMemberName] string propName = null ) {
+      if( field != value ) {
+        Set( ref field, value, propName );
+        UpdateAll();
+        return true;
+      }
+      return false;
+    }
+    protected void UpdateAll() {
+      //  Don't call the All setter from here, because it has side effects.
+      if( CheckBoxVolt && CheckBoxCurr && CheckBoxTorq && CheckBoxExt && CheckBoxMot ) {
+        _chAll = true;
+        OnPropertyChanged( nameof( CheckBoxAll ) );
+      }
+      else if( !CheckBoxVolt && !CheckBoxCurr && !CheckBoxTorq && !CheckBoxExt && !CheckBoxMot ) {
+        _chAll = false;
+        OnPropertyChanged( nameof( CheckBoxAll ) );
+      }
+      else if( CheckBoxAll.HasValue ) {
+        _chAll = null;
+        OnPropertyChanged( nameof( CheckBoxAll ) );
+      }
     }
 
   }

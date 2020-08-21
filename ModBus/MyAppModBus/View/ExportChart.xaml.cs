@@ -1,10 +1,15 @@
-﻿namespace MyAppModBus.View {
+﻿using System.Windows;
+using MyAppModBus.Controllers;
+using MyAppModBus.View;
+
+namespace MyAppModBus.View {
   /// <summary>
   /// Логика взаимодействия для ExportChart.xaml
   /// </summary>
   public partial class ExportChart {
-    public ExportChart() {
+    internal ExportChart() {
       InitializeComponent();
     }
   }
 }
+

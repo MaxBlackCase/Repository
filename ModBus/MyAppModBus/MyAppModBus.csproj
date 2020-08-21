@@ -156,8 +156,10 @@
     <Compile Include="Models\DbModel\LinePoint.cs" />
     <Compile Include="Models\ViewRegisterModel.cs" />
     <Compile Include="ViewModel\Base\ViewModelBase.cs" />
-    <Compile Include="ViewModel\ExportChartViewModel.cs" />
     <Compile Include="ViewModel\SfChartViewModel.cs" />
+    <Compile Include="View\UserControls\ExportToExcelControl.xaml.cs">
+      <DependentUpon>ExportToExcelControl.xaml</DependentUpon>
+    </Compile>
     <Page Include="View\ExportChart.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -177,6 +179,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\UserControls\ExportToExcelControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

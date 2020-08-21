@@ -12,10 +12,9 @@
                  Width="auto"
                  SizeToContent="WidthAndHeight"
                  ResizeMode="NoResize"
-                 SaveWindowPosition="True"
                  WindowStartupLocation="CenterScreen">
     <mah:MetroWindow.DataContext>
-        <vm:ExportChartViewModel />
+        <vm:SfChartViewModel />
     </mah:MetroWindow.DataContext>
     <mah:MetroWindow.Resources>
         <Style TargetType="TextBlock">
@@ -47,32 +46,32 @@
                 <CheckBox Grid.Row="0"
                           Grid.Column="0"
                           Content="Напряжение"
-                          IsChecked="{Binding CheckBoxVolt}"
+                          IsChecked="{Binding Path=CheckBoxVolt}"
                           Margin="0 0 10 5" />
                 <CheckBox Grid.Row="0"
                           Grid.Column="1"
                           Content="Ток"
-                          IsChecked="{Binding CheckBoxCurr}"
+                          IsChecked="{Binding Path=CheckBoxCurr}"
                           Margin="0 0 10 5" />
                 <CheckBox Grid.Row="1"
                           Grid.Column="0"
                           Content="Момент"
-                          IsChecked="{Binding CheckBoxTorq}"
+                          IsChecked="{Binding Path=CheckBoxTorq}"
                           Margin="0 0 10 5" />
                 <CheckBox Grid.Row="1"
                           Grid.Column="1"
                           Content="Обороты"
-                          IsChecked="{Binding CheckBoxExt}"
+                          IsChecked="{Binding Path=CheckBoxExt}"
                           Margin="0 0 10 5" />
                 <CheckBox Grid.Row="2"
                           Grid.Column="0"
                           Content="Empty"
-                          IsChecked="{Binding CheckBoxMot}"
+                          IsChecked="{Binding Path=CheckBoxMot}"
                           Margin="0 0 10 5" />
                 <CheckBox Grid.Row="2"
                           Grid.Column="1"
                           Content="All"
-                          IsChecked="{Binding CheckBoxAll}"
+                          IsChecked="{Binding Path=CheckBoxAll}"
                           Margin="0 0 10 5" />
             </Grid>
 
@@ -92,37 +91,33 @@
                             Margin="0 0 0 10">
                     <TextBlock Text="Min"
                                Grid.Column="0"
-                               HorizontalAlignment="Right"
-                               Margin="0 0 0 2" />
+                               HorizontalAlignment="Right"/>
                     <msk:TimeSpanUpDown Width="auto"
-                                        Padding="5 0"
+                                        Padding="10 0"
                                         Foreground="#fff"
                                         Watermark="00:00:00"
                                         Minimum="00:00:00:000"
-                                        Value="{Binding MinValueTime}"
+                                        Value="{Binding Path=MinValueTimeExl}"
                                         TextAlignment="Right"
-                                        HorizontalAlignment="Right"
-                                        Margin="5 0 0 0" />
+                                        HorizontalAlignment="Right"/>
                     
                 </StackPanel>
                 <StackPanel Orientation="Vertical"
                             HorizontalAlignment="Right"
                             Grid.Column="1"
-                            Grid.Row="0"
-                            Margin="0 0 0 2">
+                            Grid.Row="0">
                     <TextBlock Text="Max"
                                HorizontalAlignment="Right"/>
                     <msk:TimeSpanUpDown Width="auto"
-                                        Padding="5 0"
+                                        Padding="10 0"
                                         Foreground="#fff"
                                         ClipValueToMinMax="True"
                                         AllowDrop="True"
                                         Watermark="00:00:00:000"
-                                        Value="{Binding MaxValueTime}"
+                                        Value="{Binding Path=MaxValueTimeExl}"
                                         TextAlignment="Right"
                                         Minimum="00:00:00"
-                                        HorizontalAlignment="Right"
-                                        Margin="5 0 0 0" />
+                                        HorizontalAlignment="Right"/>
                 </StackPanel>
                 <Button Grid.Row="2"
                         Width="100"
@@ -131,8 +126,8 @@
                         Content="Export"
                         VerticalAlignment="Bottom"
                         HorizontalAlignment="Right"
-                        Margin="0 10"
-                        Command="{Binding ExportToXLS}" />
+                        Margin="0 10 0 10"
+                        Command="{Binding Path=ExportDataToXLS}" />
             </Grid>
         </StackPanel>
     </Grid>

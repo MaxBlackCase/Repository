@@ -33,8 +33,10 @@
         </Grid.RowDefinitions>
         <Menu VerticalAlignment="Top"
               Grid.Row="0">
-            <MenuItem Header="File" IsEnabled="{Binding }">
-                <MenuItem Header="Expot Chart" Command="{Binding Path=ExportChart}" />
+            <MenuItem Header="File"
+                      IsEnabled="{Binding }">
+                <MenuItem Header="Expot Chart"
+                          Command="{Binding Path=ExportToExlWindow}" />
             </MenuItem>
         </Menu>
         <Grid Grid.Row="1">
@@ -319,7 +321,8 @@
                     <chart:SfChart.Behaviors>
                         <chart:ChartZoomPanBehavior ZoomRelativeToCursor="True"
                                                     EnableSelectionZooming="True"></chart:ChartZoomPanBehavior>
-                        <chart:ChartTrackBallBehavior UseSeriesPalette="True"  LineStyle="{StaticResource seriesLineStyle}" />
+                        <chart:ChartTrackBallBehavior UseSeriesPalette="True"
+                                                      LineStyle="{StaticResource seriesLineStyle}" />
                     </chart:SfChart.Behaviors>
                     <chart:FastLineSeries Label="Напряжение [В]"
                                           EnableAnimation="True"

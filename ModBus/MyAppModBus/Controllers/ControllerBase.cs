@@ -3,6 +3,7 @@ using Modbus.Device;
 using MyAppModBus.Context;
 using MyAppModBus.Models;
 using MyAppModBus.Models.DbModel;
+using MyAppModBus.View;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -69,7 +70,7 @@ namespace MyAppModBus.Controllers {
     #endregion
 
     public ControllerBase() {
-
+      _countTimeList = new List<double>();
       linePointGroup = new List<LineGroup>() {
         new LineGroup { NameLine = "Volltage" },
         new LineGroup { NameLine = "Current" },
@@ -77,6 +78,7 @@ namespace MyAppModBus.Controllers {
         new LineGroup { NameLine = "External" },
         new LineGroup { NameLine = "Motor" }
         };
+
     }
 
     /// <summary>
@@ -238,7 +240,7 @@ namespace MyAppModBus.Controllers {
             _registers.Add( $"Регистр: {item.ID}\t|  {item.Value}" );
           }
           _countTimes += _readWriteConvert;
-          //_countTimeList.Add( _countTimes );
+          _countTimeList.Add( _countTimes );
           _dTime = TimeSpan.FromMilliseconds( _countTimes );
           SetColorEllipses( result[ 9 ], result[ 10 ] );
           SetPointsSeries( result[ 0 ], 0, _volt );
@@ -406,7 +408,6 @@ namespace MyAppModBus.Controllers {
         _valReg = ConverValuesFfromRegisters( _valRegister, 17, 1300, 0.0, 80.0 );
         linePoints.Add( new LinePoint { LineGroupId = 1, Time = _dTime, Values = _valReg } );
         await Task.Run( () => {
-          _countTimeList.Add( _dTime.TotalMilliseconds );
           _voltListExl.Add( _valReg );
         } );
         break;
@@ -510,8 +511,7 @@ namespace MyAppModBus.Controllers {
         _errMessage = err.Message.ToString();
       }
     }
-
-    internal async void ExportDataToExcelAsync( TimeSpan _minValueTime, TimeSpan _maxValueTime, bool[] _arrBoolValues, List<string> _nameSeries ) {
+    internal async void ExportDataToExcelAsync( TimeSpan _minValueTime, TimeSpan _maxValueTime, bool[] _arrBoolValues, List<string> _nameSeries) {
 
       try {
 
@@ -544,7 +544,7 @@ namespace MyAppModBus.Controllers {
         foreach( var setTimeItem in _countTimeList ) {
           if( setTimeItem >= min && setTimeItem <= max ) {
             wsh.Cells[ timeValItem, 1 ] = setTimeItem;
-            timeValItem++;
+            timeValItem += 1;
           }
         }
 
@@ -627,10 +627,7 @@ namespace MyAppModBus.Controllers {
         _errMessage = err.Message.ToString();
 
       }
-
-
     }
-
   }
 }
 
